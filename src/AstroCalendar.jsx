@@ -154,17 +154,41 @@ const AstroCalendar = ({ isDarkMode = true }) => {
                             const isToday = isSameDay(date, new Date());
                             const { phase } = getMoonPhase(date);
                             
+                            // Calculate events for this specific day cell
+                            const dayEvents = getEventsForDate(date, coords.lat, coords.lon);
+                            const specialPhase = dayEvents.find(e => e.type === 'Phase');
+                            const observations = dayEvents.filter(e => e.type === 'Observation');
+
                             return (
                                 <button
                                     key={day}
                                     onClick={() => setSelectedDate(date)}
-                                    className={`relative aspect-square p-2 border rounded-lg flex flex-col justify-between transition-all
+                                    className={`relative aspect-square p-1.5 border rounded-lg flex flex-col justify-between transition-all overflow-hidden group
                                         ${isSelected ? 'border-orange-500 bg-orange-500/10 ring-1 ring-orange-500' : isDarkMode ? 'border-zinc-800 bg-zinc-900 hover:border-zinc-600' : 'border-zinc-200 bg-white hover:border-zinc-400'}
                                     `}
                                 >
-                                    <span className={`text-sm font-bold ${isToday ? 'text-orange-500' : ''}`}>{day}</span>
-                                    <div className="self-end opacity-50">
-                                        <Moon size={16} className={phase > 180 ? "scale-x-[-1]" : ""} fill={phase > 170 && phase < 190 ? "currentColor" : "none"} />
+                                    <div className="flex justify-between items-start w-full z-10">
+                                        <span className={`text-xs font-bold ${isToday ? 'text-orange-500' : ''}`}>{day}</span>
+                                        {specialPhase && (
+                                            <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" title={specialPhase.name}></div>
+                                        )}
+                                    </div>
+                                    
+                                    {/* Mini Event List */}
+                                    <div className="flex flex-col gap-0.5 mt-1 w-full z-10">
+                                        {observations.slice(0, 2).map((obs, idx) => (
+                                            <div key={idx} className="flex items-center gap-1 text-[9px] opacity-60 truncate">
+                                                <Star size={8} className="text-yellow-500 shrink-0" />
+                                                <span className="truncate">{obs.name.split(' ')[0]}</span>
+                                            </div>
+                                        ))}
+                                        {observations.length > 2 && (
+                                            <div className="text-[9px] opacity-40 pl-3">+{observations.length - 2}</div>
+                                        )}
+                                    </div>
+
+                                    <div className="absolute bottom-1 right-1 opacity-20 group-hover:opacity-40 transition-opacity">
+                                        <Moon size={24} className={phase > 180 ? "scale-x-[-1]" : ""} fill={phase > 170 && phase < 190 ? "currentColor" : "none"} />
                                     </div>
                                 </button>
                             );
