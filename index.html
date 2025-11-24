@@ -1,13 +1,55 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>personnal-site</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accueil - Mon Site Personnel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-zinc-950 text-zinc-100 h-screen flex flex-col items-center justify-center font-sans selection:bg-orange-500/30">
+
+    <div class="max-w-2xl text-center space-y-8 p-6">
+        <div class="space-y-2">
+            <h1 class="text-4xl sm:text-6xl font-black uppercase tracking-tighter">
+                Bienvenue <span class="text-orange-500">Explorateur</span>
+            </h1>
+            <p class="text-zinc-400 text-lg sm:text-xl font-light">
+                Portail d'accès aux outils astronomiques et projets personnels.
+            </p>
+        </div>
+
+        <div class="grid gap-4 w-full max-w-md mx-auto">
+            <a href="astrocalendar.html" class="group relative flex items-center gap-4 p-4 rounded-xl border border-zinc-800 bg-zinc-900/50 hover:border-orange-500/50 hover:bg-zinc-900 transition-all">
+                <div class="p-3 rounded-lg bg-zinc-950 border border-zinc-800 group-hover:border-orange-500/30 group-hover:text-orange-500 transition-colors">
+                    <i data-lucide="calendar" class="w-6 h-6"></i>
+                </div>
+                <div class="text-left">
+                    <h3 class="font-bold text-lg group-hover:text-orange-500 transition-colors">AstroCalendar</h3>
+                    <p class="text-sm text-zinc-500">Calendrier lunaire et éphémérides en temps réel.</p>
+                </div>
+                <i data-lucide="arrow-right" class="absolute right-4 w-5 h-5 text-zinc-600 group-hover:text-orange-500 group-hover:translate-x-1 transition-all"></i>
+            </a>
+
+            <!-- Placeholder for other projects -->
+            <div class="group relative flex items-center gap-4 p-4 rounded-xl border border-zinc-800 bg-zinc-900/20 opacity-50 cursor-not-allowed">
+                <div class="p-3 rounded-lg bg-zinc-950 border border-zinc-800">
+                    <i data-lucide="rocket" class="w-6 h-6"></i>
+                </div>
+                <div class="text-left">
+                    <h3 class="font-bold text-lg">Projet Ganymede</h3>
+                    <p class="text-sm text-zinc-500">En cours de développement...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="absolute bottom-6 text-zinc-600 text-xs font-mono">
+        SYSTEM_ONLINE // v1.0.0
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
 </html>

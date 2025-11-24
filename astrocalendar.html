@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroCalendar</title>
+    
+    <!-- Tailwind CSS (via CDN for simplicity) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Astronomy Engine -->
+    <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #52525b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #71717a; }
+        
+        /* Hide scrollbar for clean UI but allow scroll */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 h-screen overflow-hidden flex flex-col font-sans selection:bg-orange-500/30">
+    
+    <!-- Main App Container -->
+    <div id="app" class="flex-1 flex flex-col lg:flex-row h-full w-full overflow-hidden relative">
+        <!-- Content will be injected by script.js -->
+    </div>
+    
+    <!-- Back to Home Button (Absolute positioning) -->
+    <a href="index.html" class="absolute top-4 right-4 z-50 p-2 bg-zinc-900/80 backdrop-blur border border-zinc-700 rounded-lg hover:border-orange-500 text-zinc-400 hover:text-orange-500 transition-all">
+        <i data-lucide="home" class="w-5 h-5"></i>
+    </a>
+
+    <script src="script.js"></script>
+</body>
+</html>
