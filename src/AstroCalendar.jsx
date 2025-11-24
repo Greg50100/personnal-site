@@ -44,6 +44,49 @@ const getMoonPhase = (date) => {
     };
 };
 
+const getGridEvents = (date) => {
+    const events = [];
+    
+    // 1. Moon Phase (Exact)
+    const phase = Astronomy.MoonPhase(date);
+    if (Math.abs(phase - 0) < 10) events.push({ type: 'Phase', name: 'Nouvelle Lune', icon: Moon });
+    else if (Math.abs(phase - 90) < 10) events.push({ type: 'Phase', name: '1er Quartier', icon: Moon });
+    else if (Math.abs(phase - 180) < 10) events.push({ type: 'Phase', name: 'Pleine Lune', icon: Moon });
+    else if (Math.abs(phase - 270) < 10) events.push({ type: 'Phase', name: 'Dernier Quartier', icon: Moon });
+
+    // 2. Conjunctions & Oppositions (Fast Check)
+    const bodies = [
+        { name: 'Mercure', id: Astronomy.Body.Mercury },
+        { name: 'Vénus', id: Astronomy.Body.Venus },
+        { name: 'Mars', id: Astronomy.Body.Mars },
+        { name: 'Jupiter', id: Astronomy.Body.Jupiter },
+        { name: 'Saturne', id: Astronomy.Body.Saturn }
+    ];
+
+    try {
+        // Moon-Planet Conjunctions
+        bodies.forEach(p => {
+            const sep = Astronomy.Separation(Astronomy.Body.Moon, p.id, date);
+            if (sep < 6) { 
+                 events.push({ type: 'Conjunction', name: `Lune-${p.name}`, icon: GitMerge });
+            }
+        });
+
+        // Planet-Sun Oppositions
+        bodies.forEach(p => {
+            if (p.name === 'Mercure' || p.name === 'Vénus') return;
+            const el = Astronomy.Elongation(p.id, date);
+            if (el > 170) { 
+                 events.push({ type: 'Opposition', name: `Opp. ${p.name}`, icon: ArrowLeftRight });
+            }
+        });
+    } catch (e) {
+        // Silent fail for grid
+    }
+
+    return events;
+};
+
 const getEventsForDate = (date, lat, lon) => {
     const events = [];
     const observer = new Astronomy.Observer(lat, lon, 0);
@@ -62,40 +105,9 @@ const getEventsForDate = (date, lat, lon) => {
     if (moonRise) events.push({ type: 'Ephemeris', name: 'Lever Lune', time: moonRise.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), icon: Moon, action: 'Lever' });
     if (moonSet) events.push({ type: 'Ephemeris', name: 'Coucher Lune', time: moonSet.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), icon: Moon, action: 'Coucher' });
 
-    // 3. Moon Phase (Exact)
-    const phase = Astronomy.MoonPhase(date);
-    if (Math.abs(phase - 0) < 10) events.push({ type: 'Phase', name: 'Nouvelle Lune', icon: Moon });
-    else if (Math.abs(phase - 90) < 10) events.push({ type: 'Phase', name: '1er Quartier', icon: Moon });
-    else if (Math.abs(phase - 180) < 10) events.push({ type: 'Phase', name: 'Pleine Lune', icon: Moon });
-    else if (Math.abs(phase - 270) < 10) events.push({ type: 'Phase', name: 'Dernier Quartier', icon: Moon });
-
-    // 4. Conjunctions & Oppositions
-    const bodies = [
-        { name: 'Mercure', id: Astronomy.Body.Mercury },
-        { name: 'Vénus', id: Astronomy.Body.Venus },
-        { name: 'Mars', id: Astronomy.Body.Mars },
-        { name: 'Jupiter', id: Astronomy.Body.Jupiter },
-        { name: 'Saturne', id: Astronomy.Body.Saturn }
-    ];
-
-    // Moon-Planet Conjunctions
-    bodies.forEach(p => {
-        const search = Astronomy.SearchRelativeLongitude(Astronomy.Body.Moon, p.id, 0, date, 1);
-        if (search && search.time.date.getDate() === date.getDate()) {
-             events.push({ type: 'Conjunction', name: `Lune-${p.name}`, icon: GitMerge });
-        }
-    });
-
-    // Planet-Sun Oppositions
-    bodies.forEach(p => {
-        if (p.name === 'Mercure' || p.name === 'Vénus') return;
-        const search = Astronomy.SearchRelativeLongitude(p.id, Astronomy.Body.Sun, 180, date, 1);
-        if (search && search.time.date.getDate() === date.getDate()) {
-             events.push({ type: 'Opposition', name: `Opp. ${p.name}`, icon: ArrowLeftRight });
-        }
-    });
-
-    return events;
+    // Add grid events to detailed view
+    const gridEvents = getGridEvents(date);
+    return [...events, ...gridEvents];
 };
 
 const isSameDay = (d1, d2) => {
@@ -167,8 +179,8 @@ const AstroCalendar = ({ isDarkMode = true }) => {
                             const isToday = isSameDay(date, new Date());
                             const { phase, illumination } = getMoonPhase(date);
                             
-                            // Calculate events for this specific day cell
-                            const dayEvents = getEventsForDate(date, coords.lat, coords.lon);
+                            // Calculate events for this specific day cell using the FAST function
+                            const dayEvents = getGridEvents(date);
                             const specialEvents = dayEvents.filter(e => e.type === 'Conjunction' || e.type === 'Opposition');
 
                             return (
