@@ -105,18 +105,37 @@ function calculateMonthEvents(year, month) {
         }
     }
 
-    // 5. Max Elongation (Mercury, Venus)
+    // 5. Max Elongation & Conjunctions (Mercury, Venus)
     const innerPlanets = [
         { name: 'Mercure', id: Astronomy.Body.Mercury },
         { name: 'Vénus', id: Astronomy.Body.Venus }
     ];
     for (const p of innerPlanets) {
+        // Max Elongation
         let d = startDate;
         while (d < endDate) {
             const elon = Astronomy.SearchMaxElongation(p.id, d);
             if (!elon || elon.date >= endDate) break;
             addEvent(elon.date, { type: 'Elongation', name: `Elong. Max ${p.name}`, icon: 'maximize-2', time: elon.date });
             d = new Date(elon.date.getTime() + 24 * 3600 * 1000);
+        }
+
+        // Inferior Conjunction (Relative Longitude 0)
+        d = startDate;
+        while (d < endDate) {
+            const conj = Astronomy.SearchRelativeLongitude(p.id, 0, d);
+            if (!conj || conj.date >= endDate) break;
+            addEvent(conj.date, { type: 'Conjunction', name: `Conjonction Inf. ${p.name}`, icon: 'git-merge', time: conj.date });
+            d = new Date(conj.date.getTime() + 24 * 3600 * 1000);
+        }
+
+        // Superior Conjunction (Relative Longitude 180)
+        d = startDate;
+        while (d < endDate) {
+            const conj = Astronomy.SearchRelativeLongitude(p.id, 180, d);
+            if (!conj || conj.date >= endDate) break;
+            addEvent(conj.date, { type: 'Conjunction', name: `Conjonction Sup. ${p.name}`, icon: 'git-merge', time: conj.date });
+            d = new Date(conj.date.getTime() + 24 * 3600 * 1000);
         }
     }
 
