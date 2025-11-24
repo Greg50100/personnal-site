@@ -3,10 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AstroCalendar</title>
+    <title>AstroCalendar - GREG.MECH</title>
     
-    <!-- Tailwind CSS (via CDN for simplicity) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
     
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -14,14 +26,16 @@
     <!-- Astronomy Engine -->
     <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
 
+    <!-- Fonts -->
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;700;900&display=swap');
+        
         /* Custom scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #52525b; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #71717a; }
         
-        /* Hide scrollbar for clean UI but allow scroll */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -33,9 +47,9 @@
         <!-- Content will be injected by script.js -->
     </div>
     
-    <!-- Back to Home Button (Absolute positioning) -->
-    <a href="index.html" class="absolute top-4 right-4 z-50 p-2 bg-zinc-900/80 backdrop-blur border border-zinc-700 rounded-lg hover:border-orange-500 text-zinc-400 hover:text-orange-500 transition-all">
-        <i data-lucide="home" class="w-5 h-5"></i>
+    <!-- Back to Home Button -->
+    <a href="index.html" class="absolute top-4 right-4 z-50 p-2 bg-zinc-900/80 backdrop-blur border border-zinc-700 rounded-lg hover:border-orange-500 text-zinc-400 hover:text-orange-500 transition-all group">
+        <i data-lucide="home" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
     </a>
 
     <script src="script.js"></script>

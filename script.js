@@ -18,10 +18,154 @@ let state = {
     viewDate: new Date(),
     selectedDate: new Date(),
     coords: { lat: 48.8566, lon: 2.3522, name: "Paris" },
-    isDarkMode: true
+    isDarkMode: true,
+    monthEvents: {} // Cache for the current month's events
 };
 
 // --- HELPER FUNCTIONS ---
+
+function calculateMonthEvents(year, month) {
+    const events = {}; // Key: "YYYY-M-D", Value: Array of objects
+    const startDate = new Date(year, month, 1);
+    // Go a bit into the next month to cover the grid
+    const endDate = new Date(year, month + 2, 1); 
+
+    function addEvent(date, event) {
+        const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+        if (!events[key]) events[key] = [];
+        events[key].push(event);
+    }
+
+    // 1. Moon Phases
+    for (let phase = 0; phase < 360; phase += 90) {
+        let d = startDate;
+        while (d < endDate) {
+            const m = Astronomy.SearchMoonPhase(phase, d, 40);
+            if (!m || m.date >= endDate) break;
+            let name = '';
+            if (phase === 0) name = 'Nouvelle Lune';
+            else if (phase === 90) name = 'Premier Quartier';
+            else if (phase === 180) name = 'Pleine Lune';
+            else if (phase === 270) name = 'Dernier Quartier';
+            
+            addEvent(m.date, { type: 'Phase', name, icon: 'moon', time: m.date });
+            d = new Date(m.date.getTime() + 24 * 3600 * 1000);
+        }
+    }
+
+    // 2. Moon Apsis (Perigee/Apogee)
+    let d = startDate;
+    while (d < endDate) {
+        const apsis = Astronomy.SearchLunarApsis(d);
+        if (!apsis || apsis.date >= endDate) break;
+        const name = apsis.dist_km < 370000 ? 'Périgée Lunaire' : 'Apogée Lunaire';
+        addEvent(apsis.date, { type: 'Apsis', name, icon: 'move-vertical', time: apsis.date });
+        d = new Date(apsis.date.getTime() + 24 * 3600 * 1000);
+    }
+
+    // 3. Seasons
+    const seasons = Astronomy.Seasons(year);
+    const seasonEvents = [
+        { date: seasons.mar_equinox, name: 'Équinoxe de Printemps' },
+        { date: seasons.jun_solstice, name: 'Solstice d\'Été' },
+        { date: seasons.sep_equinox, name: 'Équinoxe d\'Automne' },
+        { date: seasons.dec_solstice, name: 'Solstice d\'Hiver' }
+    ];
+    for (const s of seasonEvents) {
+        if (s.date >= startDate && s.date < endDate) {
+            addEvent(s.date, { type: 'Season', name: s.name, icon: 'sun', time: s.date });
+        }
+    }
+
+    // 4. Planet Oppositions (Superior Planets) & Conjunctions
+    const planets = [
+        { name: 'Mars', id: Astronomy.Body.Mars },
+        { name: 'Jupiter', id: Astronomy.Body.Jupiter },
+        { name: 'Saturne', id: Astronomy.Body.Saturn },
+        { name: 'Uranus', id: Astronomy.Body.Uranus },
+        { name: 'Neptune', id: Astronomy.Body.Neptune }
+    ];
+
+    for (const p of planets) {
+        // Opposition (Relative Longitude 180)
+        let d = startDate;
+        while (d < endDate) {
+            const opp = Astronomy.SearchRelativeLongitude(p.id, 180, d);
+            if (!opp || opp.date >= endDate) break;
+            addEvent(opp.date, { type: 'Opposition', name: `Opposition ${p.name}`, icon: 'arrow-left-right', time: opp.date });
+            d = new Date(opp.date.getTime() + 24 * 3600 * 1000);
+        }
+        // Conjunction (Relative Longitude 0)
+        d = startDate;
+        while (d < endDate) {
+            const conj = Astronomy.SearchRelativeLongitude(p.id, 0, d);
+            if (!conj || conj.date >= endDate) break;
+            addEvent(conj.date, { type: 'Conjunction', name: `Conjonction ${p.name}`, icon: 'git-merge', time: conj.date });
+            d = new Date(conj.date.getTime() + 24 * 3600 * 1000);
+        }
+    }
+
+    // 5. Max Elongation (Mercury, Venus)
+    const innerPlanets = [
+        { name: 'Mercure', id: Astronomy.Body.Mercury },
+        { name: 'Vénus', id: Astronomy.Body.Venus }
+    ];
+    for (const p of innerPlanets) {
+        let d = startDate;
+        while (d < endDate) {
+            const elon = Astronomy.SearchMaxElongation(p.id, d);
+            if (!elon || elon.date >= endDate) break;
+            addEvent(elon.date, { type: 'Elongation', name: `Elong. Max ${p.name}`, icon: 'maximize-2', time: elon.date });
+            d = new Date(elon.date.getTime() + 24 * 3600 * 1000);
+        }
+    }
+
+    // 6. Planet-Planet & Moon-Planet Conjunctions (Iterative Check)
+    const brightBodies = [
+        { name: 'Lune', id: Astronomy.Body.Moon },
+        { name: 'Mercure', id: Astronomy.Body.Mercury },
+        { name: 'Vénus', id: Astronomy.Body.Venus },
+        { name: 'Mars', id: Astronomy.Body.Mars },
+        { name: 'Jupiter', id: Astronomy.Body.Jupiter },
+        { name: 'Saturne', id: Astronomy.Body.Saturn }
+    ];
+
+    let iterDate = new Date(startDate);
+    while (iterDate < endDate) {
+        // Check pairs
+        for (let i = 0; i < brightBodies.length; i++) {
+            for (let j = i + 1; j < brightBodies.length; j++) {
+                const body1 = brightBodies[i];
+                const body2 = brightBodies[j];
+                
+                // Skip Moon-Moon obviously
+                
+                const sep = Astronomy.Separation(body1.id, body2.id, iterDate);
+                if (sep.angle < 4.0) {
+                    // Check visibility (elongation from Sun)
+                    const el1 = Astronomy.Elongation(body1.id, iterDate);
+                    const el2 = Astronomy.Elongation(body2.id, iterDate);
+                    
+                    if (el1.elongation > 15 && el2.elongation > 15) {
+                        addEvent(new Date(iterDate), {
+                            type: 'Conjunction',
+                            name: `Conj. ${body1.name}-${body2.name}`,
+                            icon: 'git-merge',
+                            time: new Date(iterDate)
+                        });
+                    }
+                }
+            }
+        }
+        
+        // 7. Venus Peak Magnitude (Approximate via Elongation check or just skip for now as it's complex)
+        // We stick to the main events for now.
+
+        iterDate.setDate(iterDate.getDate() + 1);
+    }
+
+    return events;
+}
 
 function getMoonPhase(date) {
     const phase = Astronomy.MoonPhase(date); // 0 to 360
@@ -48,46 +192,9 @@ function getMoonPhase(date) {
 }
 
 function getGridEvents(date) {
-    const events = [];
-    
-    // 1. Moon Phase (Exact)
-    const phase = Astronomy.MoonPhase(date);
-    if (Math.abs(phase - 0) < 10) events.push({ type: 'Phase', name: 'Nouvelle Lune', icon: 'moon' });
-    else if (Math.abs(phase - 90) < 10) events.push({ type: 'Phase', name: '1er Quartier', icon: 'moon' });
-    else if (Math.abs(phase - 180) < 10) events.push({ type: 'Phase', name: 'Pleine Lune', icon: 'moon' });
-    else if (Math.abs(phase - 270) < 10) events.push({ type: 'Phase', name: 'Dernier Quartier', icon: 'moon' });
-
-    // 2. Conjunctions & Oppositions (Fast Check)
-    const bodies = [
-        { name: 'Mercure', id: Astronomy.Body.Mercury },
-        { name: 'Vénus', id: Astronomy.Body.Venus },
-        { name: 'Mars', id: Astronomy.Body.Mars },
-        { name: 'Jupiter', id: Astronomy.Body.Jupiter },
-        { name: 'Saturne', id: Astronomy.Body.Saturn }
-    ];
-
-    try {
-        // Moon-Planet Conjunctions
-        bodies.forEach(p => {
-            const sep = Astronomy.Separation(Astronomy.Body.Moon, p.id, date);
-            if (sep < 6) { 
-                 events.push({ type: 'Conjunction', name: `Lune-${p.name}`, icon: 'git-merge' });
-            }
-        });
-
-        // Planet-Sun Oppositions
-        bodies.forEach(p => {
-            if (p.name === 'Mercure' || p.name === 'Vénus') return;
-            const el = Astronomy.Elongation(p.id, date);
-            if (el > 170) { 
-                 events.push({ type: 'Opposition', name: `Opp. ${p.name}`, icon: 'arrow-left-right' });
-            }
-        });
-    } catch (e) {
-        // Silent fail
-    }
-
-    return events;
+    const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+    // Copy cached events
+    return [...(state.monthEvents[key] || [])];
 }
 
 function getEventsForDate(date, lat, lon) {
@@ -108,9 +215,18 @@ function getEventsForDate(date, lat, lon) {
     if (moonRise) events.push({ type: 'Ephemeris', name: 'Lever Lune', time: moonRise.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), icon: 'moon', action: 'Lever' });
     if (moonSet) events.push({ type: 'Ephemeris', name: 'Coucher Lune', time: moonSet.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), icon: 'moon', action: 'Coucher' });
 
-    // Add grid events
+    // Add grid events (which now include advanced events)
     const gridEvents = getGridEvents(date);
-    return [...events, ...gridEvents];
+    
+    // Format times for advanced events if they exist
+    const formattedGridEvents = gridEvents.map(e => {
+        if (e.time && e.time instanceof Date) {
+            return { ...e, time: e.time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) };
+        }
+        return e;
+    });
+
+    return [...events, ...formattedGridEvents];
 }
 
 function isSameDay(d1, d2) {
@@ -270,12 +386,14 @@ function render() {
 
 window.changeMonth = (delta) => {
     state.viewDate = new Date(state.viewDate.getFullYear(), state.viewDate.getMonth() + delta, 1);
+    state.monthEvents = calculateMonthEvents(state.viewDate.getFullYear(), state.viewDate.getMonth());
     render();
 };
 
 window.goToToday = () => {
     state.viewDate = new Date();
     state.selectedDate = new Date();
+    state.monthEvents = calculateMonthEvents(state.viewDate.getFullYear(), state.viewDate.getMonth());
     render();
 };
 
@@ -297,5 +415,6 @@ window.handleGeolocation = () => {
 
 // --- INIT ---
 document.addEventListener('DOMContentLoaded', () => {
+    state.monthEvents = calculateMonthEvents(state.viewDate.getFullYear(), state.viewDate.getMonth());
     render();
 });
