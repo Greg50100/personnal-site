@@ -428,7 +428,7 @@ const AstroCalendar = ({ isDarkMode = true }) => {
 
   if (!isLibLoaded) {
       return (
-          <div className={`w-full h-96 flex flex-col items-center justify-center ${isDarkMode ? 'bg-zinc-900 text-zinc-200' : 'bg-white text-zinc-800'}`}>
+          <div className={`w-full h-full flex flex-col items-center justify-center ${isDarkMode ? 'bg-zinc-900 text-zinc-200' : 'bg-white text-zinc-800'}`}>
               <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-4"></div>
               <p className="text-sm font-mono">Chargement des données astronomiques...</p>
           </div>
@@ -436,7 +436,7 @@ const AstroCalendar = ({ isDarkMode = true }) => {
   }
 
   return (
-    <div className={`w-full h-full mx-auto ${isDarkMode ? 'bg-zinc-900 text-zinc-200' : 'bg-white text-zinc-800'} shadow-2xl flex flex-col lg:flex-row overflow-hidden font-sans`}>
+    <div className={`w-full h-full mx-auto ${isDarkMode ? 'bg-zinc-900 text-zinc-200' : 'bg-white text-zinc-800'} flex flex-col lg:flex-row overflow-hidden font-sans`}>
       
         {/* --- LEFT: CALENDAR GRID --- */}
         <div className="flex-1 flex flex-col border-r border-zinc-800/50">

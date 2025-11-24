@@ -452,10 +452,10 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.4, ease: "circOut" }}
-            className={`fixed inset-0 z-[100] overflow-y-auto ${isDarkMode ? 'bg-zinc-950' : 'bg-zinc-50'}`}
+            className={`fixed inset-0 z-[100] flex flex-col ${isDarkMode ? 'bg-zinc-950' : 'bg-zinc-50'}`}
           >
             {/* Module Header */}
-            <div className={`sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b ${isDarkMode ? 'bg-zinc-950/90 border-zinc-800' : 'bg-zinc-50/90 border-zinc-200'} backdrop-blur-md`}>
+            <div className={`flex-none flex items-center justify-between px-6 py-4 border-b ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-zinc-50 border-zinc-200'}`}>
                 <div className="flex items-center gap-4">
                     <button 
                         onClick={handleCloseProject}
@@ -477,7 +477,7 @@ export default function App() {
             </div>
 
             {/* Module Content */}
-            <div className="w-full min-h-[calc(100vh-80px)] flex flex-col">
+            <div className="flex-1 w-full relative overflow-hidden">
                <AstroCalendar isDarkMode={isDarkMode} />
             </div>
           </motion.div>
