@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import * as Astronomy from 'astronomy-engine';
 import { Moon, Sun, Star, ChevronLeft, ChevronRight, Info, Rocket, Locate, Download, Leaf, GitMerge, ArrowLeftRight, Clock, MapPin } from 'lucide-react';
 
 // --- CONFIGURATION & CONSTANTS (Static) ---
@@ -17,13 +18,6 @@ const METEOR_SHOWERS = [
 
 // --- HELPER FUNCTIONS ---
 
-const getAstronomy = () => {
-    if (typeof window !== 'undefined' && window.Astronomy) {
-        return window.Astronomy;
-    }
-    return null;
-};
-
 const formatTime = (t) => {
     if (!t || !t.date) return '--:--';
     try {
@@ -41,9 +35,6 @@ const isSameDay = (d1, d2) => {
 };
 
 const getMoonPhaseData = (date) => {
-    const Astronomy = getAstronomy();
-    if (!Astronomy) return { phase: 0, phaseName: '', illumination: 0 };
-
     try {
         const phase = Astronomy.MoonPhase(date);
         const illum = Astronomy.Illumination(Astronomy.Body.Moon, date);
@@ -127,9 +118,6 @@ const EventIcon = ({ type, className }) => {
 };
 
 const getAstronomicalEvents = (date, observer) => {
-    const Astronomy = getAstronomy();
-    if (!Astronomy) return [];
-
     const PLANETS = [
         { id: Astronomy.Body.Mercury, name: "Mercure" },
         { id: Astronomy.Body.Venus, name: "Vénus" },
@@ -273,9 +261,6 @@ const getAstronomicalEvents = (date, observer) => {
 };
 
 const getDayEventsSummary = (date) => {
-    const Astronomy = getAstronomy();
-    if (!Astronomy) return [];
-
     const events = [];
     try {
         // 1. Moon Phase
@@ -348,30 +333,11 @@ const getDayEventsSummary = (date) => {
 };
 
 const AstroCalendar = ({ isDarkMode = true }) => {
-  const [isLibLoaded, setIsLibLoaded] = useState(false);
   const [viewDate, setViewDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [latitude, setLatitude] = useState(46.2276);
   const [longitude, setLongitude] = useState(2.2137);
   const [locationName, setLocationName] = useState("France (Défaut)");
-
-  useEffect(() => {
-    if (window.Astronomy) {
-        setIsLibLoaded(true);
-        return;
-    }
-    const script = document.createElement('script');
-    script.src = "https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js";
-    script.async = true;
-    script.onload = () => {
-        setIsLibLoaded(true);
-    };
-    document.body.appendChild(script);
-
-    return () => {
-        // Optional: remove script if needed, but usually better to keep it
-    }
-  }, []);
 
   const handleGeolocation = () => {
     if ("geolocation" in navigator) {
@@ -389,12 +355,9 @@ const AstroCalendar = ({ isDarkMode = true }) => {
   };
 
   const selectedEvents = useMemo(() => {
-    if (!isLibLoaded) return [];
-    const Astronomy = getAstronomy();
-    if (!Astronomy) return [];
     const observer = new Astronomy.Observer(latitude, longitude, 0);
     return getAstronomicalEvents(selectedDate, observer);
-  }, [selectedDate, latitude, longitude, isLibLoaded]);
+  }, [selectedDate, latitude, longitude]);
 
   const daysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
   const firstDayOfMonth = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1).getDay();
@@ -426,17 +389,8 @@ const AstroCalendar = ({ isDarkMode = true }) => {
   const weekDays = ['LUN', 'MAR', 'MER', 'JEU', 'VEN', 'SAM', 'DIM'];
   const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
 
-  if (!isLibLoaded) {
-      return (
-          <div className={`w-full h-full flex flex-col items-center justify-center ${isDarkMode ? 'bg-zinc-900 text-zinc-200' : 'bg-white text-zinc-800'}`}>
-              <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-              <p className="text-sm font-mono">Chargement des données astronomiques...</p>
-          </div>
-      );
-  }
-
   return (
-    <div className={`w-full h-full mx-auto ${isDarkMode ? 'bg-zinc-900 text-zinc-200' : 'bg-white text-zinc-800'} flex flex-col lg:flex-row overflow-hidden font-sans`}>
+    <div className={`flex flex-col lg:flex-row h-full overflow-hidden ${isDarkMode ? 'bg-zinc-950 text-zinc-200' : 'bg-zinc-50 text-zinc-800'}`}>
       
         {/* --- LEFT: CALENDAR GRID --- */}
         <div className="flex-1 flex flex-col border-r border-zinc-800/50">
