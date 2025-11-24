@@ -231,7 +231,10 @@ const ProjectCard = ({ project, isDarkMode, onOpen }) => (
     <div className="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-orange-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
     <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-orange-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
-    <div className={`h-40 w-full overflow-hidden flex items-center justify-center border-b ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-zinc-100 border-zinc-200'}`}>
+    <div 
+      onClick={() => project.id === 4 && onOpen(project)}
+      className={`h-40 w-full overflow-hidden flex items-center justify-center border-b ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-zinc-100 border-zinc-200'} ${project.id === 4 ? 'cursor-pointer' : ''}`}
+    >
       <Code size={40} className={`transition-colors ${isDarkMode ? 'text-zinc-700 group-hover:text-orange-500' : 'text-zinc-400 group-hover:text-orange-600'}`} />
     </div>
     
@@ -257,7 +260,14 @@ const ProjectCard = ({ project, isDarkMode, onOpen }) => (
             <Github size={16} className="mr-2" /> CODE
           </a>
           {project.id === 4 ? (
-             <button onClick={() => onOpen(project)} className={`text-sm font-bold flex items-center transition-colors ${isDarkMode ? 'text-zinc-500 hover:text-orange-500' : 'text-zinc-500 hover:text-orange-600'}`}>
+             <button 
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpen(project);
+                }} 
+                className={`text-sm font-bold flex items-center transition-colors ${isDarkMode ? 'text-zinc-500 hover:text-orange-500' : 'text-zinc-500 hover:text-orange-600'}`}
+             >
                 <ExternalLink size={16} className="mr-2" /> DEMO
              </button>
           ) : (
