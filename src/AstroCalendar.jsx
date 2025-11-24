@@ -52,33 +52,46 @@ const getEventsForDate = (date, lat, lon) => {
     const sunRise = Astronomy.SearchRiseSet(Astronomy.Body.Sun, observer, +1, date, 1);
     const sunSet = Astronomy.SearchRiseSet(Astronomy.Body.Sun, observer, -1, date, 1);
     
-    if (sunRise) events.push({ type: 'Ephemeris', name: 'Lever du Soleil', time: sunRise.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), icon: Sun, action: 'Lever' });
-    if (sunSet) events.push({ type: 'Ephemeris', name: 'Coucher du Soleil', time: sunSet.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), icon: Sun, action: 'Coucher' });
+    if (sunRise) events.push({ type: 'Ephemeris', name: 'Lever Soleil', time: sunRise.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), icon: Sun, action: 'Lever' });
+    if (sunSet) events.push({ type: 'Ephemeris', name: 'Coucher Soleil', time: sunSet.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), icon: Sun, action: 'Coucher' });
 
     // 2. Moon Rise/Set
     const moonRise = Astronomy.SearchRiseSet(Astronomy.Body.Moon, observer, +1, date, 1);
     const moonSet = Astronomy.SearchRiseSet(Astronomy.Body.Moon, observer, -1, date, 1);
 
-    if (moonRise) events.push({ type: 'Ephemeris', name: 'Lever de la Lune', time: moonRise.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), icon: Moon, action: 'Lever' });
-    if (moonSet) events.push({ type: 'Ephemeris', name: 'Coucher de la Lune', time: moonSet.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), icon: Moon, action: 'Coucher' });
+    if (moonRise) events.push({ type: 'Ephemeris', name: 'Lever Lune', time: moonRise.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), icon: Moon, action: 'Lever' });
+    if (moonSet) events.push({ type: 'Ephemeris', name: 'Coucher Lune', time: moonSet.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), icon: Moon, action: 'Coucher' });
 
     // 3. Moon Phase (Exact)
     const phase = Astronomy.MoonPhase(date);
-    if (Math.abs(phase - 0) < 5) events.push({ type: 'Phase', name: 'Nouvelle Lune', time: '', icon: Moon });
-    else if (Math.abs(phase - 90) < 5) events.push({ type: 'Phase', name: 'Premier Quartier', time: '', icon: Moon });
-    else if (Math.abs(phase - 180) < 5) events.push({ type: 'Phase', name: 'Pleine Lune', time: '', icon: Moon });
-    else if (Math.abs(phase - 270) < 5) events.push({ type: 'Phase', name: 'Dernier Quartier', time: '', icon: Moon });
+    if (Math.abs(phase - 0) < 10) events.push({ type: 'Phase', name: 'Nouvelle Lune', icon: Moon });
+    else if (Math.abs(phase - 90) < 10) events.push({ type: 'Phase', name: '1er Quartier', icon: Moon });
+    else if (Math.abs(phase - 180) < 10) events.push({ type: 'Phase', name: 'Pleine Lune', icon: Moon });
+    else if (Math.abs(phase - 270) < 10) events.push({ type: 'Phase', name: 'Dernier Quartier', icon: Moon });
 
-    // 4. Planet Visibility (Simplified)
-    // Check if planets are visible in the evening sky (altitude > 10 deg at 22:00)
-    const eveningTime = new Date(date);
-    eveningTime.setHours(22, 0, 0);
-    
-    PLANETS.forEach(planet => {
-        const equ = Astronomy.Equator(planet, eveningTime, observer, true, true);
-        const hor = Astronomy.Horizon(eveningTime, observer, equ.ra, equ.dec, 'normal');
-        if (hor.altitude > 10) {
-            events.push({ type: 'Observation', name: `${planet} visible`, time: 'Soirée', icon: Star });
+    // 4. Conjunctions & Oppositions
+    const bodies = [
+        { name: 'Mercure', id: Astronomy.Body.Mercury },
+        { name: 'Vénus', id: Astronomy.Body.Venus },
+        { name: 'Mars', id: Astronomy.Body.Mars },
+        { name: 'Jupiter', id: Astronomy.Body.Jupiter },
+        { name: 'Saturne', id: Astronomy.Body.Saturn }
+    ];
+
+    // Moon-Planet Conjunctions
+    bodies.forEach(p => {
+        const search = Astronomy.SearchRelativeLongitude(Astronomy.Body.Moon, p.id, 0, date, 1);
+        if (search && search.time.date.getDate() === date.getDate()) {
+             events.push({ type: 'Conjunction', name: `Lune-${p.name}`, icon: GitMerge });
+        }
+    });
+
+    // Planet-Sun Oppositions
+    bodies.forEach(p => {
+        if (p.name === 'Mercure' || p.name === 'Vénus') return;
+        const search = Astronomy.SearchRelativeLongitude(p.id, Astronomy.Body.Sun, 180, date, 1);
+        if (search && search.time.date.getDate() === date.getDate()) {
+             events.push({ type: 'Opposition', name: `Opp. ${p.name}`, icon: ArrowLeftRight });
         }
     });
 
@@ -152,43 +165,40 @@ const AstroCalendar = ({ isDarkMode = true }) => {
                             const date = new Date(viewDate.getFullYear(), viewDate.getMonth(), day);
                             const isSelected = isSameDay(date, selectedDate);
                             const isToday = isSameDay(date, new Date());
-                            const { phase } = getMoonPhase(date);
+                            const { phase, illumination } = getMoonPhase(date);
                             
                             // Calculate events for this specific day cell
                             const dayEvents = getEventsForDate(date, coords.lat, coords.lon);
-                            const specialPhase = dayEvents.find(e => e.type === 'Phase');
-                            const observations = dayEvents.filter(e => e.type === 'Observation');
+                            const specialEvents = dayEvents.filter(e => e.type === 'Conjunction' || e.type === 'Opposition');
 
                             return (
                                 <button
                                     key={day}
                                     onClick={() => setSelectedDate(date)}
-                                    className={`relative aspect-square p-1.5 border rounded-lg flex flex-col justify-between transition-all overflow-hidden group
+                                    className={`relative aspect-square p-1 border rounded-lg flex flex-col justify-between transition-all overflow-hidden group
                                         ${isSelected ? 'border-orange-500 bg-orange-500/10 ring-1 ring-orange-500' : isDarkMode ? 'border-zinc-800 bg-zinc-900 hover:border-zinc-600' : 'border-zinc-200 bg-white hover:border-zinc-400'}
                                     `}
                                 >
                                     <div className="flex justify-between items-start w-full z-10">
                                         <span className={`text-xs font-bold ${isToday ? 'text-orange-500' : ''}`}>{day}</span>
-                                        {specialPhase && (
-                                            <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" title={specialPhase.name}></div>
-                                        )}
+                                        <span className="text-[9px] font-mono opacity-50">{illumination}%</span>
                                     </div>
                                     
                                     {/* Mini Event List */}
                                     <div className="flex flex-col gap-0.5 mt-1 w-full z-10">
-                                        {observations.slice(0, 2).map((obs, idx) => (
-                                            <div key={idx} className="flex items-center gap-1 text-[9px] opacity-60 truncate">
-                                                <Star size={8} className="text-yellow-500 shrink-0" />
-                                                <span className="truncate">{obs.name.split(' ')[0]}</span>
+                                        {specialEvents.slice(0, 2).map((evt, idx) => (
+                                            <div key={idx} className="flex items-center gap-1 text-[9px] opacity-80 truncate">
+                                                <evt.icon size={8} className={evt.type === 'Opposition' ? "text-red-400" : "text-yellow-400"} />
+                                                <span className="truncate">{evt.name}</span>
                                             </div>
                                         ))}
-                                        {observations.length > 2 && (
-                                            <div className="text-[9px] opacity-40 pl-3">+{observations.length - 2}</div>
+                                        {specialEvents.length > 2 && (
+                                            <div className="text-[8px] opacity-40 pl-1">+{specialEvents.length - 2}</div>
                                         )}
                                     </div>
 
-                                    <div className="absolute bottom-1 right-1 opacity-20 group-hover:opacity-40 transition-opacity">
-                                        <Moon size={24} className={phase > 180 ? "scale-x-[-1]" : ""} fill={phase > 170 && phase < 190 ? "currentColor" : "none"} />
+                                    <div className="absolute bottom-0 right-0 opacity-10 pointer-events-none">
+                                        <Moon size={32} className={phase > 180 ? "scale-x-[-1]" : ""} fill={phase > 170 && phase < 190 ? "currentColor" : "none"} />
                                     </div>
                                 </button>
                             );
