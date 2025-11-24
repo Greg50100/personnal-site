@@ -25,165 +25,221 @@ let state = {
 // --- HELPER FUNCTIONS ---
 
 function calculateMonthEvents(year, month) {
-    const events = {}; // Key: "YYYY-M-D", Value: Array of objects
-    const startDate = new Date(year, month, 1);
-    // Go a bit into the next month to cover the grid
-    const endDate = new Date(year, month + 2, 1); 
-
-    function addEvent(date, event) {
-        const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-        if (!events[key]) events[key] = [];
-        events[key].push(event);
+    if (typeof Astronomy === 'undefined') {
+        console.error("Astronomy library not loaded");
+        return {};
     }
 
-    // 1. Moon Phases
-    for (let phase = 0; phase < 360; phase += 90) {
-        let d = startDate;
-        while (d < endDate) {
-            const m = Astronomy.SearchMoonPhase(phase, d, 40);
-            if (!m || m.date >= endDate) break;
-            let name = '';
-            if (phase === 0) name = 'Nouvelle Lune';
-            else if (phase === 90) name = 'Premier Quartier';
-            else if (phase === 180) name = 'Pleine Lune';
-            else if (phase === 270) name = 'Dernier Quartier';
+    try {
+        const events = {}; // Key: "YYYY-M-D", Value: Array of objects
+        const startDate = new Date(year, month, 1);
+        // Go a bit into the next month to cover the grid
+        const endDate = new Date(year, month + 2, 1); 
+
+        function addEvent(date, event) {
+            if (!date) return;
+            let d = date;
+            // Handle Astronomy.Time or other wrappers that have a .date property
+            if (d && d.date instanceof Date) d = d.date;
             
-            addEvent(m.date, { type: 'Phase', name, icon: 'moon', time: m.date });
-            d = new Date(m.date.getTime() + 24 * 3600 * 1000);
-        }
-    }
+            // Ensure d is a valid Date object
+            if (!(d instanceof Date) || isNaN(d.getTime())) return;
 
-    // 2. Moon Apsis (Perigee/Apogee)
-    let d = startDate;
-    while (d < endDate) {
-        const apsis = Astronomy.SearchLunarApsis(d);
-        if (!apsis || apsis.date >= endDate) break;
-        const name = apsis.dist_km < 370000 ? 'Périgée Lunaire' : 'Apogée Lunaire';
-        addEvent(apsis.date, { type: 'Apsis', name, icon: 'move-vertical', time: apsis.date });
-        d = new Date(apsis.date.getTime() + 24 * 3600 * 1000);
-    }
-
-    // 3. Seasons
-    const seasons = Astronomy.Seasons(year);
-    const seasonEvents = [
-        { date: seasons.mar_equinox, name: 'Équinoxe de Printemps' },
-        { date: seasons.jun_solstice, name: 'Solstice d\'Été' },
-        { date: seasons.sep_equinox, name: 'Équinoxe d\'Automne' },
-        { date: seasons.dec_solstice, name: 'Solstice d\'Hiver' }
-    ];
-    for (const s of seasonEvents) {
-        if (s.date >= startDate && s.date < endDate) {
-            addEvent(s.date, { type: 'Season', name: s.name, icon: 'sun', time: s.date });
-        }
-    }
-
-    // 4. Planet Oppositions (Superior Planets) & Conjunctions
-    const planets = [
-        { name: 'Mars', id: Astronomy.Body.Mars },
-        { name: 'Jupiter', id: Astronomy.Body.Jupiter },
-        { name: 'Saturne', id: Astronomy.Body.Saturn },
-        { name: 'Uranus', id: Astronomy.Body.Uranus },
-        { name: 'Neptune', id: Astronomy.Body.Neptune }
-    ];
-
-    for (const p of planets) {
-        // Opposition (Relative Longitude 180)
-        let d = startDate;
-        while (d < endDate) {
-            const opp = Astronomy.SearchRelativeLongitude(p.id, 180, d);
-            if (!opp || opp.date >= endDate) break;
-            addEvent(opp.date, { type: 'Opposition', name: `Opposition ${p.name}`, icon: 'arrow-left-right', time: opp.date });
-            d = new Date(opp.date.getTime() + 24 * 3600 * 1000);
-        }
-        // Conjunction (Relative Longitude 0)
-        d = startDate;
-        while (d < endDate) {
-            const conj = Astronomy.SearchRelativeLongitude(p.id, 0, d);
-            if (!conj || conj.date >= endDate) break;
-            addEvent(conj.date, { type: 'Conjunction', name: `Conjonction ${p.name}`, icon: 'git-merge', time: conj.date });
-            d = new Date(conj.date.getTime() + 24 * 3600 * 1000);
-        }
-    }
-
-    // 5. Max Elongation & Conjunctions (Mercury, Venus)
-    const innerPlanets = [
-        { name: 'Mercure', id: Astronomy.Body.Mercury },
-        { name: 'Vénus', id: Astronomy.Body.Venus }
-    ];
-    for (const p of innerPlanets) {
-        // Max Elongation
-        let d = startDate;
-        while (d < endDate) {
-            const elon = Astronomy.SearchMaxElongation(p.id, d);
-            if (!elon || elon.date >= endDate) break;
-            addEvent(elon.date, { type: 'Elongation', name: `Elong. Max ${p.name}`, icon: 'maximize-2', time: elon.date });
-            d = new Date(elon.date.getTime() + 24 * 3600 * 1000);
+            const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+            if (!events[key]) events[key] = [];
+            events[key].push(event);
         }
 
-        // Inferior Conjunction (Relative Longitude 0)
-        d = startDate;
-        while (d < endDate) {
-            const conj = Astronomy.SearchRelativeLongitude(p.id, 0, d);
-            if (!conj || conj.date >= endDate) break;
-            addEvent(conj.date, { type: 'Conjunction', name: `Conjonction Inf. ${p.name}`, icon: 'git-merge', time: conj.date });
-            d = new Date(conj.date.getTime() + 24 * 3600 * 1000);
-        }
+        // 1. Moon Phases (Returns AstroTime)
+        try {
+            for (let phase = 0; phase < 360; phase += 90) {
+                let d = startDate;
+                while (d < endDate) {
+                    const m = Astronomy.SearchMoonPhase(phase, d, 40);
+                    if (!m) break;
+                    const mDate = m.date; // AstroTime.date
+                    if (mDate >= endDate) break;
 
-        // Superior Conjunction (Relative Longitude 180)
-        d = startDate;
-        while (d < endDate) {
-            const conj = Astronomy.SearchRelativeLongitude(p.id, 180, d);
-            if (!conj || conj.date >= endDate) break;
-            addEvent(conj.date, { type: 'Conjunction', name: `Conjonction Sup. ${p.name}`, icon: 'git-merge', time: conj.date });
-            d = new Date(conj.date.getTime() + 24 * 3600 * 1000);
-        }
-    }
-
-    // 6. Planet-Planet & Moon-Planet Conjunctions (Iterative Check)
-    const brightBodies = [
-        { name: 'Lune', id: Astronomy.Body.Moon },
-        { name: 'Mercure', id: Astronomy.Body.Mercury },
-        { name: 'Vénus', id: Astronomy.Body.Venus },
-        { name: 'Mars', id: Astronomy.Body.Mars },
-        { name: 'Jupiter', id: Astronomy.Body.Jupiter },
-        { name: 'Saturne', id: Astronomy.Body.Saturn }
-    ];
-
-    let iterDate = new Date(startDate);
-    while (iterDate < endDate) {
-        // Check pairs
-        for (let i = 0; i < brightBodies.length; i++) {
-            for (let j = i + 1; j < brightBodies.length; j++) {
-                const body1 = brightBodies[i];
-                const body2 = brightBodies[j];
-                
-                // Skip Moon-Moon obviously
-                
-                const sep = Astronomy.Separation(body1.id, body2.id, iterDate);
-                if (sep.angle < 4.0) {
-                    // Check visibility (elongation from Sun)
-                    const el1 = Astronomy.Elongation(body1.id, iterDate);
-                    const el2 = Astronomy.Elongation(body2.id, iterDate);
+                    let name = '';
+                    if (phase === 0) name = 'Nouvelle Lune';
+                    else if (phase === 90) name = 'Premier Quartier';
+                    else if (phase === 180) name = 'Pleine Lune';
+                    else if (phase === 270) name = 'Dernier Quartier';
                     
-                    if (el1.elongation > 15 && el2.elongation > 15) {
-                        addEvent(new Date(iterDate), {
-                            type: 'Conjunction',
-                            name: `Conj. ${body1.name}-${body2.name}`,
-                            icon: 'git-merge',
-                            time: new Date(iterDate)
-                        });
+                    addEvent(mDate, { type: 'Phase', name, icon: 'moon', time: mDate });
+                    d = new Date(mDate.getTime() + 24 * 3600 * 1000);
+                }
+            }
+        } catch (err) { console.error("Error in Moon Phases:", err); }
+
+        // 2. Moon Apsis (Returns Apsis object with .time property)
+        try {
+            let d = startDate;
+            while (d < endDate) {
+                const apsis = Astronomy.SearchLunarApsis(d);
+                if (!apsis) break;
+                const apsisDate = apsis.time.date; // Apsis.time.date
+                if (apsisDate >= endDate) break;
+
+                const name = apsis.dist_km < 370000 ? 'Périgée Lunaire' : 'Apogée Lunaire';
+                addEvent(apsisDate, { type: 'Apsis', name, icon: 'move-vertical', time: apsisDate });
+                d = new Date(apsisDate.getTime() + 24 * 3600 * 1000);
+            }
+        } catch (err) { console.error("Error in Moon Apsis:", err); }
+
+        // 3. Seasons (Returns SeasonInfo with properties like mar_equinox which are AstroTime)
+        try {
+            const seasons = Astronomy.Seasons(year);
+            if (seasons) {
+                const seasonEvents = [
+                    { time: seasons.mar_equinox, name: 'Équinoxe de Printemps' },
+                    { time: seasons.jun_solstice, name: 'Solstice d\'Été' },
+                    { time: seasons.sep_equinox, name: 'Équinoxe d\'Automne' },
+                    { time: seasons.dec_solstice, name: 'Solstice d\'Hiver' }
+                ];
+                for (const s of seasonEvents) {
+                    if (s.time && s.time.date) {
+                        const sDate = s.time.date;
+                        if (sDate >= startDate && sDate < endDate) {
+                            addEvent(sDate, { type: 'Season', name: s.name, icon: 'sun', time: sDate });
+                        }
                     }
                 }
             }
-        }
-        
-        // 7. Venus Peak Magnitude (Approximate via Elongation check or just skip for now as it's complex)
-        // We stick to the main events for now.
+        } catch (err) { console.error("Error in Seasons:", err); }
 
-        iterDate.setDate(iterDate.getDate() + 1);
+        // 4. Planet Oppositions (Superior Planets) & Conjunctions (Returns AstroTime)
+        try {
+            const planets = [
+                { name: 'Mars', id: Astronomy.Body.Mars },
+                { name: 'Jupiter', id: Astronomy.Body.Jupiter },
+                { name: 'Saturne', id: Astronomy.Body.Saturn },
+                { name: 'Uranus', id: Astronomy.Body.Uranus },
+                { name: 'Neptune', id: Astronomy.Body.Neptune }
+            ];
+
+            for (const p of planets) {
+                // Opposition (Relative Longitude 180)
+                let d = startDate;
+                while (d < endDate) {
+                    const opp = Astronomy.SearchRelativeLongitude(p.id, 180, d);
+                    if (!opp) break;
+                    const oppDate = opp.date; // AstroTime.date
+                    if (oppDate >= endDate) break;
+                    
+                    addEvent(oppDate, { type: 'Opposition', name: `Opposition ${p.name}`, icon: 'arrow-left-right', time: oppDate });
+                    d = new Date(oppDate.getTime() + 24 * 3600 * 1000);
+                }
+                // Conjunction (Relative Longitude 0)
+                d = startDate;
+                while (d < endDate) {
+                    const conj = Astronomy.SearchRelativeLongitude(p.id, 0, d);
+                    if (!conj) break;
+                    const conjDate = conj.date; // AstroTime.date
+                    if (conjDate >= endDate) break;
+                    
+                    addEvent(conjDate, { type: 'Conjunction', name: `Conjonction ${p.name}`, icon: 'git-merge', time: conjDate });
+                    d = new Date(conjDate.getTime() + 24 * 3600 * 1000);
+                }
+            }
+        } catch (err) { console.error("Error in Planet Oppositions/Conjunctions:", err); }
+
+        // 5. Max Elongation & Conjunctions (Mercury, Venus)
+        try {
+            const innerPlanets = [
+                { name: 'Mercure', id: Astronomy.Body.Mercury },
+                { name: 'Vénus', id: Astronomy.Body.Venus }
+            ];
+            for (const p of innerPlanets) {
+                // Max Elongation (Returns ElongationEvent with .time property)
+                let d = startDate;
+                while (d < endDate) {
+                    const elon = Astronomy.SearchMaxElongation(p.id, d);
+                    if (!elon) break;
+                    const elonDate = elon.time.date; // ElongationEvent.time.date
+                    if (elonDate >= endDate) break;
+
+                    addEvent(elonDate, { type: 'Elongation', name: `Elong. Max ${p.name}`, icon: 'maximize-2', time: elonDate });
+                    d = new Date(elonDate.getTime() + 24 * 3600 * 1000);
+                }
+
+                // Inferior Conjunction (Relative Longitude 0)
+                d = startDate;
+                while (d < endDate) {
+                    const conj = Astronomy.SearchRelativeLongitude(p.id, 0, d);
+                    if (!conj) break;
+                    const conjDate = conj.date;
+                    if (conjDate >= endDate) break;
+                    
+                    addEvent(conjDate, { type: 'Conjunction', name: `Conjonction Inf. ${p.name}`, icon: 'git-merge', time: conjDate });
+                    d = new Date(conjDate.getTime() + 24 * 3600 * 1000);
+                }
+
+                // Superior Conjunction (Relative Longitude 180)
+                d = startDate;
+                while (d < endDate) {
+                    const conj = Astronomy.SearchRelativeLongitude(p.id, 180, d);
+                    if (!conj) break;
+                    const conjDate = conj.date;
+                    if (conjDate >= endDate) break;
+                    
+                    addEvent(conjDate, { type: 'Conjunction', name: `Conjonction Sup. ${p.name}`, icon: 'git-merge', time: conjDate });
+                    d = new Date(conjDate.getTime() + 24 * 3600 * 1000);
+                }
+            }
+        } catch (err) { console.error("Error in Inner Planets:", err); }
+
+        // 6. Planet-Planet & Moon-Planet Conjunctions (Iterative Check)
+        try {
+            const brightBodies = [
+                { name: 'Lune', id: Astronomy.Body.Moon },
+                { name: 'Mercure', id: Astronomy.Body.Mercury },
+                { name: 'Vénus', id: Astronomy.Body.Venus },
+                { name: 'Mars', id: Astronomy.Body.Mars },
+                { name: 'Jupiter', id: Astronomy.Body.Jupiter },
+                { name: 'Saturne', id: Astronomy.Body.Saturn }
+            ];
+
+            let iterDate = new Date(startDate);
+            // Limit iteration to avoid freezing if something goes wrong
+            let safetyCounter = 0;
+            while (iterDate < endDate && safetyCounter < 100) {
+                safetyCounter++;
+                
+                // Check pairs
+                for (let i = 0; i < brightBodies.length; i++) {
+                    for (let j = i + 1; j < brightBodies.length; j++) {
+                        const body1 = brightBodies[i];
+                        const body2 = brightBodies[j];
+                        
+                        const sep = Astronomy.Separation(body1.id, body2.id, iterDate);
+                        if (sep.angle < 4.0) {
+                            // Check visibility (elongation from Sun)
+                            const el1 = Astronomy.Elongation(body1.id, iterDate);
+                            const el2 = Astronomy.Elongation(body2.id, iterDate);
+                            
+                            if (el1.elongation > 15 && el2.elongation > 15) {
+                                addEvent(new Date(iterDate), {
+                                    type: 'Conjunction',
+                                    name: `Conj. ${body1.name}-${body2.name}`,
+                                    icon: 'git-merge',
+                                    time: new Date(iterDate)
+                                });
+                            }
+                        }
+                    }
+                }
+                
+                iterDate.setDate(iterDate.getDate() + 1);
+            }
+        } catch (err) { console.error("Error in Iterative Conjunctions:", err); }
+
+        return events;
+    } catch (e) {
+        console.error("Error calculating events:", e);
+        alert("Erreur critique dans le calcul astronomique: " + e.message);
+        return {};
     }
-
-    return events;
 }
 
 function getMoonPhase(date) {

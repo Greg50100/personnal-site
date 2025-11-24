@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AstroCalendar - GREG.MECH</title>
+    <title>AstroCalendar Pro - GREG.MECH</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,6 +14,9 @@
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        zinc: { 950: '#09090b' }
                     }
                 }
             }
@@ -26,32 +29,561 @@
     <!-- Astronomy Engine -->
     <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
 
-    <!-- Fonts -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;700;900&display=swap');
         
-        /* Custom scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #52525b; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #71717a; }
+        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #52525b; }
         
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .loading-overlay {
+            background: rgba(9, 9, 11, 0.98);
+            backdrop-filter: blur(4px);
+        }
     </style>
 </head>
 <body class="bg-zinc-950 text-zinc-100 h-screen overflow-hidden flex flex-col font-sans selection:bg-orange-500/30">
     
-    <!-- Main App Container -->
-    <div id="app" class="flex-1 flex flex-col lg:flex-row h-full w-full overflow-hidden relative">
-        <!-- Content will be injected by script.js -->
+    <!-- Loader -->
+    <div id="loader" class="absolute inset-0 z-50 flex flex-col items-center justify-center loading-overlay transition-opacity duration-500">
+        <div class="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <div class="font-mono text-sm text-orange-500 animate-pulse" id="loader-text">CALCUL ASTRONOMIQUE...</div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" class="flex-1 flex flex-col lg:flex-row h-full w-full overflow-hidden relative opacity-0 transition-opacity duration-500">
+        <!-- Contenu injecté par JS -->
     </div>
     
-    <!-- Back to Home Button -->
-    <a href="index.html" class="absolute top-4 right-4 z-50 p-2 bg-zinc-900/80 backdrop-blur border border-zinc-700 rounded-lg hover:border-orange-500 text-zinc-400 hover:text-orange-500 transition-all group">
+    <!-- Home Button -->
+    <a href="index.html" class="absolute top-4 right-4 z-40 p-2 bg-zinc-900/80 backdrop-blur border border-zinc-700 rounded-lg hover:border-orange-500 text-zinc-400 hover:text-orange-500 transition-all group">
         <i data-lucide="home" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
     </a>
 
-    <script src="script.js"></script>
+    <script>
+        // --- CONFIGURATION ---
+        const MOON_PHASES = [
+            { name: 'Nouvelle Lune', icon: 'circle', phase: 0 },
+            { name: 'Premier Quartier', icon: 'circle-dashed', phase: 0.25 },
+            { name: 'Pleine Lune', icon: 'circle-dot', phase: 0.5 },
+            { name: 'Dernier Quartier', icon: 'circle-dashed', phase: 0.75 }
+        ];
+
+        const PLANETS = [
+            { name: 'Mercure', id: 'Mercury', type: 'Inner', color: 'text-zinc-400' },
+            { name: 'Vénus', id: 'Venus', type: 'Inner', color: 'text-yellow-200' },
+            { name: 'Mars', id: 'Mars', type: 'Outer', color: 'text-red-400' },
+            { name: 'Jupiter', id: 'Jupiter', type: 'Outer', color: 'text-orange-300' },
+            { name: 'Saturne', id: 'Saturn', type: 'Outer', color: 'text-yellow-600' },
+            { name: 'Uranus', id: 'Uranus', type: 'Outer', color: 'text-cyan-300' },
+            { name: 'Neptune', id: 'Neptune', type: 'Outer', color: 'text-blue-500' }
+        ];
+
+        const METEOR_SHOWERS = [
+            { name: "Quadrantes", month: 0, day: 3 },
+            { name: "Lyrides", month: 3, day: 22 },
+            { name: "Êta Aquarides", month: 4, day: 6 },
+            { name: "Perséides", month: 7, day: 12 },
+            { name: "Orionides", month: 9, day: 21 },
+            { name: "Léonides", month: 10, day: 17 },
+            { name: "Géminides", month: 11, day: 14 }
+        ];
+
+        const WEEK_DAYS = ['LUN', 'MAR', 'MER', 'JEU', 'VEN', 'SAM', 'DIM'];
+        const MONTHS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+
+        // --- STATE ---
+        let state = {
+            viewDate: new Date(),
+            selectedDate: new Date(),
+            coords: { lat: 48.8566, lon: 2.3522, name: "Paris" },
+            eventsCache: {},
+            yearlyHighlights: []
+        };
+
+        // --- HELPER FUNCTIONS ---
+
+        // Calculate angle between two bodies (in degrees)
+        function getSeparation(body1, body2, time) {
+            const v1 = Astronomy.GeoVector(body1, time, true);
+            const v2 = Astronomy.GeoVector(body2, time, true);
+            return Astronomy.AngleBetween(v1, v2);
+        }
+
+        // Check if planet is in retrograde motion (heliocentric longitude decreasing?)
+        // Usually we check Apparent Geocentric Longitude velocity for "Retrograde" in almanacs.
+        function isRetrograde(body, time) {
+            // Calculate Ecliptic Longitude at T and T - 1 hour
+            const t1 = time;
+            const t2 = new Date(time.getTime() - 3600000);
+            
+            // Topocentric Ecliptic coordinates
+            const obs = new Astronomy.Observer(state.coords.lat, state.coords.lon, 0);
+            const eq1 = Astronomy.Equator(body, t1, obs, true, true);
+            const eq2 = Astronomy.Equator(body, t2, obs, true, true);
+            
+            // Convert Equator (RA/Dec) to Ecliptic (Lon/Lat) is complex without helper, 
+            // but Retrograde is roughly -RA velocity for outer planets near opposition.
+            // Let's stick to RA velocity provided by the library state vector? No.
+            // Simple heuristic: RA usually increases. If RA decreases => Retrograde.
+            // Handle 360 wrap-around.
+            let diff = eq1.ra - eq2.ra;
+            if (diff < -12) diff += 24;
+            if (diff > 12) diff -= 24;
+            
+            return diff < 0; 
+        }
+
+        function addEvent(events, date, data) {
+            if (!date) return;
+            const d = (date.date) ? date.date : date;
+            if (!(d instanceof Date) || isNaN(d.getTime())) return;
+            
+            const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+            if (!events[key]) events[key] = [];
+            // Avoid exact duplicates
+            if (!events[key].some(e => e.name === data.name)) {
+                events[key].push(data);
+            }
+        }
+
+        // --- CORE CALCULATION ENGINE ---
+
+        function calculateEvents(year, month) {
+            const events = {};
+            // Buffer: Start 5 days before and end 5 days after to catch edge cases
+            const startDate = new Date(year, month, 1);
+            const endDate = new Date(year, month + 1, 0);
+            const searchStart = new Date(year, month, -5); 
+            const searchEnd = new Date(year, month + 2, 5);
+
+            try {
+                // 1. Moon Phases (Exact times)
+                for (let phase = 0; phase < 360; phase += 90) {
+                    let t = searchStart;
+                    while (t < searchEnd) {
+                        const m = Astronomy.SearchMoonPhase(phase, t, 30);
+                        if (!m || m.date >= searchEnd) break;
+                        const p = MOON_PHASES.find(x => x.phase === phase/360);
+                        if (p) {
+                            addEvent(events, m.date, { type: 'Phase', name: p.name, icon: p.icon, time: m.date, priority: 1 });
+                        }
+                        t = new Date(m.date.getTime() + 24 * 3600 * 1000);
+                    }
+                }
+
+                // 2. Seasons & Apsides
+                const seasons = Astronomy.Seasons(year);
+                const seasonArr = [
+                    {t: seasons.mar_equinox, n: 'Équinoxe de Printemps'},
+                    {t: seasons.jun_solstice, n: 'Solstice d\'Été'},
+                    {t: seasons.sep_equinox, n: 'Équinoxe d\'Automne'},
+                    {t: seasons.dec_solstice, n: 'Solstice d\'Hiver'}
+                ];
+                seasonArr.forEach(s => {
+                    if (s.t && s.t.date >= searchStart && s.t.date <= searchEnd) {
+                        addEvent(events, s.t.date, { type: 'Season', name: s.n, icon: 'sun', time: s.t.date, priority: 0 });
+                    }
+                });
+
+                let t = searchStart;
+                while(t < searchEnd) {
+                    const apsis = Astronomy.SearchLunarApsis(t);
+                    if (!apsis || apsis.time.date >= searchEnd) break;
+                    const isPerigee = apsis.dist_km < 380000;
+                    addEvent(events, apsis.time.date, {
+                        type: 'Apsis', name: isPerigee ? 'Périgée Lunaire' : 'Apogée Lunaire',
+                        icon: isPerigee ? 'minimize-2' : 'maximize-2',
+                        details: `${Math.round(apsis.dist_km).toLocaleString()} km`, priority: 3
+                    });
+                    t = new Date(apsis.time.date.getTime() + 24 * 3600 * 1000);
+                }
+
+                // 3. Eclipses
+                const lunarE = Astronomy.SearchLunarEclipse(searchStart);
+                if (lunarE && lunarE.peak.date >= searchStart && lunarE.peak.date <= searchEnd) {
+                    addEvent(events, lunarE.peak.date, { type: 'Eclipse', name: 'Eclipse Lunaire', icon: 'eclipse', priority: 0, details: lunarE.kind });
+                }
+                const solarE = Astronomy.SearchGlobalSolarEclipse(searchStart);
+                if (solarE && solarE.peak.date >= searchStart && solarE.peak.date <= searchEnd) {
+                    addEvent(events, solarE.peak.date, { type: 'Eclipse', name: 'Eclipse Solaire', icon: 'sun-dim', priority: 0, details: solarE.kind });
+                }
+
+                // 4. PLANETARY EVENTS (Exact Engine Search)
+                PLANETS.forEach(p => {
+                    const body = Astronomy.Body[p.id];
+                    if (!body) return;
+
+                    // Oppositions (Outer Planets): Relative Longitude 180
+                    if (p.type === 'Outer') {
+                        let tOpp = searchStart;
+                        while (tOpp < searchEnd) {
+                            const opp = Astronomy.SearchRelativeLongitude(body, 180, tOpp);
+                            if (!opp || opp.date >= searchEnd) break;
+                            addEvent(events, opp.date, { type: 'Opposition', name: `Opposition ${p.name}`, icon: 'circle-off', priority: 0 });
+                            tOpp = new Date(opp.date.getTime() + 100 * 24 * 3600 * 1000);
+                        }
+                        // Conjunctions with Sun: Relative Longitude 0
+                        let tConj = searchStart;
+                        while (tConj < searchEnd) {
+                            const conj = Astronomy.SearchRelativeLongitude(body, 0, tConj);
+                            if (!conj || conj.date >= searchEnd) break;
+                            addEvent(events, conj.date, { type: 'SolarConj', name: `Conjonction Solaire ${p.name}`, icon: 'sun', details: 'Invisible (proche du Soleil)', priority: 3 });
+                            tConj = new Date(conj.date.getTime() + 100 * 24 * 3600 * 1000);
+                        }
+                    }
+
+                    // Inner Planets (Elongations & Inferior/Superior Conjunctions)
+                    if (p.type === 'Inner') {
+                        // Max Elongation
+                        let tEl = searchStart;
+                        while(tEl < searchEnd) {
+                            const el = Astronomy.SearchMaxElongation(body, tEl);
+                            if (!el || el.time.date >= searchEnd) break;
+                            addEvent(events, el.time.date, { type: 'Elongation', name: `Élong. Max ${p.name}`, icon: 'arrow-up-right', details: `${el.elongation.toFixed(1)}°`, priority: 1 });
+                            tEl = new Date(el.time.date.getTime() + 20 * 24 * 3600 * 1000);
+                        }
+                        // Conjunctions (Rel Longitude 0) - Usually Inferior
+                        let tConj = searchStart;
+                        while(tConj < searchEnd) {
+                            // Note: Astronomy Engine SearchRelativeLongitude(0) for inner planets finds Inferior Conjunction.
+                            // Does it find Superior? The longitude difference passes 0 in both cases.
+                            // Let's assume closest approach to 0 is found.
+                            const conj = Astronomy.SearchRelativeLongitude(body, 0, tConj);
+                            if (!conj || conj.date >= searchEnd) break;
+                            addEvent(events, conj.date, { type: 'SolarConj', name: `Conjonction Solaire ${p.name}`, icon: 'sun', priority: 3 });
+                            tConj = new Date(conj.date.getTime() + 20 * 24 * 3600 * 1000);
+                        }
+                    }
+                });
+
+                // 5. PLANET-PLANET & MOON-PLANET CONJUNCTIONS (Local Minima Search)
+                // Instead of "if < X", we scan day by day and find the specific day where separation is minimal.
+                const bodies = [Astronomy.Body.Moon, Astronomy.Body.Venus, Astronomy.Body.Mars, Astronomy.Body.Jupiter, Astronomy.Body.Saturn];
+                const bNames = ['Lune', 'Vénus', 'Mars', 'Jupiter', 'Saturne'];
+
+                // We scan the whole month + buffer
+                let tIter = new Date(searchStart);
+                while (tIter < searchEnd) {
+                    // Check pairs
+                    for (let i = 0; i < bodies.length; i++) {
+                        for (let j = i + 1; j < bodies.length; j++) {
+                            // Current separation
+                            const sepNow = getSeparation(bodies[i], bodies[j], tIter);
+                            
+                            // Thresholds: Moon needs larger (moves fast), Planets tighter
+                            const isMoon = (i === 0);
+                            const threshold = isMoon ? 8.0 : 2.5;
+
+                            if (sepNow < threshold) {
+                                // Check previous and next day to see if this is a minimum
+                                const tPrev = new Date(tIter.getTime() - 24*3600000);
+                                const tNext = new Date(tIter.getTime() + 24*3600000);
+                                const sepPrev = getSeparation(bodies[i], bodies[j], tPrev);
+                                const sepNext = getSeparation(bodies[i], bodies[j], tNext);
+
+                                // If strictly smaller than neighbors, it's the conjunction day event
+                                if (sepNow <= sepPrev && sepNow <= sepNext) {
+                                    addEvent(events, tIter, {
+                                        type: 'Conjunction',
+                                        name: `Conj. ${bNames[i]}-${bNames[j]}`,
+                                        icon: 'users',
+                                        details: `${sepNow.toFixed(1)}°`,
+                                        priority: 2
+                                    });
+                                }
+                            }
+                        }
+                    }
+                    tIter.setDate(tIter.getDate() + 1);
+                }
+
+                // 6. Meteors
+                METEOR_SHOWERS.forEach(m => {
+                    if (m.month === month) {
+                        const d = new Date(year, month, m.day);
+                        addEvent(events, d, { type: 'Meteor', name: `Pluie: ${m.name}`, icon: 'star', details: 'Pic d\'activité', priority: 2 });
+                    }
+                });
+
+            } catch (err) {
+                console.error("Calculation Error:", err);
+            }
+
+            return events;
+        }
+
+        function getDailyData(date, lat, lon) {
+            try {
+                const observer = new Astronomy.Observer(lat, lon, 0);
+                const data = [];
+
+                // Sun & Moon
+                [Astronomy.Body.Sun, Astronomy.Body.Moon].forEach((body, i) => {
+                    const name = i === 0 ? 'Soleil' : 'Lune';
+                    const rise = Astronomy.SearchRiseSet(body, observer, +1, date, 1);
+                    const set = Astronomy.SearchRiseSet(body, observer, -1, date, 1);
+                    
+                    if (rise) data.push({ name: `Lever ${name}`, time: rise.date, icon: 'arrow-up', type: 'Rise' });
+                    if (set) data.push({ name: `Coucher ${name}`, time: set.date, icon: 'arrow-down', type: 'Set' });
+                });
+
+                // Planets
+                PLANETS.forEach(p => {
+                    const body = Astronomy.Body[p.id];
+                    const rise = Astronomy.SearchRiseSet(body, observer, +1, date, 1);
+                    const illum = Astronomy.Illumination(body, date);
+                    const retro = isRetrograde(body, date);
+
+                    let detailStr = `Mag: ${illum.mag.toFixed(1)}`;
+                    if (retro) detailStr += ' (R)';
+
+                    if (rise) {
+                        data.push({ 
+                            name: p.name, time: rise.date, icon: 'arrow-up-circle', 
+                            type: 'Planet', details: detailStr, color: p.color 
+                        });
+                    }
+                });
+                return data.sort((a,b) => a.time - b.time);
+            } catch(e) { return []; }
+        }
+
+        // --- RENDERER ---
+
+        function render() {
+            const app = document.getElementById('app');
+            const { viewDate, selectedDate, coords, eventsCache } = state;
+            const year = viewDate.getFullYear();
+            const month = viewDate.getMonth();
+            
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const firstDay = new Date(year, month, 1).getDay();
+            const offset = firstDay === 0 ? 6 : firstDay - 1;
+
+            const selectedKey = `${selectedDate.getFullYear()}-${selectedDate.getMonth()}-${selectedDate.getDate()}`;
+            
+            // Daily Events for Sidebar
+            const rawEvents = eventsCache[selectedKey] || [];
+            // Deduplicate by name
+            const dayEvents = [];
+            const seen = new Set();
+            rawEvents.forEach(e => { 
+                if(!seen.has(e.name)){ seen.add(e.name); dayEvents.push(e); } 
+            });
+            dayEvents.sort((a,b) => a.priority - b.priority);
+
+            const ephemeris = getDailyData(selectedDate, coords.lat, coords.lon);
+            let moonIllum = 0;
+            try { moonIllum = Astronomy.Illumination(Astronomy.Body.Moon, selectedDate).mag_ratio * 100; } catch(e){}
+
+            const html = `
+                <!-- LEFT: CALENDAR GRID -->
+                <div class="w-full lg:w-2/3 xl:w-3/4 flex flex-col bg-zinc-950/50 h-full relative">
+                    <!-- Top Bar -->
+                    <div class="flex items-center justify-between p-4 border-b border-zinc-800/50 bg-zinc-900/20 backdrop-blur">
+                        <div class="flex items-center gap-4">
+                            <button onclick="changeMonth(-1)" class="p-2 rounded-full hover:bg-zinc-800 text-zinc-400 transition"><i data-lucide="chevron-left"></i></button>
+                            <h2 class="text-2xl font-black uppercase tracking-widest">
+                                ${MONTHS[month]} <span class="text-orange-500 font-mono">${year}</span>
+                            </h2>
+                            <button onclick="changeMonth(1)" class="p-2 rounded-full hover:bg-zinc-800 text-zinc-400 transition"><i data-lucide="chevron-right"></i></button>
+                        </div>
+                        <button onclick="goToToday()" class="px-3 py-1 text-xs font-mono border border-zinc-700 rounded hover:border-orange-500 text-zinc-400">AUJOURD'HUI</button>
+                    </div>
+
+                    <!-- Day Headers -->
+                    <div class="grid grid-cols-7 border-b border-zinc-800/50 bg-zinc-900/30">
+                        ${WEEK_DAYS.map(d => `<div class="py-2 text-center text-[10px] font-mono text-zinc-500 font-bold">${d}</div>`).join('')}
+                    </div>
+
+                    <!-- Days Grid -->
+                    <div class="flex-1 grid grid-cols-7 auto-rows-fr overflow-y-auto bg-zinc-900/10 custom-scrollbar">
+                        ${Array(offset).fill('<div class="bg-zinc-950/30 border-b border-r border-zinc-800/30"></div>').join('')}
+                        ${Array(daysInMonth).fill(0).map((_, i) => {
+                            const d = i + 1;
+                            const currentKey = `${year}-${month}-${d}`;
+                            const evts = state.eventsCache[currentKey] || [];
+                            const isSelected = d === selectedDate.getDate() && month === selectedDate.getMonth();
+                            const isToday = new Date().toDateString() === new Date(year, month, d).toDateString();
+                            
+                            // Determine distinct dots
+                            const hasOpp = evts.some(e => e.type === 'Opposition');
+                            const hasConj = evts.some(e => e.type === 'Conjunction');
+                            const hasEclipse = evts.some(e => e.type === 'Eclipse');
+
+                            // Unique List for display text
+                            const displayEvts = [];
+                            const nSet = new Set();
+                            evts.forEach(e => { if(!nSet.has(e.name)){ nSet.add(e.name); displayEvts.push(e); }});
+
+                            return `
+                                <div onclick="selectDate(${d})" 
+                                    class="relative group p-1 sm:p-2 border-b border-r border-zinc-800/50 transition-colors cursor-pointer min-h-[90px] flex flex-col justify-between
+                                    ${isSelected ? 'bg-orange-500/10 ring-1 ring-inset ring-orange-500/50' : 'hover:bg-zinc-900/40'}">
+                                    
+                                    <!-- Date Number & Top Badge -->
+                                    <div class="flex justify-between items-start w-full">
+                                        <span class="text-sm font-bold ${isToday ? 'text-orange-500' : 'text-zinc-400'}">${d}</span>
+                                        ${hasEclipse ? '<span class="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_5px_red]"></span>' : 
+                                          hasOpp ? '<span class="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_5px_purple]"></span>' : ''}
+                                    </div>
+
+                                    <!-- Text Events -->
+                                    <div class="space-y-0.5 mb-auto mt-1">
+                                        ${displayEvts.slice(0, 2).map(e => `
+                                            <div class="flex items-center gap-1 text-[9px] text-zinc-500 truncate max-w-full">
+                                                <div class="w-1 h-1 shrink-0 rounded-full ${getEventColor(e.type)}"></div>
+                                                <span class="truncate ${e.priority<=1 ? 'text-zinc-300 font-medium' : ''}">${e.name}</span>
+                                            </div>
+                                        `).join('')}
+                                        ${displayEvts.length > 2 ? `<div class="text-[8px] text-zinc-600 pl-2">+${displayEvts.length-2}</div>` : ''}
+                                    </div>
+
+                                    <!-- Bottom Dot Indicators -->
+                                    <div class="flex justify-end gap-0.5">
+                                        ${hasConj ? '<div class="w-1.5 h-1.5 rounded-full bg-blue-400" title="Conjonction"></div>' : ''}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+
+                <!-- RIGHT: SIDEBAR INFO -->
+                <div class="w-full lg:w-1/3 xl:w-1/4 flex flex-col bg-zinc-950 border-l border-zinc-800 h-full z-10 shadow-2xl">
+                    
+                    <!-- Selected Date Header -->
+                    <div class="p-6 border-b border-zinc-800 bg-gradient-to-b from-zinc-900/80 to-zinc-950">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <div class="text-5xl font-black text-white tracking-tighter">${selectedDate.getDate()}</div>
+                                <div class="text-orange-500 uppercase tracking-widest text-sm font-bold">${MONTHS[selectedDate.getMonth()]}</div>
+                            </div>
+                            <div class="text-right">
+                                <i data-lucide="moon" class="w-10 h-10 text-zinc-400 mb-1 ml-auto" style="fill: rgba(255,255,255,${moonIllum/100})"></i>
+                                <div class="text-xs font-mono text-zinc-500">${moonIllum.toFixed(0)}% ILLUM</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Major Events List -->
+                        <div class="space-y-2">
+                             ${dayEvents.length === 0 ? '<div class="text-xs text-zinc-600 italic">Aucun événement majeur</div>' : ''}
+                             ${dayEvents.map(e => `
+                                <div class="p-2 rounded bg-zinc-900/80 border border-zinc-800 flex justify-between items-center group hover:border-zinc-600 transition">
+                                    <div class="overflow-hidden">
+                                        <span class="font-bold text-xs text-zinc-200 block truncate group-hover:text-white transition">${e.name}</span>
+                                        ${e.details ? `<span class="text-[10px] text-zinc-500 truncate block">${e.details}</span>` : ''}
+                                    </div>
+                                    <i data-lucide="${e.icon}" class="w-4 h-4 ${getTextColor(e.type)} shrink-0 ml-2"></i>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Ephemeris -->
+                    <div class="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
+                        <div class="text-[10px] font-bold uppercase text-zinc-500 tracking-wider mb-2 flex items-center gap-2">
+                            <i data-lucide="compass" class="w-3 h-3"></i> Ephémérides
+                        </div>
+                        ${ephemeris.map(e => `
+                            <div class="flex items-center justify-between py-1.5 px-2 border-l-2 border-zinc-800 hover:border-orange-500/50 hover:bg-zinc-900/30 transition group">
+                                <div class="flex items-center gap-2 overflow-hidden">
+                                    <i data-lucide="${e.icon}" class="w-3 h-3 ${e.color || 'text-zinc-500'}"></i>
+                                    <div class="flex flex-col">
+                                        <span class="text-xs font-bold text-zinc-300">${e.name}</span>
+                                        ${e.details ? `<span class="text-[9px] text-zinc-600 group-hover:text-zinc-500 transition">${e.details}</span>` : ''}
+                                    </div>
+                                </div>
+                                <div class="text-xs font-mono text-orange-500/80 whitespace-nowrap">${formatTime(e.time)}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <!-- Footer Location -->
+                    <div class="p-3 border-t border-zinc-800 bg-zinc-950 text-[10px] font-mono text-zinc-600 flex justify-between items-center hover:text-orange-500 cursor-pointer transition" onclick="handleGeo()">
+                        <div class="flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> ${state.coords.name}</div>
+                        <div>${state.coords.lat.toFixed(2)}°N</div>
+                    </div>
+                </div>
+            `;
+
+            app.innerHTML = html;
+            app.classList.remove('opacity-0');
+            lucide.createIcons();
+        }
+
+        // --- UTILS ---
+
+        function formatTime(date) {
+            if (!date) return '';
+            return new Date(date).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+        }
+
+        function getEventColor(type) {
+            if (type === 'Eclipse') return 'bg-red-500';
+            if (type === 'Opposition') return 'bg-purple-500';
+            if (type === 'Conjunction') return 'bg-blue-500';
+            if (type === 'Phase') return 'bg-zinc-400';
+            if (type === 'Elongation') return 'bg-yellow-500';
+            return 'bg-zinc-600';
+        }
+        function getTextColor(type) {
+            if (type === 'Eclipse') return 'text-red-500';
+            if (type === 'Opposition') return 'text-purple-400';
+            if (type === 'Conjunction') return 'text-blue-400';
+            return 'text-zinc-500';
+        }
+
+        async function updateView() {
+            const loader = document.getElementById('loader');
+            loader.classList.remove('opacity-0', 'pointer-events-none');
+            
+            // Defer calculation to next frame to allow UI loader to appear
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    const y = state.viewDate.getFullYear();
+                    const m = state.viewDate.getMonth();
+                    state.eventsCache = calculateEvents(y, m);
+                    render();
+                    loader.classList.add('opacity-0', 'pointer-events-none');
+                }, 50);
+            });
+        }
+
+        window.changeMonth = (d) => {
+            state.viewDate.setMonth(state.viewDate.getMonth() + d);
+            updateView();
+        };
+
+        window.goToToday = () => {
+            state.viewDate = new Date();
+            state.selectedDate = new Date();
+            updateView();
+        };
+
+        window.selectDate = (d) => {
+            state.selectedDate = new Date(state.viewDate.getFullYear(), state.viewDate.getMonth(), d);
+            render();
+        };
+
+        window.handleGeo = () => {
+            if(navigator.geolocation) {
+                document.getElementById('loader').classList.remove('opacity-0', 'pointer-events-none');
+                navigator.geolocation.getCurrentPosition(p => {
+                    state.coords = {lat: p.coords.latitude, lon: p.coords.longitude, name: 'Local'};
+                    updateView();
+                }, () => {
+                    alert("Erreur Géolocalisation");
+                    document.getElementById('loader').classList.add('opacity-0', 'pointer-events-none');
+                });
+            }
+        };
+
+        // Init
+        updateView();
+
+    </script>
 </body>
 </html>
