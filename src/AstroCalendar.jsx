@@ -78,22 +78,27 @@ const getEventsForDate = (date, lat, lon) => {
         { name: 'Saturne', id: Astronomy.Body.Saturn }
     ];
 
-    // Moon-Planet Conjunctions
-    bodies.forEach(p => {
-        const search = Astronomy.SearchRelativeLongitude(Astronomy.Body.Moon, p.id, 0, date, 1);
-        if (search && search.time.date.getDate() === date.getDate()) {
-             events.push({ type: 'Conjunction', name: `Lune-${p.name}`, icon: GitMerge });
-        }
-    });
+    try {
+        // Moon-Planet Conjunctions (Check separation at noon)
+        // Using Separation is much faster than SearchRelativeLongitude for grid rendering
+        bodies.forEach(p => {
+            const sep = Astronomy.Separation(Astronomy.Body.Moon, p.id, date);
+            if (sep < 6) { // < 6 degrees separation
+                 events.push({ type: 'Conjunction', name: `Lune-${p.name}`, icon: GitMerge });
+            }
+        });
 
-    // Planet-Sun Oppositions
-    bodies.forEach(p => {
-        if (p.name === 'Mercure' || p.name === 'Vénus') return;
-        const search = Astronomy.SearchRelativeLongitude(p.id, Astronomy.Body.Sun, 180, date, 1);
-        if (search && search.time.date.getDate() === date.getDate()) {
-             events.push({ type: 'Opposition', name: `Opp. ${p.name}`, icon: ArrowLeftRight });
-        }
-    });
+        // Planet-Sun Oppositions (Check elongation)
+        bodies.forEach(p => {
+            if (p.name === 'Mercure' || p.name === 'Vénus') return;
+            const el = Astronomy.Elongation(p.id, date);
+            if (el > 170) { // > 170 degrees elongation
+                 events.push({ type: 'Opposition', name: `Opp. ${p.name}`, icon: ArrowLeftRight });
+            }
+        });
+    } catch (e) {
+        console.error("Error calculating planetary events", e);
+    }
 
     return events;
 };
