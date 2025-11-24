@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Github, Mail, ExternalLink, Code, Moon, Sun, Menu, X, ChevronRight, Terminal, Database, Cpu, Zap, Monitor, ArrowLeft } from 'lucide-react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import AstroCalendar from './AstroCalendar';
 
@@ -139,7 +140,7 @@ const Hero = ({ isDarkMode }) => {
     setDisplayText('');
     const timer = setInterval(() => {
       if (i < text.length) {
-        setDisplayText(prev => text.substring(0, i + 1));
+        setDisplayText(() => text.substring(0, i + 1));
         i++;
       } else {
         clearInterval(timer);
@@ -416,15 +417,14 @@ const Footer = ({ isDarkMode }) => (
 // --- MAIN APP ---
 
 export default function App() {
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return true;
+  });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
-
-  useEffect(() => {
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setIsDarkMode(true);
-    }
-  }, []);
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
