@@ -455,19 +455,20 @@ export default function App() {
             className={`fixed inset-0 z-[100] flex flex-col ${isDarkMode ? 'bg-zinc-950' : 'bg-zinc-50'}`}
           >
             {/* Module Header */}
-            <div className={`flex-none flex items-center justify-between px-6 py-4 border-b ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-zinc-50 border-zinc-200'}`}>
-                <div className="flex items-center gap-4">
+            <div className={`flex-none flex items-center justify-between px-3 py-3 sm:px-6 sm:py-4 border-b ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-zinc-50 border-zinc-200'}`}>
+                <div className="flex items-center gap-2 sm:gap-4">
                     <button 
                         onClick={handleCloseProject}
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-mono font-bold border transition-all group ${isDarkMode ? 'border-zinc-700 text-zinc-400 hover:border-orange-500 hover:text-orange-500' : 'border-zinc-300 text-zinc-600 hover:border-orange-600 hover:text-orange-600'}`}
+                        className={`flex items-center gap-2 px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-mono font-bold border transition-all group ${isDarkMode ? 'border-zinc-700 text-zinc-400 hover:border-orange-500 hover:text-orange-500' : 'border-zinc-300 text-zinc-600 hover:border-orange-600 hover:text-orange-600'}`}
                     >
-                        <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-                        RETOUR_BASE
+                        <ArrowLeft size={14} className="sm:w-4 sm:h-4 group-hover:-translate-x-1 transition-transform" />
+                        <span className="hidden sm:inline">RETOUR_BASE</span>
+                        <span className="sm:hidden">RETOUR</span>
                     </button>
-                    <div className="h-6 w-px bg-zinc-700/50"></div>
+                    <div className="h-4 sm:h-6 w-px bg-zinc-700/50"></div>
                     <div className="flex flex-col">
-                        <span className={`text-xs font-mono tracking-widest ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>MODULE ACTIF</span>
-                        <span className={`text-lg font-black uppercase tracking-tighter ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>Astro<span className="text-orange-500">Calendar</span></span>
+                        <span className={`text-[8px] sm:text-xs font-mono tracking-widest ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>MODULE ACTIF</span>
+                        <span className={`text-sm sm:text-lg font-black uppercase tracking-tighter ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>Astro<span className="text-orange-500">Calendar</span></span>
                     </div>
                 </div>
                 <div className={`hidden md:flex items-center gap-2 text-xs font-mono ${isDarkMode ? 'text-zinc-600' : 'text-zinc-400'}`}>
