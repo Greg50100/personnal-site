@@ -477,7 +477,7 @@ export default function App() {
             </div>
 
             {/* Module Content */}
-            <div className="p-4 md:p-8 min-h-[calc(100vh-80px)] flex items-start justify-center">
+            <div className="w-full min-h-[calc(100vh-80px)] flex flex-col">
                <AstroCalendar isDarkMode={isDarkMode} />
             </div>
           </motion.div>
