@@ -56,7 +56,7 @@ const SKILLS = [
 
 // --- INTERNAL COMPONENTS ---
 
-const Navbar = ({ isDarkMode, toggleTheme, isMenuOpen, setIsMenuOpen }) => {
+const Navbar = ({ isDarkMode, toggleTheme, isMenuOpen, setIsMenuOpen, openCalendar }) => {
   const navLinks = [
     { name: 'ACCUEIL', href: '#home' },
     { name: 'PROJETS', href: '#projects' },
@@ -87,6 +87,12 @@ const Navbar = ({ isDarkMode, toggleTheme, isMenuOpen, setIsMenuOpen }) => {
                 <span className="text-orange-500 mr-1">{`//`}</span>{link.name}
               </a>
             ))}
+            <button
+              onClick={openCalendar}
+              className={`text-xs font-mono tracking-widest transition-colors hover:text-orange-500 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
+            >
+              <span className="text-orange-500 mr-1">{`//`}</span>CALENDRIER
+            </button>
             <button
               onClick={toggleTheme}
               aria-label={isDarkMode ? "Activer le mode clair" : "Activer le mode sombre"}
@@ -123,6 +129,17 @@ const Navbar = ({ isDarkMode, toggleTheme, isMenuOpen, setIsMenuOpen }) => {
                 {`> ${link.name}`}
               </a>
             ))}
+            <button
+              onClick={() => {
+                setIsMenuOpen(false);
+                openCalendar();
+              }}
+              className={`block w-full text-left px-3 py-2 font-mono text-sm ${
+                isDarkMode ? 'text-zinc-300 hover:bg-orange-500/10 hover:text-orange-400' : 'text-zinc-700 hover:bg-orange-100'
+              }`}
+            >
+              {`> CALENDRIER`}
+            </button>
           </div>
         </div>
       )}
@@ -426,6 +443,13 @@ export default function App() {
     setSelectedProject(null);
   };
 
+  const handleOpenCalendar = () => {
+    const calendarProject = PROJECTS.find(p => p.id === 4);
+    if (calendarProject) {
+      setSelectedProject(calendarProject);
+    }
+  };
+
   return (
     <div className={`min-h-screen transition-colors duration-300 font-sans ${isDarkMode ? 'bg-zinc-950' : 'bg-zinc-50'}`}>
       <Navbar 
@@ -433,6 +457,7 @@ export default function App() {
         toggleTheme={toggleTheme} 
         isMenuOpen={isMenuOpen} 
         setIsMenuOpen={setIsMenuOpen} 
+        openCalendar={handleOpenCalendar}
       />
       
       <AnimatePresence>
