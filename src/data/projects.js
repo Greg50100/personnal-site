@@ -19,7 +19,7 @@ export const PROJECTS = [
     repo: 'Ganymede',
     title: 'Ganymede',
     description:
-      'Calculatrice scientifique Android : convertisseur, traceur de fonctions et suite de calculateurs (électronique, maths, santé).',
+      'Application Android : calculatrice, convertisseur, traceur de fonctions, plus de cent calculateurs et fiches de référence.',
     tech: ['Kotlin', 'Jetpack Compose', 'Hilt', 'Room'],
     status: 'actif',
     tools: ['traceur', 'matrices', 'loi-ohm', 'code-couleur', 'timer-555', 'imc', 'masse-molaire', 'calcul-dates'],
@@ -29,7 +29,7 @@ export const PROJECTS = [
     title: 'Céleste — observatoire',
     description:
       'Application de bureau : positions du Soleil, de la Lune et des planètes, crépuscules, éclipses, carte du ciel et export PDF.',
-    tech: ['Python', 'Skyfield', 'CustomTkinter', 'Matplotlib'],
+    tech: ['Python', 'CustomTkinter', 'Matplotlib', 'Meeus / VSOP87'],
     status: 'actif',
     tools: ['ce-soir', 'carte-du-ciel'],
   },
