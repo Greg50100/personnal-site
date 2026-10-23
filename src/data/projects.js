@@ -21,7 +21,7 @@ export const PROJECTS = [
       'Calculatrice scientifique Android : convertisseur, traceur de fonctions et suite de calculateurs (électronique, maths, santé).',
     tech: ['Kotlin', 'Jetpack Compose', 'Hilt', 'Room'],
     status: 'actif',
-    tools: ['second-degre', 'pgcd-ppcm'],
+    tools: ['second-degre', 'pgcd-ppcm', 'pont-diviseur', 'resistance-led', 'timer-555'],
   },
   {
     repo: 'Celeste_App',

@@ -13,7 +13,7 @@ utilitaires du quotidien, calculs mathématiques, électronique et astronomie (d
 | Astronomie | Ce soir dans le ciel (éphémérides, crépuscules, planètes visibles, courbes de hauteur) · Carte du ciel en temps réel · Calendrier astronomique · Calculateur du système solaire · Passages de l'ISS et des satellites |
 | Utilitaires | Convertisseur d'unités (19 grandeurs) · Calculatrice scientifique |
 | Mathématiques | Équation du second degré · PGCD / PPCM / facteurs premiers · Nombres complexes · Bases numériques |
-| Électronique | Code couleur des résistances · Loi d'Ohm et puissance |
+| Électronique | Code couleur des résistances · Loi d'Ohm et puissance · Pont diviseur de tension · Résistance pour LED · Temporisateur 555 |
 
 Les outils d'astronomie partagent le **lieu d'observation** (sélecteur dans l'en-tête : villes,
 géolocalisation ou coordonnées), mémorisé dans le navigateur.
