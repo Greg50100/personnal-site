@@ -9,7 +9,7 @@ export default function TimeControls({ clock, steps = ['day', 'hour'], className
   const D = 24 * H
 
   return (
-    <div className={`flex flex-wrap items-center gap-2 ${className}`}>
+    <div className={`flex min-w-0 max-w-full flex-wrap items-center gap-2 ${className}`}>
       <button
         type="button"
         onClick={goLive}
@@ -51,7 +51,7 @@ export default function TimeControls({ clock, steps = ['day', 'hour'], className
           </button>
         )}
       </div>
-      <span className="font-mono text-[11px] text-zinc-500">heure locale ({utcOffsetLabel(date)})</span>
+      <span className="font-mono text-[11px] text-night-500">heure locale ({utcOffsetLabel(date)})</span>
     </div>
   )
 }

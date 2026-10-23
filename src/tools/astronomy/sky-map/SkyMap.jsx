@@ -114,8 +114,8 @@ export default function SkyMap() {
                 onClick={() => setOptions({ ...options, [key]: !options[key] })}
                 className={`rounded-md border px-2.5 py-1 text-xs font-medium transition-colors ${
                   options[key]
-                    ? 'border-orange-500/60 bg-orange-500/10 text-orange-600 dark:text-orange-400'
-                    : 'border-zinc-200 text-zinc-500 hover:border-orange-500/40 dark:border-zinc-800'
+                    ? 'border-accent-500/60 bg-accent-500/10 text-accent-700 dark:text-accent-400'
+                    : 'border-night-200 text-night-500 hover:border-accent-500/40 dark:border-night-800'
                 }`}
               >
                 {label}
@@ -124,7 +124,7 @@ export default function SkyMap() {
           </div>
           <div
             ref={wrapRef}
-            className="mx-auto w-full max-w-[900px] overflow-hidden rounded-lg bg-zinc-950"
+            className="mx-auto w-full max-w-[900px] overflow-hidden rounded-lg bg-night-950"
             style={options.night ? { filter: 'sepia(1) saturate(6) hue-rotate(-50deg) brightness(0.75)' } : undefined}
           >
             <canvas
@@ -137,7 +137,7 @@ export default function SkyMap() {
             />
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <label className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-400">
+            <label className="flex items-center gap-2 text-xs text-night-600 dark:text-night-400">
               Magnitude limite
               <input
                 type="range"
@@ -146,7 +146,7 @@ export default function SkyMap() {
                 step="0.5"
                 value={options.magLimit}
                 onChange={(e) => setOptions({ ...options, magLimit: Number(e.target.value) })}
-                className="accent-orange-500"
+                className="accent-accent-500"
               />
               <span className="w-6 font-mono">{fmt(options.magLimit, 1)}</span>
             </label>
@@ -160,8 +160,8 @@ export default function SkyMap() {
                 { value: 180, label: 'Sud en haut' },
               ]}
             />
-            <label className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-400">
-              <input type="checkbox" checked={options.night} onChange={(e) => setOptions({ ...options, night: e.target.checked })} className="accent-orange-500" />
+            <label className="flex items-center gap-2 text-xs text-night-600 dark:text-night-400">
+              <input type="checkbox" checked={options.night} onChange={(e) => setOptions({ ...options, night: e.target.checked })} className="accent-accent-500" />
               Vision nocturne (rouge)
             </label>
           </div>
@@ -175,45 +175,45 @@ export default function SkyMap() {
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="text-lg font-semibold">{selected.title}</p>
-                    <p className="text-sm text-zinc-500">{selected.subtitle}</p>
+                    <p className="text-sm text-night-500">{selected.subtitle}</p>
                   </div>
-                  <button type="button" className="text-zinc-400 hover:text-orange-500" onClick={() => setSelectedId(null)} aria-label="Désélectionner">
+                  <button type="button" className="text-night-400 hover:text-accent-500" onClick={() => setSelectedId(null)} aria-label="Désélectionner">
                     <X size={16} />
                   </button>
                 </div>
                 <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
                   {selected.mag != null && (
                     <>
-                      <dt className="text-zinc-500">Magnitude</dt>
+                      <dt className="text-night-500">Magnitude</dt>
                       <dd className="font-mono">{fmt(selected.mag, 2)}</dd>
                     </>
                   )}
-                  <dt className="text-zinc-500">Hauteur</dt>
+                  <dt className="text-night-500">Hauteur</dt>
                   <dd className="font-mono">{fmt(selected.alt, 1)}°</dd>
-                  <dt className="text-zinc-500">Azimut</dt>
+                  <dt className="text-night-500">Azimut</dt>
                   <dd className="font-mono">
                     {fmt(selected.az, 1)}° {compass(selected.az)}
                   </dd>
-                  <dt className="text-zinc-500">Asc. droite</dt>
+                  <dt className="text-night-500">Asc. droite</dt>
                   <dd className="font-mono">{fmtHMS(selected.raHours)}</dd>
-                  <dt className="text-zinc-500">Déclinaison</dt>
+                  <dt className="text-night-500">Déclinaison</dt>
                   <dd className="font-mono">{fmtDMS(selected.dec)}</dd>
                   {selected.constellation && (
                     <>
-                      <dt className="text-zinc-500">Constellation</dt>
+                      <dt className="text-night-500">Constellation</dt>
                       <dd>{selected.constellation}</dd>
                     </>
                   )}
                   {selected.distance != null && (
                     <>
-                      <dt className="text-zinc-500">Distance</dt>
+                      <dt className="text-night-500">Distance</dt>
                       <dd className="font-mono">{selected.distance < 0.01 ? `${fmt(selected.distance * 149_597_870.7, 0)} km` : `${fmt(selected.distance, 3)} ua`}</dd>
                     </>
                   )}
                 </dl>
               </div>
             ) : (
-              <p className="flex items-center gap-2 text-sm text-zinc-500">
+              <p className="flex items-center gap-2 text-sm text-night-500">
                 <Maximize2 size={14} /> Touchez une étoile, une planète ou un objet pour l'identifier.
               </p>
             )}
@@ -225,11 +225,11 @@ export default function SkyMap() {
               <ul className="space-y-1.5 text-sm">
                 {visibleBodies.map((b) => (
                   <li key={b.id}>
-                    <button type="button" onClick={() => setSelectedId(`body:${b.id}`)} className="flex w-full items-center justify-between gap-2 hover:text-orange-500">
+                    <button type="button" onClick={() => setSelectedId(`body:${b.id}`)} className="flex w-full items-center justify-between gap-2 hover:text-accent-500">
                       <span>
                         <span className="sym" style={{ color: b.color }}>{b.symbol}</span> {b.name}
                       </span>
-                      <span className="font-mono text-xs text-zinc-500">
+                      <span className="font-mono text-xs text-night-500">
                         {fmt(b.alt, 0)}° {compass(b.az)}
                       </span>
                     </button>
@@ -237,11 +237,11 @@ export default function SkyMap() {
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-zinc-500">Ni le Soleil, ni la Lune, ni aucune planète.</p>
+              <p className="text-sm text-night-500">Ni le Soleil, ni la Lune, ni aucune planète.</p>
             )}
           </div>
 
-          <div className="card card-pad text-xs leading-relaxed text-zinc-500">
+          <div className="card card-pad text-xs leading-relaxed text-night-500">
             Projection stéréographique centrée sur le zénith : le bord du cercle est l'horizon, l'est est à gauche quand le nord est en haut
             (comme en regardant le ciel au-dessus de soi). {scene.stars.length.toLocaleString('fr-FR')} étoiles jusqu'à la magnitude 6,
             tracés et noms des 88 constellations, 110 objets Messier. Pointillés orange : écliptique ; bleus : équateur céleste.

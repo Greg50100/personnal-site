@@ -7,71 +7,81 @@
     -webkit-tap-highlight-color: transparent;
   }
   body {
-    @apply bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100;
-    @apply selection:bg-orange-500/30;
+    @apply bg-night-50 text-night-900 antialiased dark:bg-night-950 dark:text-night-100;
+    @apply selection:bg-accent-400/30;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
   }
   :focus-visible {
-    @apply outline-none ring-2 ring-orange-500/70 ring-offset-0;
+    @apply outline-none ring-2 ring-accent-400/80 ring-offset-0;
   }
 }
 
 @layer components {
   .card {
-    @apply rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900/60 dark:shadow-none;
+    @apply rounded-2xl border border-night-200 bg-white shadow-sm dark:border-night-800 dark:bg-night-900/70 dark:shadow-none;
   }
   .card-pad {
     @apply p-4 sm:p-5;
   }
   .label {
-    @apply mb-1.5 block font-mono text-[11px] uppercase tracking-widest text-zinc-500 dark:text-zinc-400;
+    @apply mb-1.5 block text-xs font-medium text-night-500 dark:text-night-400;
   }
   .input {
-    @apply w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 transition-colors;
-    @apply focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20;
-    @apply dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:placeholder:text-zinc-600;
+    @apply w-full rounded-lg border border-night-300 bg-white px-3 py-2 text-sm text-night-900 placeholder:text-night-400 transition-colors;
+    @apply focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-400/25;
+    @apply dark:border-night-700 dark:bg-night-950 dark:text-night-100 dark:placeholder:text-night-600;
   }
   .btn {
     @apply inline-flex items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50;
-    @apply border-zinc-300 bg-white text-zinc-700 hover:border-orange-500 hover:text-orange-600;
-    @apply dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-orange-500 dark:hover:text-orange-400;
+    @apply border-night-300 bg-white text-night-700 hover:border-accent-500 hover:text-accent-700;
+    @apply dark:border-night-700 dark:bg-night-900 dark:text-night-200 dark:hover:border-accent-400 dark:hover:text-accent-300;
   }
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-orange-600 bg-orange-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-accent-400 bg-accent-400 px-3 py-2 text-sm font-semibold text-night-950 transition-colors hover:bg-accent-300 disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-icon {
-    @apply inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-300 bg-white text-zinc-600 transition-colors hover:border-orange-500 hover:text-orange-600;
-    @apply dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:border-orange-500 dark:hover:text-orange-400;
+    @apply inline-flex h-9 w-9 items-center justify-center rounded-lg border border-night-300 bg-white text-night-600 transition-colors hover:border-accent-500 hover:text-accent-700;
+    @apply dark:border-night-700 dark:bg-night-900 dark:text-night-300 dark:hover:border-accent-400 dark:hover:text-accent-300;
   }
   .chip {
-    @apply inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-zinc-50 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-zinc-600;
-    @apply dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-400;
+    @apply inline-flex items-center gap-1 rounded-full border border-night-200 bg-night-50 px-2 py-0.5 text-[11px] font-medium text-night-600;
+    @apply dark:border-night-700 dark:bg-night-950 dark:text-night-300;
   }
   .table-data {
     @apply w-full text-left text-sm;
   }
   .table-data th {
-    @apply whitespace-nowrap border-b border-zinc-200 px-3 py-2 font-mono text-[11px] font-medium uppercase tracking-wider text-zinc-500 dark:border-zinc-800 dark:text-zinc-400;
+    @apply whitespace-nowrap border-b border-night-200 px-3 py-2 text-xs font-medium text-night-500 dark:border-night-800 dark:text-night-400;
   }
   .table-data td {
-    @apply whitespace-nowrap border-b border-zinc-100 px-3 py-2 tabular-nums dark:border-zinc-800/60;
+    @apply whitespace-nowrap border-b border-night-100 px-3 py-2 tabular-nums dark:border-night-800/60;
   }
   .table-data tbody tr {
-    @apply transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/30;
+    @apply transition-colors hover:bg-night-50 dark:hover:bg-night-800/30;
   }
 }
 
 @layer utilities {
+  /* Ciel étoilé discret (fond du bandeau d'accueil) */
+  .bg-stars {
+    background-image: radial-gradient(1px 1px at 20px 30px, rgb(255 255 255 / 0.5), transparent),
+      radial-gradient(1px 1px at 120px 80px, rgb(255 255 255 / 0.35), transparent),
+      radial-gradient(1.5px 1.5px at 200px 150px, rgb(255 255 255 / 0.45), transparent),
+      radial-gradient(1px 1px at 300px 40px, rgb(255 255 255 / 0.3), transparent),
+      radial-gradient(1px 1px at 380px 120px, rgb(255 255 255 / 0.4), transparent),
+      radial-gradient(1.5px 1.5px at 60px 170px, rgb(255 255 255 / 0.3), transparent);
+    background-size: 420px 200px;
+  }
   /* Symboles colorés des astres : léger contour pour rester lisibles sur fond clair. */
   .sym {
     text-shadow: 0 0 1px rgb(0 0 0 / 0.55);
   }
   .dark .sym {
     text-shadow: none;
-  }
-  .bg-grid {
-    background-image: linear-gradient(rgb(113 113 122 / 0.08) 1px, transparent 1px),
-      linear-gradient(90deg, rgb(113 113 122 / 0.08) 1px, transparent 1px);
-    background-size: 40px 40px;
   }
   .scrollbar-thin {
     scrollbar-width: thin;

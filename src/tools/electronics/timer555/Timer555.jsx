@@ -2,8 +2,8 @@ import { useState } from 'react'
 import Segmented from '../../../components/Segmented'
 import { fmt } from '../../../lib/format'
 import { nearestInSeries } from '../resistor/colors'
-import { formatSI, parseSI } from '../si'
-import { Result, SIField } from '../fields'
+import { formatSI, parseSI } from '../../../lib/si'
+import { Result, SIField } from '../../kit/fields'
 import { astable, designAstable, monostable } from './timer555'
 
 /** Chronogramme du signal de sortie (2 périodes en astable, une impulsion en monostable). */
@@ -23,20 +23,20 @@ function Waveform({ duty: rawDuty }) {
   }
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img" aria-label="Chronogramme de la sortie">
-      <line x1="0" x2={W} y1={lo} y2={lo} className="stroke-zinc-300 dark:stroke-zinc-700" strokeDasharray="3 3" />
-      <path d={d} fill="none" stroke="#f97316" strokeWidth="2.5" strokeLinejoin="round" />
+      <line x1="0" x2={W} y1={lo} y2={lo} className="stroke-night-300 dark:stroke-night-700" strokeDasharray="3 3" />
+      <path d={d} fill="none" stroke="#f59e0b" strokeWidth="2.5" strokeLinejoin="round" />
       {duty != null && (
         <>
-          <text x={10 + (duty * (W - 20)) / 4} y={hi - 5} textAnchor="middle" className="fill-zinc-500 font-mono text-[10px]">
+          <text x={10 + (duty * (W - 20)) / 4} y={hi - 5} textAnchor="middle" className="fill-night-500 font-mono text-[10px]">
             t haut
           </text>
-          <text x={10 + ((duty + 1) * (W - 20)) / 4} y={lo + 13} textAnchor="middle" className="fill-zinc-500 font-mono text-[10px]">
+          <text x={10 + ((duty + 1) * (W - 20)) / 4} y={lo + 13} textAnchor="middle" className="fill-night-500 font-mono text-[10px]">
             t bas
           </text>
         </>
       )}
       {duty == null && (
-        <text x="140" y={hi - 5} textAnchor="middle" className="fill-zinc-500 font-mono text-[10px]">
+        <text x="140" y={hi - 5} textAnchor="middle" className="fill-night-500 font-mono text-[10px]">
           impulsion T
         </text>
       )}
@@ -90,7 +90,7 @@ export default function Timer555() {
           )}
         </div>
 
-        <div className="border-t border-zinc-200 pt-4 dark:border-zinc-800">
+        <div className="border-t border-night-200 pt-4 dark:border-night-800">
           {mode === 'astable' &&
             (a ? (
               <div className="grid gap-3 sm:grid-cols-3">
@@ -101,7 +101,7 @@ export default function Timer555() {
                 <Result label="Temps bas" value={formatSI(a.low, 's', 4)} hint="ln 2 × R2 × C" />
               </div>
             ) : (
-              <p className="text-sm text-zinc-500">R1, R2 et C doivent être strictement positifs.</p>
+              <p className="text-sm text-night-500">R1, R2 et C doivent être strictement positifs.</p>
             ))}
 
           {mode === 'monostable' &&
@@ -110,7 +110,7 @@ export default function Timer555() {
                 <Result main label="Durée de l'impulsion T" value={formatSI(m.width, 's', 4)} hint="T = ln 3 × R × C ≈ 1,1 × R × C" />
               </div>
             ) : (
-              <p className="text-sm text-zinc-500">R et C doivent être strictement positifs.</p>
+              <p className="text-sm text-night-500">R et C doivent être strictement positifs.</p>
             ))}
 
           {mode === 'design' &&
@@ -120,7 +120,7 @@ export default function Timer555() {
                 <Result main label="R2" value={formatSI(design.r2, 'Ω', 4)} hint={`proches en E24 : ${nearestInSeries(design.r2).map((x) => formatSI(x, 'Ω')).join(' / ')}`} />
               </div>
             ) : (
-              <p className="text-sm text-zinc-500">
+              <p className="text-sm text-night-500">
                 Le rapport cyclique doit être compris entre 50 et 100 % (montage astable classique, sans diode).
               </p>
             ))}
@@ -130,7 +130,7 @@ export default function Timer555() {
       <div className="card card-pad">
         <p className="label">Signal de sortie</p>
         <Waveform duty={mode === 'monostable' ? null : mode === 'astable' ? (a?.duty ?? 0.6) : (parseSI(v.duty) / 100 || 0.6)} />
-        <div className="mt-4 space-y-2 text-xs text-zinc-500">
+        <div className="mt-4 space-y-2 text-xs text-night-500">
           <p>
             En astable, la sortie reste à l'état haut pendant la charge de C (via R1 + R2) et à l'état bas pendant sa décharge (via R2) : le
             rapport cyclique est donc toujours supérieur à 50 %.

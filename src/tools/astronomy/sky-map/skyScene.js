@@ -270,7 +270,7 @@ export function drawScene(ctx, size, scene, options) {
     const sel = options.selected
     if (sel.alt > -1) {
       const [x, y] = project(sel.alt, sel.az)
-      ctx.strokeStyle = '#f97316'
+      ctx.strokeStyle = '#f59e0b'
       ctx.lineWidth = 2
       ctx.beginPath()
       ctx.arc(x, y, 12 * starScale, 0, Math.PI * 2)
@@ -292,7 +292,7 @@ export function drawScene(ctx, size, scene, options) {
     const r = R + (size / 2 - R) / 2
     const a = az * DEG + options.rotation * DEG
     ctx.font = `${main ? 700 : 500} ${Math.round((main ? 14 : 10) * Math.max(scale, 0.85))}px "JetBrains Mono", monospace`
-    ctx.fillStyle = main ? '#f97316' : '#a1a1aa'
+    ctx.fillStyle = main ? '#f59e0b' : '#a1a1aa'
     ctx.fillText(label, cx - r * Math.sin(a), cy - r * Math.cos(a))
   }
   ctx.textAlign = 'left'

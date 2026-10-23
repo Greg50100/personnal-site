@@ -49,16 +49,16 @@ function Plot({ a, b, c, result }) {
   const path = samples.map((x, i) => `${i ? 'L' : 'M'}${sx(x).toFixed(1)},${sy(ys[i]).toFixed(1)}`).join(' ')
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full rounded-lg border border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950" role="img" aria-label="Tracé de la parabole">
-      {yMin < 0 && yMax > 0 && <line x1="0" x2={W} y1={sy(0)} y2={sy(0)} className="stroke-zinc-400 dark:stroke-zinc-600" strokeWidth="1" />}
-      {xMin < 0 && xMax > 0 && <line y1="0" y2={H} x1={sx(0)} x2={sx(0)} className="stroke-zinc-400 dark:stroke-zinc-600" strokeWidth="1" />}
-      <line x1={sx(result.vertex.x)} x2={sx(result.vertex.x)} y1="0" y2={H} stroke="#f97316" strokeDasharray="4 4" strokeOpacity="0.4" />
-      <path d={path} fill="none" stroke="#f97316" strokeWidth="2.5" />
-      <circle cx={sx(result.vertex.x)} cy={sy(result.vertex.y)} r="4.5" fill="#f97316" />
+    <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full rounded-lg border border-night-200 bg-night-50 dark:border-night-800 dark:bg-night-950" role="img" aria-label="Tracé de la parabole">
+      {yMin < 0 && yMax > 0 && <line x1="0" x2={W} y1={sy(0)} y2={sy(0)} className="stroke-night-400 dark:stroke-night-600" strokeWidth="1" />}
+      {xMin < 0 && xMax > 0 && <line y1="0" y2={H} x1={sx(0)} x2={sx(0)} className="stroke-night-400 dark:stroke-night-600" strokeWidth="1" />}
+      <line x1={sx(result.vertex.x)} x2={sx(result.vertex.x)} y1="0" y2={H} stroke="#f59e0b" strokeDasharray="4 4" strokeOpacity="0.4" />
+      <path d={path} fill="none" stroke="#f59e0b" strokeWidth="2.5" />
+      <circle cx={sx(result.vertex.x)} cy={sy(result.vertex.y)} r="4.5" fill="#f59e0b" />
       {result.roots
         .filter((r) => r.im === 0)
         .map((r) => (
-          <circle key={r.re} cx={sx(r.re)} cy={sy(0)} r="5" className="fill-white stroke-emerald-500 dark:fill-zinc-950" strokeWidth="2.5" />
+          <circle key={r.re} cx={sx(r.re)} cy={sy(0)} r="5" className="fill-white stroke-emerald-500 dark:fill-night-950" strokeWidth="2.5" />
         ))}
     </svg>
   )
@@ -97,7 +97,7 @@ export default function QuadraticSolver() {
 
         {result && (
           <div className="mt-6 space-y-4 text-sm">
-            <p className="rounded-lg bg-zinc-100 p-3 text-center font-mono text-base dark:bg-zinc-950">{polynomial(a, b, c)} = 0</p>
+            <p className="rounded-lg bg-night-100 p-3 text-center font-mono text-base dark:bg-night-950">{polynomial(a, b, c)} = 0</p>
             {result.kind === 'all' && <p>Tous les réels sont solutions (0 = 0).</p>}
             {result.kind === 'none' && <p>Aucune solution ({n(c)} ≠ 0).</p>}
             {result.kind === 'linear' && (
@@ -111,14 +111,14 @@ export default function QuadraticSolver() {
                   <p className="label">Discriminant</p>
                   <p className="font-mono">
                     Δ = b² − 4ac = {n(result.delta)}{' '}
-                    <span className="text-zinc-500">
+                    <span className="text-night-500">
                       {result.kind === 'real' ? '> 0 : deux racines réelles' : result.kind === 'double' ? '= 0 : une racine double' : '< 0 : deux racines complexes conjuguées'}
                     </span>
                   </p>
                 </div>
                 <div>
                   <p className="label">Solutions</p>
-                  <ul className="space-y-1 font-mono text-base font-semibold text-orange-600 dark:text-orange-400">
+                  <ul className="space-y-1 font-mono text-base font-semibold text-accent-700 dark:text-accent-400">
                     {result.roots.map((r, i) => (
                       <li key={i}>
                         {result.kind === 'double' ? 'x₀' : `x${i === 0 ? '₁' : '₂'}`} = {complexStr(r)}
@@ -152,8 +152,8 @@ export default function QuadraticSolver() {
         <div className="card card-pad">
           <p className="label">Parabole</p>
           <Plot a={a} b={b} c={c} result={result} />
-          <p className="mt-2 text-xs text-zinc-500">
-            <span className="text-orange-500">●</span> sommet · <span className="text-emerald-500">○</span> racines réelles
+          <p className="mt-2 text-xs text-night-500">
+            <span className="text-accent-500">●</span> sommet · <span className="text-emerald-500">○</span> racines réelles
           </p>
         </div>
       )}

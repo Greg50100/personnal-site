@@ -92,4 +92,23 @@ describe('satellites', async () => {
     for (const p of visible) expect(p.magnitude).toBeLessThan(0)
     expect(passes.some((p) => !p.visible && p.sunAltAtMax < -18)).toBe(true)
   })
+
+  test('satellites brillants : passages visibles cohérents avec la prévision détaillée', async () => {
+    const { makeGrid, parseTleList, visiblePasses } = await import('./satellites/bright')
+    const list = parseTleList(`ISS (ZARYA)
+1 25544U 98067A   19156.50900463  .00003075  00000-0  59442-4 0  9992
+2 25544  51.6433  59.2583 0008217  16.4489 347.6017 15.51174618173442
+garbage line`)
+    expect(list).toHaveLength(1)
+    expect(list[0]).toMatchObject({ id: 25544, stdMag: -1.8 })
+    const start = new Date('2019-05-25T12:00:00Z')
+    const grid = makeGrid(loc, start, 72)
+    const fast = visiblePasses(list[0], grid, loc)
+    const reference = findPasses(tle.satrec, loc, start, { days: 3, stdMag: -1.8 }).filter((p) => p.visible)
+    expect(fast.length).toBe(reference.length)
+    fast.forEach((p, i) => {
+      expect(Math.abs(p.peak.t - reference[i].peak.t)).toBeLessThan(60_000)
+      expect(p.magnitude).toBeLessThan(0)
+    })
+  })
 })

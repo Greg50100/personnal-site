@@ -5,21 +5,14 @@ import { useLocalStorage } from '../../../hooks/useLocalStorage'
 import { LocationButton } from '../../../components/LocationPicker'
 import Segmented from '../../../components/Segmented'
 import { compass, fmt, fmtAngle, fmtHMS, fmtTime } from '../../../lib/format'
-import { Astronomy, BODIES, BODY, bodyConstellation, bodyPosition, makeObserver, riseTransitSet } from '../lib/astro'
+import { Astronomy, BODIES, BODY, bodyConstellation, bodyPosition, diameterArcsec, fmtDiameter, makeObserver, riseTransitSet } from '../lib/astro'
 import TimeControls from '../components/TimeControls'
-
-// Rayons équatoriaux (km) pour le diamètre apparent
-const RADIUS_KM = { Sun: 695_700, Moon: 1737.4, Mercury: 2439.7, Venus: 6051.8, Mars: 3396.2, Jupiter: 71_492, Saturn: 60_268, Uranus: 25_559, Neptune: 24_764, Pluto: 1188.3 }
 
 const ROWS = [BODY.Sun, BODY.Moon, BODY.Mercury, BODY.Venus, { id: 'Earth', name: 'Terre', symbol: '⊕', color: '#60a5fa' }, ...BODIES.slice(4)]
 
 const DEFAULTS = { cartesian: 'helio', angular: 'equatorial', angleMode: 'dms', nakedEye: false, aboveHorizon: false, selected: 'Sun' }
 
-function apparentDiameter(id, distAu) {
-  const km = distAu * Astronomy.KM_PER_AU
-  const arcsec = ((2 * Math.atan(RADIUS_KM[id] / km) * 180) / Math.PI) * 3600
-  return arcsec > 120 ? `${fmt(arcsec / 60, 1)}′` : `${fmt(arcsec, 1)}″`
-}
+const apparentDiameter = (id, distAu) => fmtDiameter(diameterArcsec(id, distAu))
 
 export default function SolarSystem() {
   const { location } = useObserverLocation()
@@ -80,7 +73,7 @@ export default function SolarSystem() {
   const vec = (r) => (opts.cartesian === 'helio' ? r.helio : r.geo)
 
   return (
-    <div className="grid gap-4">
+    <div className="grid grid-cols-1 gap-4">
       <div className="flex flex-wrap items-center gap-2">
         <LocationButton showCoords />
         <TimeControls clock={clock} />
@@ -128,11 +121,11 @@ export default function SolarSystem() {
         </div>
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm md:col-span-3">
           <label className="flex items-center gap-2">
-            <input type="checkbox" className="accent-orange-500" checked={opts.nakedEye} onChange={(e) => set({ nakedEye: e.target.checked })} />
+            <input type="checkbox" className="accent-accent-500" checked={opts.nakedEye} onChange={(e) => set({ nakedEye: e.target.checked })} />
             Seulement les objets visibles à l'œil nu (mag ≤ 6)
           </label>
           <label className="flex items-center gap-2">
-            <input type="checkbox" className="accent-orange-500" checked={opts.aboveHorizon} onChange={(e) => set({ aboveHorizon: e.target.checked })} />
+            <input type="checkbox" className="accent-accent-500" checked={opts.aboveHorizon} onChange={(e) => set({ aboveHorizon: e.target.checked })} />
             Seulement les objets au-dessus de l'horizon
           </label>
         </div>
@@ -168,9 +161,9 @@ export default function SolarSystem() {
                   <tr
                     key={r.id}
                     onClick={() => !r.isEarth && set({ selected: r.id })}
-                    className={`${r.isEarth ? '' : 'cursor-pointer'} ${opts.selected === r.id ? 'bg-orange-500/5' : ''}`}
+                    className={`${r.isEarth ? '' : 'cursor-pointer'} ${opts.selected === r.id ? 'bg-accent-500/5' : ''}`}
                   >
-                    <td className={`font-medium ${dim ? 'text-zinc-500' : ''}`}>
+                    <td className={`font-medium ${dim ? 'text-night-500' : ''}`}>
                       <span className="sym" style={{ color: r.color }}>{r.symbol}</span> {r.name}
                     </td>
                     {v && (
@@ -186,14 +179,14 @@ export default function SolarSystem() {
                     <td className="text-right font-mono">{r.isEarth ? '' : `${fmt(r.elong, 1)}°`}</td>
                     <td title={r.constellation?.name}>{r.constellation?.symbol ?? ''}</td>
                     <td className="text-right font-mono">{a1}</td>
-                    <td className={`text-right font-mono ${opts.angular === 'horizontal' && r.pos?.alt < 0 ? 'text-zinc-500' : ''}`}>{a2}</td>
+                    <td className={`text-right font-mono ${opts.angular === 'horizontal' && r.pos?.alt < 0 ? 'text-night-500' : ''}`}>{a2}</td>
                   </tr>
                 )
               })}
             </tbody>
           </table>
         </div>
-        <p className="border-t border-zinc-200 px-4 py-2 text-xs text-zinc-500 dark:border-zinc-800">
+        <p className="border-t border-night-200 px-4 py-2 text-xs text-night-500 dark:border-night-800">
           Cartésiennes : plan de l'écliptique J2000. Angles géocentriques apparents de la date (équatoriales et écliptiques), topocentriques avec
           réfraction pour les horizontales. Cliquez une ligne pour afficher le détail de l'astre.
         </p>
@@ -204,7 +197,7 @@ export default function SolarSystem() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-semibold">
               <span className="sym" style={{ color: selected.color }}>{selected.symbol}</span> {selected.name}{' '}
-              <span className="text-sm font-normal text-zinc-500">· {selected.constellation.name}</span>
+              <span className="text-sm font-normal text-night-500">· {selected.constellation.name}</span>
             </h2>
             <select className="input w-auto" value={selected.id} onChange={(e) => set({ selected: e.target.value })} aria-label="Astre">
               {rows
@@ -227,8 +220,8 @@ export default function SolarSystem() {
               ['Phase éclairée', selected.id === 'Sun' ? '—' : `${fmt(selected.phase * 100, 1)} %`],
               ['Temps-lumière', `${fmt((selected.pos.dist * Astronomy.KM_PER_AU) / 299_792.458 / 60, 2)} min`],
             ].map(([k, v]) => (
-              <div key={k} className="rounded-lg bg-zinc-50 px-3 py-2 dark:bg-zinc-950">
-                <dt className="text-[11px] text-zinc-500">{k}</dt>
+              <div key={k} className="rounded-lg bg-night-50 px-3 py-2 dark:bg-night-950">
+                <dt className="text-[11px] text-night-500">{k}</dt>
                 <dd className="font-mono">{v}</dd>
               </div>
             ))}

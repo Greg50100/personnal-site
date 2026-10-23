@@ -23,7 +23,7 @@ export default class ErrorBoundary extends Component {
         <TriangleAlert className="mt-0.5 shrink-0 text-red-500" size={20} />
         <div>
           <p className="font-semibold">Cet outil a rencontré une erreur.</p>
-          <p className="mt-1 font-mono text-xs text-zinc-500">{String(this.state.error?.message ?? this.state.error)}</p>
+          <p className="mt-1 font-mono text-xs text-night-500">{String(this.state.error?.message ?? this.state.error)}</p>
           <button type="button" className="btn mt-3" onClick={() => this.setState({ error: null })}>
             Réessayer
           </button>

@@ -33,11 +33,11 @@ function Forms({ z, label }) {
   return (
     <div className="space-y-1.5 text-sm">
       <p className="label">{label}</p>
-      <p className="font-mono text-lg font-semibold text-orange-600 dark:text-orange-400">{algebraic(z)}</p>
-      <p className="font-mono text-zinc-600 dark:text-zinc-400">
+      <p className="font-mono text-lg font-semibold text-accent-700 dark:text-accent-400">{algebraic(z)}</p>
+      <p className="font-mono text-night-600 dark:text-night-400">
         |z| = {n(r)} · arg z = {n(deg(theta))}° ({n(theta)} rad)
       </p>
-      <p className="font-mono text-zinc-600 dark:text-zinc-400">
+      <p className="font-mono text-night-600 dark:text-night-400">
         z = {n(r)} · e<sup>i·{n(theta)}</sup> = {n(r)}∠{n(deg(theta))}°
       </p>
     </div>
@@ -50,13 +50,13 @@ function Argand({ points }) {
   const sx = (x) => S / 2 + (x / max) * (S / 2)
   const sy = (y) => S / 2 - (y / max) * (S / 2)
   return (
-    <svg viewBox={`0 0 ${S} ${S}`} className="mx-auto h-auto w-full max-w-[320px] rounded-lg border border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950" role="img" aria-label="Plan complexe">
-      <line x1="0" x2={S} y1={S / 2} y2={S / 2} className="stroke-zinc-300 dark:stroke-zinc-700" />
-      <line y1="0" y2={S} x1={S / 2} x2={S / 2} className="stroke-zinc-300 dark:stroke-zinc-700" />
-      <text x={S - 6} y={S / 2 - 6} textAnchor="end" className="fill-zinc-500 font-mono text-[10px]">
+    <svg viewBox={`0 0 ${S} ${S}`} className="mx-auto h-auto w-full max-w-[320px] rounded-lg border border-night-200 bg-night-50 dark:border-night-800 dark:bg-night-950" role="img" aria-label="Plan complexe">
+      <line x1="0" x2={S} y1={S / 2} y2={S / 2} className="stroke-night-300 dark:stroke-night-700" />
+      <line y1="0" y2={S} x1={S / 2} x2={S / 2} className="stroke-night-300 dark:stroke-night-700" />
+      <text x={S - 6} y={S / 2 - 6} textAnchor="end" className="fill-night-500 font-mono text-[10px]">
         Re
       </text>
-      <text x={S / 2 + 6} y="12" className="fill-zinc-500 font-mono text-[10px]">
+      <text x={S / 2 + 6} y="12" className="fill-night-500 font-mono text-[10px]">
         Im
       </text>
       {points.map((p) =>
@@ -99,7 +99,7 @@ export default function ComplexCalculator() {
   const points = [
     z1 && { label: 'z₁', z: z1, color: '#38bdf8' },
     operation.binary && z2 && { label: 'z₂', z: z2, color: '#a78bfa' },
-    result && { label: 'r', z: result, color: '#f97316' },
+    result && { label: 'r', z: result, color: '#f59e0b' },
   ].filter(Boolean)
 
   return (
@@ -133,11 +133,11 @@ export default function ComplexCalculator() {
           <p className="label">Opération</p>
           <Segmented value={op} onChange={setOp} options={OPERATIONS.map(({ value, label }) => ({ value, label }))} ariaLabel="Opération" />
         </div>
-        <div className="border-t border-zinc-200 pt-4 dark:border-zinc-800">
+        <div className="border-t border-night-200 pt-4 dark:border-night-800">
           {error ? <p className="text-sm text-red-500">{error}</p> : result && <Forms z={result} label={`Résultat : ${operation.label}`} />}
         </div>
         {z1 && (
-          <div className="grid gap-4 border-t border-zinc-200 pt-4 dark:border-zinc-800 sm:grid-cols-2">
+          <div className="grid gap-4 border-t border-night-200 pt-4 dark:border-night-800 sm:grid-cols-2">
             <Forms z={z1} label="z₁" />
             {operation.binary && z2 && <Forms z={z2} label="z₂" />}
           </div>
@@ -146,7 +146,7 @@ export default function ComplexCalculator() {
       <div className="card card-pad">
         <p className="label">Plan complexe (Argand)</p>
         <Argand points={points} />
-        <p className="mt-3 text-xs text-zinc-500">Saisie acceptée : 3+4i, -2i, 1,5 - j2, i, 5…</p>
+        <p className="mt-3 text-xs text-night-500">Saisie acceptée : 3+4i, -2i, 1,5 - j2, i, 5…</p>
       </div>
     </div>
   )

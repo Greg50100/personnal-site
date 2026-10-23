@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import Segmented from '../../../components/Segmented'
 import { fmt } from '../../../lib/format'
-import { formatSI, parseSI } from '../si'
+import { formatSI, parseSI } from '../../../lib/si'
 import { COLOR, LAYOUTS, ROLE_LABEL, decode, eSeriesOf, encode, nearestInSeries, optionsFor } from './colors'
 
 const DEFAULT_BANDS = {
@@ -61,12 +61,12 @@ export default function ResistorColorCode() {
         </div>
         <ResistorDrawing bands={bands} />
         <div className="mt-4 text-center">
-          <p className="font-mono text-4xl font-bold text-orange-600 dark:text-orange-400">{formatSI(ohms, 'Ω', 6)}</p>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="font-mono text-4xl font-bold text-accent-700 dark:text-accent-400">{formatSI(ohms, 'Ω', 6)}</p>
+          <p className="mt-1 text-sm text-night-600 dark:text-night-400">
             ± {fmt(tolerance, tolerance < 1 ? 2 : 0)} % · de {formatSI(ohms * (1 - tolerance / 100), 'Ω', 5)} à {formatSI(ohms * (1 + tolerance / 100), 'Ω', 5)}
             {tcr !== null && <> · {tcr} ppm/K</>}
           </p>
-          <p className="mt-1 text-xs text-zinc-500">
+          <p className="mt-1 text-xs text-night-500">
             {series ? `Valeur normalisée de la série ${series}` : `Valeur hors séries E — proches en E24 : ${nearestInSeries(ohms).map((v) => formatSI(v, 'Ω')).join(' / ')}`}
           </p>
         </div>
@@ -93,13 +93,13 @@ export default function ResistorColorCode() {
                     title={`${c.label} (${detail})`}
                     aria-label={`${c.label} (${detail})`}
                     aria-pressed={active}
-                    className={`h-8 w-8 rounded-md border-2 transition-transform ${active ? 'scale-110 border-orange-500 ring-2 ring-orange-500/40' : 'border-zinc-300 dark:border-zinc-700'}`}
+                    className={`h-8 w-8 rounded-md border-2 transition-transform ${active ? 'scale-110 border-accent-500 ring-2 ring-accent-500/40' : 'border-night-300 dark:border-night-700'}`}
                     style={{ backgroundColor: c.hex }}
                   />
                 )
               })}
             </div>
-            <p className="mt-2 text-xs text-zinc-500">{COLOR[bands[i]].label}</p>
+            <p className="mt-2 text-xs text-night-500">{COLOR[bands[i]].label}</p>
           </fieldset>
         ))}
       </div>
@@ -122,7 +122,7 @@ export default function ResistorColorCode() {
           </button>
         </div>
         {reverse && (
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="mt-2 text-sm text-night-600 dark:text-night-400">
             {encoded
               ? `${encoded.digits.map((id) => COLOR[id].label).join(', ')}, ${COLOR[encoded.mult].label}${encoded.exact ? '' : ' (valeur arrondie)'}`
               : 'Valeur non représentable avec ces anneaux.'}

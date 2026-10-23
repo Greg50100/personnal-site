@@ -54,7 +54,7 @@ export default function NumberBases() {
               autoComplete="off"
             />
             {b.group && value !== null && b.base !== 10 && (
-              <p className="mt-1 break-all font-mono text-xs text-zinc-500">{groupDigits(formatInBase(value, b.base), b.group)}</p>
+              <p className="mt-1 break-all font-mono text-xs text-night-500">{groupDigits(formatInBase(value, b.base), b.group)}</p>
             )}
           </div>
         ))}

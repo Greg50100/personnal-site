@@ -24,6 +24,15 @@ export const BODIES = [
 ]
 
 export const PLANETS = BODIES.filter((b) => b.planet)
+
+/** Rayons équatoriaux (km), pour le diamètre apparent. */
+export const RADIUS_KM = { Sun: 695_700, Moon: 1737.4, Mercury: 2439.7, Venus: 6051.8, Mars: 3396.2, Jupiter: 71_492, Saturn: 60_268, Uranus: 25_559, Neptune: 24_764, Pluto: 1188.3 }
+
+/** Diamètre apparent (secondes d'arc) d'un astre situé à `distAu` unités astronomiques. */
+export const diameterArcsec = (id, distAu) => ((2 * Math.atan(RADIUS_KM[id] / (distAu * Astronomy.KM_PER_AU)) * 180) / Math.PI) * 3600
+
+/** Diamètre apparent lisible : « 31,9′ » ou « 12,4″ ». */
+export const fmtDiameter = (arcsec) => (arcsec > 120 ? `${(arcsec / 60).toFixed(1).replace('.', ',')}′` : `${arcsec.toFixed(1).replace('.', ',')}″`)
 export const BODY = Object.fromEntries(BODIES.map((b) => [b.id, b]))
 
 const CONSTELLATION_FR = Object.fromEntries(CONSTELLATIONS.map((c) => [c.id, c.fr]))

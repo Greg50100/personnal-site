@@ -60,17 +60,17 @@ export default function AltitudeChart({ series, start, end, now }) {
         ))}
         {[0, 30, 60, 90, -30].map((a) => (
           <g key={a}>
-            <line x1={PAD.l} x2={W - PAD.r} y1={y(a)} y2={y(a)} className={a === 0 ? 'stroke-zinc-500' : 'stroke-zinc-400/30'} strokeWidth={a === 0 ? 1.5 : 1} />
-            <text x={PAD.l - 6} y={y(a) + 4} textAnchor="end" className="fill-zinc-500 font-mono text-[11px]">
+            <line x1={PAD.l} x2={W - PAD.r} y1={y(a)} y2={y(a)} className={a === 0 ? 'stroke-night-500' : 'stroke-night-400/30'} strokeWidth={a === 0 ? 1.5 : 1} />
+            <text x={PAD.l - 6} y={y(a) + 4} textAnchor="end" className="fill-night-500 font-mono text-[11px]">
               {a}°
             </text>
           </g>
         ))}
         {hours.map((h) => (
           <g key={h.getTime()}>
-            <line x1={x(h)} x2={x(h)} y1={PAD.t} y2={H - PAD.b} className="stroke-zinc-400/20" />
+            <line x1={x(h)} x2={x(h)} y1={PAD.t} y2={H - PAD.b} className="stroke-night-400/20" />
             {h.getHours() % 2 === 0 && (
-              <text x={x(h)} y={H - 8} textAnchor="middle" className="fill-zinc-500 font-mono text-[11px]">
+              <text x={x(h)} y={H - 8} textAnchor="middle" className="fill-night-500 font-mono text-[11px]">
                 {String(h.getHours()).padStart(2, '0')}h
               </text>
             )}
@@ -86,8 +86,8 @@ export default function AltitudeChart({ series, start, end, now }) {
             points={s.points.map((p) => `${x(p.t).toFixed(1)},${y(p.alt).toFixed(1)}`).join(' ')}
           />
         ))}
-        {now && now >= start && now <= end && <line x1={x(now)} x2={x(now)} y1={PAD.t} y2={H - PAD.b} stroke="#f97316" strokeWidth="1.5" />}
-        {hover && <line x1={x(hover)} x2={x(hover)} y1={PAD.t} y2={H - PAD.b} className="stroke-zinc-900 dark:stroke-white" strokeWidth="1" strokeDasharray="3 3" />}
+        {now && now >= start && now <= end && <line x1={x(now)} x2={x(now)} y1={PAD.t} y2={H - PAD.b} stroke="#f59e0b" strokeWidth="1.5" />}
+        {hover && <line x1={x(hover)} x2={x(hover)} y1={PAD.t} y2={H - PAD.b} className="stroke-night-900 dark:stroke-white" strokeWidth="1" strokeDasharray="3 3" />}
       </svg>
 
       <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs">
@@ -97,11 +97,11 @@ export default function AltitudeChart({ series, start, end, now }) {
             <span key={s.id} className="inline-flex items-center gap-1.5">
               <span className="inline-block h-0.5 w-4" style={{ backgroundColor: s.color }} />
               {s.name}
-              {v != null && <span className={`font-mono ${v > 0 ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-500'}`}>{fmt(v, 0)}°</span>}
+              {v != null && <span className={`font-mono ${v > 0 ? 'text-night-900 dark:text-night-100' : 'text-night-500'}`}>{fmt(v, 0)}°</span>}
             </span>
           )
         })}
-        {hover && <span className="ml-auto font-mono text-zinc-500">{fmtTime(hover)}</span>}
+        {hover && <span className="ml-auto font-mono text-night-500">{fmtTime(hover)}</span>}
       </div>
     </div>
   )

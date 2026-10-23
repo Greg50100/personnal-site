@@ -1,7 +1,8 @@
-# GREG.MECH — site personnel
+# Ganymede — calculateurs, conversions et astronomie
 
-Vitrine de mes projets et boîte à outils qui fonctionne entièrement dans le navigateur :
-utilitaires du quotidien, calculs mathématiques, électronique et astronomie (dans l'esprit de
+Plus de soixante outils gratuits qui fonctionnent entièrement dans le navigateur : calculateurs
+d'électronique, de maths, de physique et de santé, convertisseur d'unités et de devises, temps
+astronomique, et tout le nécessaire pour observer le ciel (dans l'esprit de
 [Heavens-Above](https://www.heavens-above.com) et des pages de [Don Cross](https://cosinekitty.com)).
 
 **Site en ligne :** https://greg50100.github.io/personnal-site/
@@ -10,13 +11,18 @@ utilitaires du quotidien, calculs mathématiques, électronique et astronomie (d
 
 | Rubrique | Outils |
 | --- | --- |
-| Astronomie | Ce soir dans le ciel (éphémérides, crépuscules, planètes visibles, courbes de hauteur) · Carte du ciel en temps réel · Calendrier astronomique · Calculateur du système solaire · Passages de l'ISS et des satellites |
-| Utilitaires | Convertisseur d'unités (19 grandeurs) · Calculatrice scientifique |
-| Mathématiques | Équation du second degré · PGCD / PPCM / facteurs premiers · Nombres complexes · Bases numériques |
-| Électronique | Code couleur des résistances · Loi d'Ohm et puissance · Pont diviseur de tension · Résistance pour LED · Temporisateur 555 |
+| Astronomie | Ce soir dans le ciel · Carte du ciel · Calendrier astronomique · Calculateur du système solaire · Le Soleil · La Lune · Résumé des planètes · Éclipses et passages · Passages de l'ISS et satellites · Satellites brillants · Où est l'ISS ? · Jour et nuit sur la Terre |
+| Dates et temps | Heure et temps astronomique (UTC, TAI, TT, GPS, jour julien, temps sidéral, équation du temps) · Fuseaux horaires · Calcul de dates · Pâques et jours fériés |
+| Conversions et calcul | Convertisseur (75 grandeurs, plus de 600 unités, devises BCE) · Calculatrice scientifique |
+| Électronique | Loi d'Ohm · Codes des résistances (couleurs, CMS) et des condensateurs · Séries E · Série/parallèle · Pont diviseur · LED · Tolérances · Puissance · Valeur efficace · Réactance · Impédance RLC · Résonance LC · Filtres passifs · Constante de temps · 555 · AOP · Polarisation BJT · Zener · Transformateur · Wheatstone · Triangle-étoile · Câbles (chute de tension, section) · Bobine à air · Batterie · Coût de l'énergie |
+| Mathématiques | Traceur de courbes · Second degré · Matrices · Pourcentages · PGCD/PPCM · Complexes · Bases numériques |
+| Physique | Chute libre · Projectile · Loi de Newton · Gaz parfaits · Bernoulli · Ondes |
+| Santé | IMC · Métabolisme · Masse grasse |
+| Chimie | Masse molaire |
 
 Les outils d'astronomie partagent le **lieu d'observation** (sélecteur dans l'en-tête : villes,
-géolocalisation ou coordonnées), mémorisé dans le navigateur.
+géolocalisation ou coordonnées), mémorisé dans le navigateur. Une page « À propos » présente les
+projets dont proviennent les outils (application Android Ganymede, dépôts d'astronomie et de conversion).
 
 ## Démarrer
 
@@ -34,55 +40,60 @@ npm run check     # lint + tests + build, comme la CI
 ```
 src/
 ├── App.jsx                  # routes (générées à partir du registre)
-├── config/site.js           # nom du site, liens GitHub…
-├── data/projects.js         # liste des dépôts affichés sur la page « Projets »
+├── config/site.js           # nom du site, description, liens GitHub
+├── data/projects.js         # projets présentés sur la page « À propos »
 ├── context/                 # thème clair/sombre et lieu d'observation partagés
-├── components/              # en-tête, pied de page, cartes, sélecteur de lieu…
-├── pages/                   # accueil, catalogue, rubrique, page d'outil, projets
-├── lib/format.js            # formatage français (nombres, angles, heures)
+├── components/              # en-tête, recherche (Ctrl K), pied de page, cartes, sélecteur de lieu…
+├── pages/                   # accueil, catalogue, rubrique, page d'outil, à propos
+├── lib/                     # formatage français (nombres, angles, heures), notation SI
 └── tools/
     ├── registry.js          # ⭐ REGISTRE DES OUTILS
-    ├── astronomy/           # lib/astro.js (fonctions communes), data/ (catalogues d'étoiles), un dossier par outil
-    ├── utilities/
-    ├── maths/
-    └── electronics/
+    ├── kit/                 # calculateur générique piloté par une « spec », graphiques
+    ├── astronomy/           # lib/ (astro, time, geo), components/ (cartes, graphiques), un dossier par outil
+    ├── utilities/converter/ # units/ (grandeurs par famille), currency.js (taux BCE)
+    ├── temps/ maths/ physique/ sante/ chimie/ electronics/
 ```
 
 ## Ajouter un outil
 
-1. Créer le composant, par exemple `src/tools/maths/pourcentage/Percentage.jsx` :
+**Calculateur simple (formulaire → résultats)** : écrire une spec, sans React.
 
-   ```jsx
-   export default function Percentage() {
-     return <div className="card card-pad">…</div>
-   }
-   ```
+```js
+// src/tools/physique/energie-cinetique.js
+export default {
+  inputs: [
+    { id: 'm', label: 'Masse', unit: 'kg', value: '1000' },
+    { id: 'v', label: 'Vitesse', unit: 'm/s', value: '20' },
+  ],
+  compute: ({ m, v }) => ({ results: [{ label: 'Énergie cinétique', value: 0.5 * m * v * v, unit: 'J', main: true }] }),
+  formulas: ['E = ½ m v²'],
+}
+```
 
-2. Le déclarer dans `src/tools/registry.js` :
+```js
+// src/tools/registry.js
+{ id: 'energie-cinetique', category: 'physique', title: 'Énergie cinétique', summary: '…', icon: I.Gauge,
+  component: calc(() => import('./physique/energie-cinetique.js')) },
+```
 
-   ```js
-   {
-     id: 'pourcentage',
-     category: 'maths',
-     title: 'Pourcentages',
-     summary: 'Hausse, baisse, taux et proportions.',
-     icon: Percent,                 // icône lucide-react
-     status: 'dev',                 // 'stable' | 'beta' | 'dev'
-     repo: 'Ganymede',              // dépôt d'origine (facultatif)
-     component: lazy(() => import('./maths/pourcentage/Percentage.jsx')),
-   },
-   ```
+Une spec peut aussi renvoyer un tableau (`table`), un graphique (`chart`) et des notes ; les champs
+acceptent les préfixes SI (« 4k7 », « 100n »), des listes de choix et des valeurs prédéfinies.
+Voir `src/tools/kit/Calculator.jsx`.
 
-C'est tout : la page `#/maths/pourcentage`, le menu mobile, le catalogue, la recherche et l'accueil
-se mettent à jour automatiquement. Chaque outil est chargé à la demande, il n'alourdit pas le reste du site.
+**Outil avec une interface sur mesure** : un composant React (export default), déclaré avec
+`component: lazy(() => import('./rubrique/MonOutil.jsx'))`.
+
+Dans les deux cas, la page `#/<rubrique>/<id>`, le menu, le catalogue, la recherche et l'accueil se
+mettent à jour automatiquement. Chaque outil est chargé à la demande.
 
 Autres points d'extension :
 
 - **Nouvelle rubrique** : ajouter une entrée à `CATEGORIES` dans `registry.js`.
-- **Nouvelle grandeur ou unité** dans le convertisseur : `src/tools/utilities/converter/units.js`
-  (un facteur vers l'unité de base, ou `toBase`/`fromBase` pour les conversions non linéaires).
-- **Nouveau projet** sur la page Projets : `src/data/projects.js`.
+- **Nouvelle grandeur ou unité** : `src/tools/utilities/converter/units/` (un facteur vers l'unité de
+  base, ou `toBase`/`fromBase` pour les conversions non linéaires ; `si()` génère les préfixes).
+- **Nouveau projet** sur la page À propos : `src/data/projects.js`.
 - **Classes CSS communes** (`card`, `btn`, `input`, `label`, `chip`, `table-data`…) : `src/index.css`.
+- **Couleurs** : palettes `night` (bleu nuit) et `accent` (ambre) dans `tailwind.config.js`.
 
 ## Déploiement
 
@@ -98,6 +109,9 @@ Pour un domaine personnel, remplacer `base` dans `vite.config.js` par `'/'`.
 - Étoiles (jusqu'à la magnitude 6), tracés et noms des constellations, objets Messier :
   [d3-celestial](https://github.com/ofrohn/d3-celestial) — Olaf Frohn, licence BSD-3.
   Les fichiers compacts de `src/tools/astronomy/data/` en sont extraits.
+- Fond de carte du monde : [Natural Earth](https://www.naturalearthdata.com) (domaine public), via
+  [world-atlas](https://github.com/topojson/world-atlas), converti en tracé SVG équirectangulaire.
 - Satellites : [satellite.js](https://github.com/shashwatak/satellite-js) (MIT), éléments orbitaux
   [CelesTrak](https://celestrak.org).
-- Icônes : [Lucide](https://lucide.dev).
+- Taux de change : taux de référence de la Banque centrale européenne via [Frankfurter](https://frankfurter.dev).
+- Secondes intercalaires : IERS. Icônes : [Lucide](https://lucide.dev).

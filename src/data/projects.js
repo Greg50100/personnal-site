@@ -8,8 +8,8 @@
 export const PROJECTS = [
   {
     repo: 'personnal-site',
-    title: 'Site personnel',
-    description: 'Ce site : vitrine des projets et boîte à outils (astronomie, conversions, calculs) en React + Vite.',
+    title: 'Ganymede (site web)',
+    description: 'Ce site : boîte à outils de calcul, de conversion et d’astronomie, en React + Vite.',
     tech: ['React', 'Vite', 'Tailwind', 'astronomy-engine'],
     status: 'actif',
     tools: [],
@@ -21,7 +21,7 @@ export const PROJECTS = [
       'Calculatrice scientifique Android : convertisseur, traceur de fonctions et suite de calculateurs (électronique, maths, santé).',
     tech: ['Kotlin', 'Jetpack Compose', 'Hilt', 'Room'],
     status: 'actif',
-    tools: ['second-degre', 'pgcd-ppcm', 'pont-diviseur', 'resistance-led', 'timer-555'],
+    tools: ['traceur', 'matrices', 'loi-ohm', 'code-couleur', 'timer-555', 'imc', 'masse-molaire', 'calcul-dates'],
   },
   {
     repo: 'Celeste_App',
@@ -94,5 +94,5 @@ export const PROJECT_STATUS = {
   actif: { label: 'Actif', className: 'border-emerald-500/40 text-emerald-600 dark:text-emerald-400' },
   prototype: { label: 'Prototype', className: 'border-sky-500/40 text-sky-600 dark:text-sky-400' },
   'en-pause': { label: 'En pause', className: 'border-amber-500/40 text-amber-600 dark:text-amber-400' },
-  termine: { label: 'Terminé', className: 'border-zinc-500/40 text-zinc-500' },
+  termine: { label: 'Terminé', className: 'border-night-500/40 text-night-500' },
 }

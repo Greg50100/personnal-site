@@ -1,0 +1,34 @@
+/** Constantes de définition des unités (valeurs exactes sauf mention contraire). */
+export const PI = Math.PI
+export const IN = 0.0254
+export const FT = 0.3048
+export const YD = 0.9144
+export const MI = 1609.344
+export const NMI = 1852
+export const LB = 0.45359237
+export const OZ = LB / 16
+export const GRAIN = LB / 7000
+export const G0 = 9.80665
+export const LBF = LB * G0
+export const KGF = G0
+export const CAL = 4.184 // calorie thermochimique
+export const CAL_IT = 4.1868 // calorie internationale
+export const BTU = 1055.05585262 // BTU international
+export const GAL_US = 3.785411784e-3
+export const GAL_UK = 4.54609e-3
+export const AU = 149_597_870_700
+export const LY = 9_460_730_472_580_800
+export const PC = (AU * 648_000) / PI
+export const EV = 1.602176634e-19
+export const NA = 6.02214076e23
+export const C_LIGHT = 299_792_458
+export const ATM = 101_325
+export const MMHG = 133.322387415
+export const INHG = 3386.389
+export const HP = 550 * FT * LBF // horsepower mécanique ≈ 745,7 W
+export const CV = 75 * KGF // cheval-vapeur métrique = 735,49875 W
+export const MINUTE = 60
+export const HOUR = 3600
+export const DAY = 86_400
+export const YEAR = 365.25 * DAY
+export const CURIE = 3.7e10

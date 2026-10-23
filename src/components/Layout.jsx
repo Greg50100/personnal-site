@@ -16,7 +16,7 @@ export default function Layout() {
       <button
         type="button"
         onClick={() => document.getElementById('contenu')?.focus()}
-        className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-[200] focus:rounded focus:bg-orange-600 focus:px-3 focus:py-2 focus:text-white"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-[200] focus:rounded focus:bg-accent-600 focus:px-3 focus:py-2 focus:text-white"
       >
         Aller au contenu
       </button>

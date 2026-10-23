@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { formatSI, parseSI } from './si'
+import { formatSI, parseSI } from '../../lib/si'
 import { decode, eSeriesOf, encode, nearestInSeries } from './resistor/colors'
 import { solveOhm } from './ohm/ohm'
 import { findR2, solveDivider } from './divider/divider'
@@ -35,7 +35,8 @@ describe('code couleur', () => {
     expect(encode(1.5e6, 3).mult).toBe('jaune')
   })
   test('séries E', () => {
-    expect(eSeriesOf(4700)).toBe('E6')
+    expect(eSeriesOf(4700)).toBe('E3')
+    expect(eSeriesOf(1500)).toBe('E6')
     expect(eSeriesOf(2700)).toBe('E12')
     expect(eSeriesOf(5100)).toBe('E24')
     expect(eSeriesOf(4750)).toBe('E96')

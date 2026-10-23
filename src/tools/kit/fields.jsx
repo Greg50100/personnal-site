@@ -1,4 +1,4 @@
-import { formatSI, parseSI } from './si'
+import { formatSI, parseSI } from '../../lib/si'
 
 /**
  * Champ numérique acceptant les préfixes SI (4k7, 10µ, 20m…), avec rappel de la valeur lue.
@@ -22,7 +22,7 @@ export function SIField({ id, label, unit, value, onChange, placeholder, optiona
         onChange={(e) => onChange(e.target.value)}
         autoComplete="off"
       />
-      <p className={`mt-1 font-mono text-xs ${invalid ? 'text-red-500' : 'text-zinc-500'}`}>
+      <p className={`mt-1 font-mono text-xs ${invalid ? 'text-red-500' : 'text-night-500'}`}>
         {invalid ? 'Valeur non reconnue' : empty ? (optional ? 'facultatif' : '\u00a0') : `= ${formatSI(parsed, unit, 6)}`}
       </p>
     </div>
@@ -32,10 +32,10 @@ export function SIField({ id, label, unit, value, onChange, placeholder, optiona
 /** Tuile de résultat ; `main` la met en avant. */
 export function Result({ label, value, hint, main = false }) {
   return (
-    <div className={`rounded-lg px-3 py-2 ${main ? 'border border-orange-500/40 bg-orange-500/5' : 'bg-zinc-50 dark:bg-zinc-950'}`}>
-      <p className="text-[11px] text-zinc-500">{label}</p>
-      <p className={`font-mono ${main ? 'text-2xl font-bold text-orange-600 dark:text-orange-400' : 'text-base'}`}>{value}</p>
-      {hint && <p className="text-[11px] text-zinc-500">{hint}</p>}
+    <div className={`rounded-lg px-3 py-2 ${main ? 'border border-accent-500/40 bg-accent-500/5' : 'bg-night-50 dark:bg-night-950'}`}>
+      <p className="text-[11px] text-night-500">{label}</p>
+      <p className={`font-mono ${main ? 'text-2xl font-bold text-accent-700 dark:text-accent-400' : 'text-base'}`}>{value}</p>
+      {hint && <p className="text-[11px] text-night-500">{hint}</p>}
     </div>
   )
 }

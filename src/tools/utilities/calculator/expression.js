@@ -1,5 +1,7 @@
 /**
  * Évaluateur d'expressions mathématiques (descente récursive, sans eval).
+ * L'expression est compilée une seule fois en fonction JavaScript, puis évaluée autant de fois
+ * que nécessaire (le traceur de courbes l'appelle pour des milliers de valeurs de x).
  *
  * Grammaire :
  *   expr    := term (('+' | '-') term)*
@@ -7,15 +9,18 @@
  *   unary   := ('+' | '-') unary | power
  *   power   := postfix ('^' unary)?          (associatif à droite : 2^3^2 = 2^9)
  *   postfix := primary ('!' | '%' | '²' | '³')*
- *   primary := nombre | constante | fonction '(' expr ')' | '(' expr ')' | '√' unary
+ *   primary := nombre | variable | constante | fonction '(' expr ')' | '(' expr ')' | '√' unary
  */
 
+const toRad = (x, deg) => (deg ? (x * Math.PI) / 180 : x)
+const toAngle = (rad, deg) => (deg ? (rad * 180) / Math.PI : rad)
+
 const FUNCTIONS = {
-  sin: (x, deg) => Math.sin(deg ? (x * Math.PI) / 180 : x),
-  cos: (x, deg) => Math.cos(deg ? (x * Math.PI) / 180 : x),
+  sin: (x, deg) => Math.sin(toRad(x, deg)),
+  cos: (x, deg) => Math.cos(toRad(x, deg)),
   tan: (x, deg) => {
-    if (deg && Math.abs(((x % 180) + 180) % 180 - 90) < 1e-12) throw new Error('tan non définie pour cet angle')
-    return Math.tan(deg ? (x * Math.PI) / 180 : x)
+    if (deg && Math.abs((((x % 180) + 180) % 180) - 90) < 1e-12) throw new Error('tan non définie pour cet angle')
+    return Math.tan(toRad(x, deg))
   },
   asin: (x, deg) => toAngle(Math.asin(x), deg),
   acos: (x, deg) => toAngle(Math.acos(x), deg),
@@ -33,6 +38,7 @@ const FUNCTIONS = {
   floor: Math.floor,
   ceil: Math.ceil,
   round: Math.round,
+  sign: Math.sign,
 }
 
 const CONSTANTS = {
@@ -42,8 +48,6 @@ const CONSTANTS = {
   phi: (1 + Math.sqrt(5)) / 2,
   'φ': (1 + Math.sqrt(5)) / 2,
 }
-
-const toAngle = (rad, deg) => (deg ? (rad * 180) / Math.PI : rad)
 
 export const FUNCTION_NAMES = Object.keys(FUNCTIONS)
 
@@ -93,12 +97,12 @@ export function tokenize(input) {
 }
 
 /**
- * Évalue une expression. options.angle : 'deg' | 'rad' ; options.ans : résultat précédent.
+ * Compile une expression. `variables` liste les noms autorisés (ex. ['x']).
+ * Retourne une fonction (scope) => nombre, où scope = { angle, ans, x, … }.
  * Lève une Error (message en français) si l'expression est invalide.
  */
-export function evaluate(input, { angle = 'deg', ans = 0 } = {}) {
+export function compile(input, variables = []) {
   const tokens = tokenize(input)
-  const deg = angle === 'deg'
   let pos = 0
 
   const peek = () => tokens[pos]
@@ -108,7 +112,7 @@ export function evaluate(input, { angle = 'deg', ans = 0 } = {}) {
     if (!isOp(v)) throw new Error(v === ')' ? 'Parenthèse fermante manquante' : `« ${v} » attendu`)
     pos++
   }
-  // Un jeton qui peut commencer un facteur : sert à détecter la multiplication implicite (2π, 3(4+1)…).
+  // Un jeton qui peut commencer un facteur : sert à détecter la multiplication implicite (2π, 3(4+1), 2x…).
   const startsPrimary = () => {
     const t = peek()
     return t && (t.type === 'num' || t.type === 'id' || (t.type === 'op' && (t.value === '(' || t.value === '√')))
@@ -118,8 +122,9 @@ export function evaluate(input, { angle = 'deg', ans = 0 } = {}) {
     let left = term()
     while (isOp('+') || isOp('-')) {
       const op = next().value
-      const right = term()
-      left = op === '+' ? left + right : left - right
+      const a = left
+      const b = term()
+      left = op === '+' ? (s) => a(s) + b(s) : (s) => a(s) - b(s)
     }
     return left
   }
@@ -129,11 +134,20 @@ export function evaluate(input, { angle = 'deg', ans = 0 } = {}) {
     for (;;) {
       if (isOp('*') || isOp('/')) {
         const op = next().value
-        const right = unary()
-        if (op === '/' && right === 0) throw new Error('Division par zéro')
-        left = op === '*' ? left * right : left / right
+        const a = left
+        const b = unary()
+        left =
+          op === '*'
+            ? (s) => a(s) * b(s)
+            : (s) => {
+                const d = b(s)
+                if (d === 0 && !s.allowInfinity) throw new Error('Division par zéro')
+                return a(s) / d
+              }
       } else if (startsPrimary()) {
-        left *= power()
+        const a = left
+        const b = power()
+        left = (s) => a(s) * b(s)
       } else {
         return left
       }
@@ -143,7 +157,8 @@ export function evaluate(input, { angle = 'deg', ans = 0 } = {}) {
   function unary() {
     if (isOp('-')) {
       next()
-      return -unary()
+      const a = unary()
+      return (s) => -a(s)
     }
     if (isOp('+')) {
       next()
@@ -156,7 +171,8 @@ export function evaluate(input, { angle = 'deg', ans = 0 } = {}) {
     const base = postfix()
     if (isOp('^')) {
       next()
-      return base ** unary()
+      const exp = unary()
+      return (s) => base(s) ** exp(s)
     }
     return base
   }
@@ -164,10 +180,11 @@ export function evaluate(input, { angle = 'deg', ans = 0 } = {}) {
   function postfix() {
     let value = primary()
     for (;;) {
-      if (isOp('!')) value = factorial(value)
-      else if (isOp('%')) value /= 100
-      else if (isOp('²')) value **= 2
-      else if (isOp('³')) value **= 3
+      const a = value
+      if (isOp('!')) value = (s) => factorial(a(s))
+      else if (isOp('%')) value = (s) => a(s) / 100
+      else if (isOp('²')) value = (s) => a(s) ** 2
+      else if (isOp('³')) value = (s) => a(s) ** 3
       else return value
       next()
     }
@@ -176,31 +193,52 @@ export function evaluate(input, { angle = 'deg', ans = 0 } = {}) {
   function primary() {
     const t = next()
     if (!t) throw new Error('Expression incomplète')
-    if (t.type === 'num') return t.value
+    if (t.type === 'num') {
+      const n = t.value
+      return () => n
+    }
     if (t.type === 'op' && t.value === '(') {
       const v = expr()
       expect(')')
       return v
     }
-    if (t.type === 'op' && t.value === '√') return Math.sqrt(unary())
+    if (t.type === 'op' && t.value === '√') {
+      const a = unary()
+      return (s) => Math.sqrt(a(s))
+    }
     if (t.type === 'id') {
-      if (t.value === 'ans') return ans
-      if (t.value in CONSTANTS) return CONSTANTS[t.value]
-      if (t.value in FUNCTIONS) {
-        if (!isOp('(')) throw new Error(`« ${t.value} » doit être suivi de parenthèses`)
+      const name = t.value
+      if (variables.includes(name)) return (s) => s[name]
+      if (name === 'ans') return (s) => s.ans ?? 0
+      if (name in CONSTANTS) {
+        const c = CONSTANTS[name]
+        return () => c
+      }
+      if (name in FUNCTIONS) {
+        if (!isOp('(')) throw new Error(`« ${name} » doit être suivi de parenthèses`)
         next()
         const arg = expr()
         expect(')')
-        return FUNCTIONS[t.value](arg, deg)
+        const fn = FUNCTIONS[name]
+        return (s) => fn(arg(s), s.angle === 'deg')
       }
-      throw new Error(`Nom inconnu « ${t.value} »`)
+      throw new Error(`Nom inconnu « ${name} »`)
     }
     throw new Error(`Symbole inattendu « ${t.value} »`)
   }
 
   if (!tokens.length) throw new Error('Expression vide')
-  const result = expr()
+  const fn = expr()
   if (pos < tokens.length) throw new Error(`Symbole inattendu « ${tokens[pos].value} »`)
+  return fn
+}
+
+/**
+ * Évalue une expression. options.angle : 'deg' | 'rad' ; options.ans : résultat précédent.
+ * Lève une Error (message en français) si l'expression est invalide.
+ */
+export function evaluate(input, { angle = 'deg', ans = 0 } = {}) {
+  const result = compile(input)({ angle, ans })
   if (Number.isNaN(result)) throw new Error('Résultat indéfini')
   // Nettoie les erreurs d'arrondi flottant (sin(180°) → 1e-16).
   return Math.abs(result) < 1e-14 ? 0 : parseFloat(result.toPrecision(15))

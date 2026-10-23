@@ -9,7 +9,7 @@ export const EVENT_TYPES = {
   phase: { label: 'Phase de la Lune', color: '#a1a1aa' },
   apsis: { label: 'Périgée / apogée', color: '#38bdf8' },
   season: { label: 'Saison', color: '#34d399' },
-  eclipse: { label: 'Éclipse', color: '#f97316' },
+  eclipse: { label: 'Éclipse', color: '#f59e0b' },
   opposition: { label: 'Opposition', color: '#f87171' },
   conjunction: { label: 'Conjonction solaire', color: '#fbbf24' },
   elongation: { label: 'Élongation maximale', color: '#a78bfa' },

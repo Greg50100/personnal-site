@@ -61,45 +61,4 @@ export function encode(ohms, digitCount) {
   return { digits, mult: multColor.id, exact: Math.abs(m * 10 ** e - ohms) / ohms < 1e-9 }
 }
 
-const E = {
-  E6: [10, 15, 22, 33, 47, 68],
-  E12: [10, 12, 15, 18, 22, 27, 33, 39, 47, 56, 68, 82],
-  E24: [10, 11, 12, 13, 15, 16, 18, 20, 22, 24, 27, 30, 33, 36, 39, 43, 47, 51, 56, 62, 68, 75, 82, 91],
-  E96: [
-    100, 102, 105, 107, 110, 113, 115, 118, 121, 124, 127, 130, 133, 137, 140, 143, 147, 150, 154, 158, 162, 165, 169, 174, 178, 182,
-    187, 191, 196, 200, 205, 210, 215, 221, 226, 232, 237, 243, 249, 255, 261, 267, 274, 280, 287, 294, 301, 309, 316, 324, 332, 340,
-    348, 357, 365, 374, 383, 392, 402, 412, 422, 432, 442, 453, 464, 475, 487, 499, 511, 523, 536, 549, 562, 576, 590, 604, 619, 634,
-    649, 665, 681, 698, 715, 732, 750, 768, 787, 806, 825, 845, 866, 887, 909, 931, 953, 976,
-  ],
-}
-E.E48 = E.E96.filter((_, i) => i % 2 === 0)
-
-const normalized = (ohms, digits) => Math.round(ohms / 10 ** (Math.floor(Math.log10(ohms)) - (digits - 1)))
-
-/** Plus petite série normalisée contenant la valeur, ou null. */
-export function eSeriesOf(ohms) {
-  if (!(ohms > 0)) return null
-  for (const name of ['E6', 'E12', 'E24']) {
-    const v = ohms / 10 ** (Math.floor(Math.log10(ohms)) - 1)
-    if (Math.abs(v - Math.round(v)) < 1e-6 && E[name].includes(Math.round(v))) return name
-  }
-  for (const name of ['E48', 'E96']) {
-    const v = ohms / 10 ** (Math.floor(Math.log10(ohms)) - 2)
-    if (Math.abs(v - Math.round(v)) < 1e-6 && E[name].includes(normalized(ohms, 3))) return name
-  }
-  return null
-}
-
-/** Valeurs normalisées encadrant `ohms` dans une série. */
-export function nearestInSeries(ohms, series = 'E24') {
-  if (!(ohms > 0)) return []
-  const list = E[series]
-  const digits = list[0] >= 100 ? 3 : 2
-  const decade = 10 ** (Math.floor(Math.log10(ohms)) - (digits - 1))
-  const candidates = [...list.map((v) => v * decade / 10), ...list.map((v) => v * decade), ...list.map((v) => v * decade * 10)].map((v) =>
-    parseFloat(v.toPrecision(6)),
-  )
-  const below = candidates.filter((v) => v <= ohms * (1 + 1e-9)).pop()
-  const above = candidates.find((v) => v >= ohms * (1 - 1e-9))
-  return [...new Set([below, above].filter(Boolean))]
-}
+export { nearestInSeries, seriesOf as eSeriesOf } from '../eseries'
