@@ -36,18 +36,19 @@ export const PROJECTS = [
   {
     repo: 'Celeste_HA',
     title: 'Céleste pour Home Assistant',
-    description: "Intégration Home Assistant : capteurs d'éphémérides (IMCCE), visibilité, magnitude et élongation des astres.",
-    tech: ['Python', 'Home Assistant', 'astroquery'],
-    status: 'prototype',
-    tools: [],
+    description:
+      'Intégration Home Assistant : Soleil, Lune et planètes calculés localement (même moteur que ce site), astéroïdes et comètes via l’IMCCE, jour julien et temps sidéral.',
+    tech: ['Python', 'Home Assistant', 'HACS', 'astronomy-engine'],
+    status: 'actif',
+    tools: ['soleil', 'lune', 'temps-astronomique'],
   },
   {
     repo: 'ha-meeus-astronomy',
     title: 'Meeus Astronomy (HA)',
-    description: "Composant Home Assistant basé sur les « Astronomical Algorithms » de Jean Meeus : jour julien, temps sidéral…",
+    description: 'Composant Home Assistant de jour julien d’après Jean Meeus, fusionné dans Céleste pour Home Assistant.',
     tech: ['Python', 'Home Assistant', 'HACS'],
-    status: 'prototype',
-    tools: ['systeme-solaire'],
+    status: 'archive',
+    tools: ['temps-astronomique'],
   },
   {
     repo: 'Astronomy',
