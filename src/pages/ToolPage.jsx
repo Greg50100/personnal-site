@@ -8,6 +8,7 @@ import ErrorBoundary from '../components/ErrorBoundary'
 import Loader from '../components/Loader'
 import StatusBadge from '../components/StatusBadge'
 import NotFound from './NotFound'
+import { isPublicRepo } from '../data/projects'
 
 export default function ToolPage() {
   const { category: categoryId, toolId } = useParams()
@@ -44,7 +45,7 @@ export default function ToolPage() {
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <StatusBadge status={tool.status} />
-          {tool.repo && (
+          {isPublicRepo(tool.repo) && (
             <a href={`${SITE.github}/${tool.repo}`} target="_blank" rel="noreferrer" className="chip hover:border-accent-500" title="Projet d'origine">
               <Github size={11} /> {tool.repo}
             </a>

@@ -39,14 +39,18 @@ function ProjectCard({ project }) {
           ))}
         </p>
       )}
-      <a
-        href={`${SITE.github}/${project.repo}`}
-        target="_blank"
-        rel="noreferrer"
-        className="mt-3 inline-flex items-center gap-1.5 text-xs text-night-500 hover:text-accent-600"
-      >
-        <ExternalLink size={12} /> github.com/{project.repo}
-      </a>
+      {project.private ? (
+        <p className="mt-3 text-xs text-night-500">Dépôt privé</p>
+      ) : (
+        <a
+          href={`${SITE.github}/${project.repo}`}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-3 inline-flex items-center gap-1.5 text-xs text-night-500 hover:text-accent-600"
+        >
+          <ExternalLink size={12} /> github.com/{project.repo}
+        </a>
+      )}
     </article>
   )
 }
@@ -83,7 +87,18 @@ export default function About() {
           Applications et bibliothèques open source dont proviennent certains outils.
         </SectionTitle>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {PROJECTS.map((p) => (
+          {PROJECTS.filter((p) => p.status !== 'archive').map((p) => (
+            <ProjectCard key={p.repo} project={p} />
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-14">
+        <SectionTitle kicker="Archives" title="Projets intégrés au site">
+          Anciens dépôts dont les outils ont été repris ici. Ils restent consultables en lecture seule.
+        </SectionTitle>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {PROJECTS.filter((p) => p.status === 'archive').map((p) => (
             <ProjectCard key={p.repo} project={p} />
           ))}
         </div>

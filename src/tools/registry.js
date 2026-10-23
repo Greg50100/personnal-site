@@ -20,6 +20,7 @@ export const CATEGORIES = [
   { id: 'electronique', label: 'Électronique', icon: I.Cpu, description: 'Loi d’Ohm, résistances, filtres, alimentations, câbles et composants actifs.' },
   { id: 'maths', label: 'Mathématiques', icon: I.Sigma, description: 'Traceur de courbes, équations, matrices, arithmétique, complexes et pourcentages.' },
   { id: 'physique', label: 'Physique', icon: I.Atom, description: 'Mécanique, gaz parfaits, fluides et ondes.' },
+  { id: 'meteo', label: 'Météo', icon: I.CloudSun, description: 'Air humide (point de rosée, température humide, enthalpie), ressenti, pression et altitude.' },
   { id: 'sante', label: 'Santé', icon: I.HeartPulse, description: 'IMC, besoins caloriques et masse grasse.' },
   { id: 'chimie', label: 'Chimie', icon: I.FlaskConical, description: 'Masse molaire et composition des molécules.' },
 ]
@@ -49,7 +50,7 @@ export const TOOLS = [
 
   // --- Conversions et calcul ---
   { id: 'convertisseur', category: 'utilitaires', title: "Convertisseur d'unités", summary: '75 grandeurs et plus de 600 unités : mécanique, électricité, thermique, chimie, informatique, rayonnements… et devises.', icon: I.ArrowLeftRight, tags: ['unités', 'conversion', 'devises', 'taux de change'], repo: 'convertisseur2', featured: true, component: lazy(() => import('./utilities/converter/UnitConverter.jsx')) },
-  { id: 'calculatrice', category: 'utilitaires', title: 'Calculatrice scientifique', summary: 'Saisie libre ou clavier, trigonométrie en degrés ou radians, historique et réutilisation des résultats.', icon: I.Calculator, tags: ['calcul', 'trigonométrie'], repo: 'CalculatorPro', featured: true, component: lazy(() => import('./utilities/calculator/ScientificCalculator.jsx')) },
+  { id: 'calculatrice', category: 'utilitaires', title: 'Calculatrice scientifique', summary: 'Saisie libre ou clavier, trigonométrie en degrés ou radians, historique et réutilisation des résultats.', icon: I.Calculator, tags: ['calcul', 'trigonométrie'], featured: true, component: lazy(() => import('./utilities/calculator/ScientificCalculator.jsx')) },
 
   // --- Dates et temps ---
   { id: 'temps-astronomique', category: 'temps', title: 'Heure et temps astronomique', summary: 'UTC, TAI, TT, temps GPS, jour julien, temps sidéral local, temps solaire vrai et équation du temps, en direct.', icon: I.Clock3, featured: true, tags: ['jour julien', 'sidéral', 'UTC', 'GPS', 'ΔT'], wide: true, component: lazy(() => import('./astronomy/time/AstroTime.jsx')) },
@@ -103,6 +104,10 @@ export const TOOLS = [
   { id: 'gaz-parfaits', category: 'physique', title: 'Loi des gaz parfaits', summary: 'Pression, volume, quantité de matière ou température : PV = nRT.', icon: I.Thermometer, tags: ['PV=nRT', 'gaz'], repo: 'Ganymede', component: calc(() => import('./physique/gaz-parfaits.js')) },
   { id: 'bernoulli', category: 'physique', title: 'Équation de Bernoulli', summary: 'Pression, vitesse ou altitude d’un fluide entre deux points d’un écoulement.', icon: I.Droplets, tags: ['fluide', 'pression'], repo: 'Ganymede', component: calc(() => import('./physique/bernoulli.js')) },
   { id: 'onde', category: 'physique', title: "Longueur d'onde et fréquence", summary: 'λ = c / f pour la lumière, le son ou un câble, période et énergie du photon.', icon: I.AudioWaveform, tags: ['onde', 'fréquence', 'photon'], repo: 'Ganymede', component: calc(() => import('./physique/onde.js')) },
+
+  // --- Météo ---
+  { id: 'air-humide', category: 'meteo', title: 'Air humide (psychrométrie)', summary: 'Point de rosée ou humidité relative, température humide, rapport de mélange, enthalpie et volume spécifique.', icon: I.Droplets, tags: ['point de rosée', 'humidité', 'psychrométrie', 'CVC', 'enthalpie'], repo: 'convertisseur2', component: calc(() => import('./meteo/air-humide.js')) },
+  { id: 'ressenti', category: 'meteo', title: 'Ressenti, pression et altitude', summary: 'Indice de chaleur, humidex, refroidissement éolien, base des nuages, pression ramenée au niveau de la mer.', icon: I.ThermometerSun, tags: ['humidex', 'wind chill', 'indice de chaleur', 'baromètre', 'QNH'], component: calc(() => import('./meteo/ressenti.js')) },
 
   // --- Santé ---
   { id: 'imc', category: 'sante', title: 'Indice de masse corporelle', summary: 'IMC, interprétation selon l’OMS et plage de poids de référence.', icon: I.PersonStanding, tags: ['IMC', 'poids'], repo: 'Ganymede', component: calc(() => import('./sante/imc.js')) },
