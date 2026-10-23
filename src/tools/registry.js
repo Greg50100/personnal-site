@@ -50,7 +50,7 @@ export const TOOLS = [
 
   // --- Conversions et calcul ---
   { id: 'convertisseur', category: 'utilitaires', title: "Convertisseur d'unités", summary: '75 grandeurs et plus de 600 unités : mécanique, électricité, thermique, chimie, informatique, rayonnements… et devises.', icon: I.ArrowLeftRight, tags: ['unités', 'conversion', 'devises', 'taux de change'], repo: 'convertisseur2', featured: true, component: lazy(() => import('./utilities/converter/UnitConverter.jsx')) },
-  { id: 'calculatrice', category: 'utilitaires', title: 'Calculatrice scientifique', summary: 'Saisie libre ou clavier, trigonométrie en degrés ou radians, historique et réutilisation des résultats.', icon: I.Calculator, tags: ['calcul', 'trigonométrie'], repo: 'CalculatorPro', featured: true, component: lazy(() => import('./utilities/calculator/ScientificCalculator.jsx')) },
+  { id: 'calculatrice', category: 'utilitaires', title: 'Calculatrice scientifique', summary: 'Saisie libre ou clavier, trigonométrie en degrés ou radians, historique et réutilisation des résultats.', icon: I.Calculator, tags: ['calcul', 'trigonométrie'], featured: true, component: lazy(() => import('./utilities/calculator/ScientificCalculator.jsx')) },
 
   // --- Dates et temps ---
   { id: 'temps-astronomique', category: 'temps', title: 'Heure et temps astronomique', summary: 'UTC, TAI, TT, temps GPS, jour julien, temps sidéral local, temps solaire vrai et équation du temps, en direct.', icon: I.Clock3, featured: true, tags: ['jour julien', 'sidéral', 'UTC', 'GPS', 'ΔT'], wide: true, component: lazy(() => import('./astronomy/time/AstroTime.jsx')) },

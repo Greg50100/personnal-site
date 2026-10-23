@@ -58,14 +58,6 @@ export const PROJECTS = [
     tools: [],
   },
   {
-    repo: 'CalculatorPro',
-    title: 'CalculatorPro',
-    description: 'Application web responsive : calculatrice, convertisseur et calculs avancés (électricité, psychrométrie).',
-    tech: ['HTML', 'CSS', 'JavaScript'],
-    status: 'archive',
-    tools: ['calculatrice', 'loi-ohm'],
-  },
-  {
     repo: 'convertisseur2',
     private: true,
     title: 'Convertisseur universel',
