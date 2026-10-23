@@ -50,11 +50,11 @@ const MAIN_KEYS = [
 ]
 
 const keyStyle = {
-  num: 'bg-white text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100',
-  op: 'bg-zinc-100 text-orange-600 dark:bg-zinc-900 dark:text-orange-400 font-bold',
-  eq: 'bg-orange-600 text-white border-orange-600 hover:bg-orange-700 font-bold',
-  action: 'bg-zinc-100 text-red-600 dark:bg-zinc-900 dark:text-red-400',
-  default: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300',
+  num: 'bg-white text-night-900 dark:bg-night-800 dark:text-night-100',
+  op: 'bg-night-100 text-accent-700 dark:bg-night-900 dark:text-accent-400 font-bold',
+  eq: 'bg-accent-600 text-white border-accent-600 hover:bg-accent-700 font-bold',
+  action: 'bg-night-100 text-red-600 dark:bg-night-900 dark:text-red-400',
+  default: 'bg-night-100 text-night-700 dark:bg-night-900 dark:text-night-300',
 }
 
 const tryEval = (expr, opts) => {
@@ -136,10 +136,10 @@ export default function ScientificCalculator() {
               { value: 'rad', label: 'RAD' },
             ]}
           />
-          <span className="hidden font-mono text-[11px] text-zinc-500 sm:inline">Entrée = calculer · Échap = effacer</span>
+          <span className="hidden font-mono text-[11px] text-night-500 sm:inline">Entrée = calculer · Échap = effacer</span>
         </div>
 
-        <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="rounded-lg border border-night-200 bg-night-50 p-3 dark:border-night-800 dark:bg-night-950">
           <input
             ref={inputRef}
             className="w-full bg-transparent text-right font-mono text-2xl outline-none"
@@ -165,7 +165,7 @@ export default function ScientificCalculator() {
             {lastError ? (
               <span className="text-red-500">{lastError}</span>
             ) : preview && 'value' in preview ? (
-              <span className="text-zinc-500">= {smartNumber(preview.value, 12)}</span>
+              <span className="text-night-500">= {smartNumber(preview.value, 12)}</span>
             ) : null}
           </p>
         </div>
@@ -176,7 +176,7 @@ export default function ScientificCalculator() {
               key={label}
               type="button"
               onClick={() => press(value)}
-              className={`rounded-md border border-zinc-200 py-2 font-mono text-xs transition-colors hover:border-orange-500 dark:border-zinc-800 ${keyStyle.default}`}
+              className={`rounded-md border border-night-200 py-2 font-mono text-xs transition-colors hover:border-accent-500 dark:border-night-800 ${keyStyle.default}`}
             >
               {label}
             </button>
@@ -189,7 +189,7 @@ export default function ScientificCalculator() {
               type="button"
               onClick={() => press(value)}
               aria-label={label === '⌫' ? 'Effacer le dernier caractère' : undefined}
-              className={`flex h-12 items-center justify-center rounded-md border border-zinc-200 font-mono text-lg transition-colors hover:border-orange-500 dark:border-zinc-800 sm:h-14 ${
+              className={`flex h-12 items-center justify-center rounded-md border border-night-200 font-mono text-lg transition-colors hover:border-accent-500 dark:border-night-800 sm:h-14 ${
                 keyStyle[style ?? 'default']
               }`}
             >
@@ -200,22 +200,22 @@ export default function ScientificCalculator() {
       </div>
 
       <aside className="card flex max-h-[600px] flex-col">
-        <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
+        <div className="flex items-center justify-between border-b border-night-200 px-4 py-3 dark:border-night-800">
           <h2 className="flex items-center gap-2 text-sm font-semibold">
-            <History size={15} className="text-orange-500" /> Historique
+            <History size={15} className="text-accent-500" /> Historique
           </h2>
           {history.length > 0 && (
-            <button type="button" className="text-zinc-400 hover:text-red-500" onClick={() => setHistory([])} aria-label="Vider l'historique">
+            <button type="button" className="text-night-400 hover:text-red-500" onClick={() => setHistory([])} aria-label="Vider l'historique">
               <Trash2 size={15} />
             </button>
           )}
         </div>
         <ul className="flex-1 overflow-y-auto">
-          {history.length === 0 && <li className="p-4 text-sm text-zinc-500">Les calculs apparaîtront ici. Cliquez pour les réutiliser.</li>}
+          {history.length === 0 && <li className="p-4 text-sm text-night-500">Les calculs apparaîtront ici. Cliquez pour les réutiliser.</li>}
           {history.map((h, i) => (
-            <li key={`${i}-${h.expr}`} className="border-b border-zinc-100 last:border-0 dark:border-zinc-800/60">
-              <button type="button" className="w-full px-4 py-2 text-right hover:bg-orange-500/5" onClick={() => insert(String(h.result))}>
-                <span className="block truncate font-mono text-xs text-zinc-500">
+            <li key={`${i}-${h.expr}`} className="border-b border-night-100 last:border-0 dark:border-night-800/60">
+              <button type="button" className="w-full px-4 py-2 text-right hover:bg-accent-500/5" onClick={() => insert(String(h.result))}>
+                <span className="block truncate font-mono text-xs text-night-500">
                   {h.expr} <span className="text-[10px] uppercase">{h.angle}</span>
                 </span>
                 <span className="font-mono font-semibold">{smartNumber(h.result, 12)}</span>
@@ -223,7 +223,7 @@ export default function ScientificCalculator() {
             </li>
           ))}
         </ul>
-        <div className="border-t border-zinc-200 p-3 text-xs text-zinc-500 dark:border-zinc-800">
+        <div className="border-t border-night-200 p-3 text-xs text-night-500 dark:border-night-800">
           Fonctions : sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, sqrt, cbrt, ln, log, log2, exp, abs, floor, ceil, round. Constantes : π (pi), e, φ (phi), Ans.
         </div>
       </aside>

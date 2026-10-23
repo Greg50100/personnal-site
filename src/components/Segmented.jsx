@@ -5,7 +5,7 @@ export default function Segmented({ options, value, onChange, size = 'md', class
     <div
       role="radiogroup"
       aria-label={ariaLabel}
-      className={`inline-flex flex-wrap gap-1 rounded-lg border border-zinc-200 bg-zinc-100 p-1 dark:border-zinc-800 dark:bg-zinc-950 ${className}`}
+      className={`inline-flex flex-wrap gap-1 rounded-lg border border-night-200 bg-night-100 p-1 dark:border-night-800 dark:bg-night-950 ${className}`}
     >
       {options.map((o) => {
         const active = o.value === value
@@ -18,8 +18,8 @@ export default function Segmented({ options, value, onChange, size = 'md', class
             onClick={() => onChange(o.value)}
             className={`rounded-md font-medium transition-colors ${pad} ${
               active
-                ? 'bg-white text-orange-600 shadow-sm dark:bg-zinc-800 dark:text-orange-400'
-                : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'
+                ? 'bg-white text-accent-700 shadow-sm dark:bg-night-800 dark:text-accent-400'
+                : 'text-night-600 hover:text-night-900 dark:text-night-400 dark:hover:text-night-100'
             }`}
           >
             {o.label}

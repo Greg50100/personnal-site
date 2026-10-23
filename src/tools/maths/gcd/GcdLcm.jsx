@@ -4,7 +4,7 @@ import { gcdSteps, lcm, parseBigInt, primeFactors } from './arith'
 const fmtBig = (n) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f')
 
 function Factors({ n }) {
-  if (n < 2n) return <span className="text-zinc-500">{n.toString()} (pas de facteur premier)</span>
+  if (n < 2n) return <span className="text-night-500">{n.toString()} (pas de facteur premier)</span>
   const { factors, complete } = primeFactors(n)
   if (factors.length === 1 && factors[0].e === 1 && complete) return <span>{fmtBig(n)} est premier</span>
   return (
@@ -14,7 +14,7 @@ function Factors({ n }) {
           {i > 0 && ' × '}
           {fmtBig(f.p)}
           {f.e > 1 && <sup>{f.e}</sup>}
-          {f.unknown && <span className="text-zinc-500"> (non décomposé)</span>}
+          {f.unknown && <span className="text-night-500"> (non décomposé)</span>}
         </span>
       ))}
     </span>
@@ -53,12 +53,12 @@ export default function GcdLcm() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="card card-pad">
               <p className="label">PGCD</p>
-              <p className="break-all font-mono text-3xl font-bold text-orange-600 dark:text-orange-400">{fmtBig(res.gcd)}</p>
-              {res.gcd === 1n && <p className="mt-1 text-sm text-zinc-500">Les deux nombres sont premiers entre eux.</p>}
+              <p className="break-all font-mono text-3xl font-bold text-accent-700 dark:text-accent-400">{fmtBig(res.gcd)}</p>
+              {res.gcd === 1n && <p className="mt-1 text-sm text-night-500">Les deux nombres sont premiers entre eux.</p>}
             </div>
             <div className="card card-pad">
               <p className="label">PPCM</p>
-              <p className="break-all font-mono text-3xl font-bold text-orange-600 dark:text-orange-400">{fmtBig(lcm(a, b))}</p>
+              <p className="break-all font-mono text-3xl font-bold text-accent-700 dark:text-accent-400">{fmtBig(lcm(a, b))}</p>
             </div>
           </div>
 
@@ -68,15 +68,15 @@ export default function GcdLcm() {
               {res.steps.length ? (
                 <ol className="space-y-1 font-mono text-sm">
                   {res.steps.map((s, i) => (
-                    <li key={i} className={s.r === 0n ? 'text-zinc-500' : ''}>
-                      {fmtBig(s.a)} = {fmtBig(s.b)} × {fmtBig(s.q)} + <strong className={s.r === 0n ? '' : 'text-orange-600 dark:text-orange-400'}>{fmtBig(s.r)}</strong>
+                    <li key={i} className={s.r === 0n ? 'text-night-500' : ''}>
+                      {fmtBig(s.a)} = {fmtBig(s.b)} × {fmtBig(s.q)} + <strong className={s.r === 0n ? '' : 'text-accent-700 dark:text-accent-400'}>{fmtBig(s.r)}</strong>
                     </li>
                   ))}
                 </ol>
               ) : (
-                <p className="text-sm text-zinc-500">PGCD(n, 0) = n.</p>
+                <p className="text-sm text-night-500">PGCD(n, 0) = n.</p>
               )}
-              <p className="mt-3 text-xs text-zinc-500">Le PGCD est le dernier reste non nul.</p>
+              <p className="mt-3 text-xs text-night-500">Le PGCD est le dernier reste non nul.</p>
             </div>
             <div className="card card-pad">
               <p className="label">Décomposition en facteurs premiers</p>

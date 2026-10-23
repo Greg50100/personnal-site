@@ -26,17 +26,17 @@ export default function TonightWidget() {
 
   return (
     <div className="card relative overflow-hidden p-5">
-      <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-orange-500/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-accent-500/10 blur-3xl" />
       <div className="mb-4 flex items-center justify-between">
-        <p className="font-mono text-xs uppercase tracking-widest text-orange-600 dark:text-orange-500">{'// '}Ce soir à {location.name}</p>
-        <span className="font-mono text-xs text-zinc-500">{fmtTime(now)}</span>
+        <p className="text-sm font-semibold text-accent-700 dark:text-accent-400">Ce soir à {location.name}</p>
+        <span className="font-mono text-xs text-night-500">{fmtTime(now)}</span>
       </div>
 
       <div className="flex items-center gap-4">
         <MoonPhase phase={data.moon.phase} size={64} south={location.lat < 0} title={data.moon.name} />
         <div>
           <p className="font-semibold">{data.moon.name}</p>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="text-sm text-night-600 dark:text-night-400">
             Éclairée à {fmt(data.moon.illumination * 100, 0)} % · {fmt(data.moon.ageDays, 1)} j
           </p>
         </div>
@@ -47,11 +47,11 @@ export default function TonightWidget() {
           <Sunrise size={16} className="text-amber-500" /> {fmtTime(data.sun.sunrise)}
         </div>
         <div className="flex items-center gap-2">
-          <Sunset size={16} className="text-orange-500" /> {fmtTime(data.sun.sunset)}
+          <Sunset size={16} className="text-accent-500" /> {fmtTime(data.sun.sunset)}
         </div>
       </div>
 
-      <div className="mt-4 border-t border-zinc-200 pt-3 dark:border-zinc-800">
+      <div className="mt-4 border-t border-night-200 pt-3 dark:border-night-800">
         <p className="label">Planètes visibles à l'œil nu</p>
         {data.planets.length ? (
           <ul className="flex flex-wrap gap-2">
@@ -62,11 +62,11 @@ export default function TonightWidget() {
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-zinc-500">Aucune cette nuit.</p>
+          <p className="text-sm text-night-500">Aucune cette nuit.</p>
         )}
       </div>
 
-      <Link to="/astronomie/ce-soir" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-orange-600 hover:underline dark:text-orange-400">
+      <Link to="/astronomie/ce-soir" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-accent-700 hover:underline dark:text-accent-400">
         Éphémérides complètes <ArrowRight size={14} />
       </Link>
     </div>

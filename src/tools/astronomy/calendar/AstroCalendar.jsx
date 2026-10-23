@@ -15,15 +15,15 @@ const MONTHS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet'
 function EventItem({ event, showDate = false }) {
   const type = EVENT_TYPES[event.type]
   return (
-    <li className="flex gap-3 border-b border-zinc-100 py-2.5 last:border-0 dark:border-zinc-800/60">
+    <li className="flex gap-3 border-b border-night-100 py-2.5 last:border-0 dark:border-night-800/60">
       <span className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: type.color }} title={type.label} />
       <div className="min-w-0 flex-1">
         <p className={`text-sm ${event.important ? 'font-semibold' : 'font-medium'}`}>{event.title}</p>
-        {event.detail && <p className="text-xs text-zinc-500">{event.detail}</p>}
+        {event.detail && <p className="text-xs text-night-500">{event.detail}</p>}
       </div>
-      <span className="shrink-0 text-right font-mono text-xs text-zinc-500">
+      <span className="shrink-0 text-right font-mono text-xs text-night-500">
         {showDate && (
-          <span className="block capitalize text-zinc-700 dark:text-zinc-300">{fmtShortDate(event.time)}</span>
+          <span className="block capitalize text-night-700 dark:text-night-300">{fmtShortDate(event.time)}</span>
         )}
         {event.approximate ? 'nuit' : fmtTime(event.time)}
       </span>
@@ -44,7 +44,7 @@ function DayPanel({ date, events, observer, south }) {
         <MoonPhase phase={info.moon.phase} size={52} south={south} title={info.moon.name} />
         <div className="text-sm">
           <p className="font-medium">{info.moon.name}</p>
-          <p className="text-zinc-500">Éclairée à {fmt(info.moon.illumination * 100, 0)} % (22 h)</p>
+          <p className="text-night-500">Éclairée à {fmt(info.moon.illumination * 100, 0)} % (22 h)</p>
         </div>
       </div>
       <dl className="mt-4 grid grid-cols-2 gap-2 text-sm">
@@ -56,8 +56,8 @@ function DayPanel({ date, events, observer, south }) {
           ['Nuit noire dès', info.sun.astronomicalDusk],
           ['Aube astronomique', info.sun.astronomicalDawn],
         ].map(([label, value]) => (
-          <div key={label} className="rounded-lg bg-zinc-50 px-3 py-2 dark:bg-zinc-950">
-            <dt className="text-[11px] text-zinc-500">{label}</dt>
+          <div key={label} className="rounded-lg bg-night-50 px-3 py-2 dark:bg-night-950">
+            <dt className="text-[11px] text-night-500">{label}</dt>
             <dd className="font-mono">{fmtTime(value)}</dd>
           </div>
         ))}
@@ -70,7 +70,7 @@ function DayPanel({ date, events, observer, south }) {
           ))}
         </ul>
       ) : (
-        <p className="text-sm text-zinc-500">Aucun phénomène particulier ce jour-là.</p>
+        <p className="text-sm text-night-500">Aucun phénomène particulier ce jour-là.</p>
       )}
     </div>
   )
@@ -115,8 +115,8 @@ export default function AstroCalendar() {
           <button type="button" className="btn-icon" onClick={() => changeMonth(-1)} aria-label="Mois précédent">
             <ChevronLeft size={16} />
           </button>
-          <h2 className="text-center text-lg font-black uppercase tracking-wide sm:min-w-[11rem] sm:text-2xl">
-            {MONTHS[view.month]} <span className="font-mono text-orange-500">{view.year}</span>
+          <h2 className="text-center text-xl font-bold sm:min-w-[11rem] sm:text-2xl">
+            {MONTHS[view.month]} <span className="font-mono text-accent-500">{view.year}</span>
           </h2>
           <button type="button" className="btn-icon" onClick={() => changeMonth(1)} aria-label="Mois suivant">
             <ChevronRight size={16} />
@@ -150,7 +150,7 @@ export default function AstroCalendar() {
               aria-pressed={on}
               onClick={() => setHidden(on ? [...hidden, id] : hidden.filter((h) => h !== id))}
               className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs transition-opacity ${
-                on ? 'border-zinc-200 dark:border-zinc-700' : 'border-dashed border-zinc-300 opacity-50 dark:border-zinc-700'
+                on ? 'border-night-200 dark:border-night-700' : 'border-dashed border-night-300 opacity-50 dark:border-night-700'
               }`}
             >
               <span className="h-2 w-2 rounded-full" style={{ backgroundColor: t.color }} />
@@ -163,9 +163,9 @@ export default function AstroCalendar() {
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
         {mode === 'grid' ? (
           <div className="card overflow-hidden">
-            <div className="grid grid-cols-7 border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950">
+            <div className="grid grid-cols-7 border-b border-night-200 bg-night-50 dark:border-night-800 dark:bg-night-950">
               {WEEK_DAYS.map((d) => (
-                <div key={d} className="py-2 text-center font-mono text-[11px] uppercase tracking-widest text-zinc-500">
+                <div key={d} className="py-2 text-center text-xs font-medium text-night-500">
                   {d}
                 </div>
               ))}
@@ -183,16 +183,16 @@ export default function AstroCalendar() {
                     key={d.getTime()}
                     type="button"
                     onClick={() => setSelected(d)}
-                    className={`relative flex min-h-[64px] flex-col items-stretch border-b border-r border-zinc-100 p-1 text-left transition-colors last:border-r-0 dark:border-zinc-800/70 sm:min-h-[104px] sm:p-1.5 ${
-                      inMonth ? '' : 'bg-zinc-50/60 text-zinc-400 dark:bg-zinc-950/60 dark:text-zinc-600'
-                    } ${isSel ? 'bg-orange-500/10 ring-1 ring-inset ring-orange-500/60' : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/30'}`}
+                    className={`relative flex min-h-[64px] flex-col items-stretch border-b border-r border-night-100 p-1 text-left transition-colors last:border-r-0 dark:border-night-800/70 sm:min-h-[104px] sm:p-1.5 ${
+                      inMonth ? '' : 'bg-night-50/60 text-night-400 dark:bg-night-950/60 dark:text-night-600'
+                    } ${isSel ? 'bg-accent-500/10 ring-1 ring-inset ring-accent-500/60' : 'hover:bg-night-50 dark:hover:bg-night-800/30'}`}
                     aria-label={`${fmtDate(d)}${evts.length ? `, ${evts.length} événement(s)` : ''}`}
                     aria-pressed={isSel}
                   >
                     <div className="flex items-start justify-between">
                       <span
                         className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold sm:text-sm ${
-                          isToday ? 'bg-orange-600 text-white' : ''
+                          isToday ? 'bg-accent-600 text-white' : ''
                         }`}
                       >
                         {d.getDate()}
@@ -203,14 +203,14 @@ export default function AstroCalendar() {
                       {others.slice(0, 3).map((e, i) => (
                         <li
                           key={i}
-                          className="truncate border-l-2 pl-1 text-[10.5px] leading-tight text-zinc-600 dark:text-zinc-300"
+                          className="truncate border-l-2 pl-1 text-[10.5px] leading-tight text-night-600 dark:text-night-300"
                           style={{ borderColor: EVENT_TYPES[e.type].color }}
                           title={`${e.title}${e.detail ? ` — ${e.detail}` : ''}`}
                         >
                           {e.title}
                         </li>
                       ))}
-                      {others.length > 3 && <li className="pl-1 text-[10px] text-zinc-500">+{others.length - 3}</li>}
+                      {others.length > 3 && <li className="pl-1 text-[10px] text-night-500">+{others.length - 3}</li>}
                     </ul>
                     <div className="mt-auto flex flex-wrap gap-0.5 sm:hidden">
                       {others.slice(0, 4).map((e, i) => (
@@ -235,7 +235,7 @@ export default function AstroCalendar() {
 
         <DayPanel date={selected} events={visible(byDay.get(dayKey(selected)))} observer={observer} south={location.lat < 0} />
       </div>
-      <p className="text-xs text-zinc-500">
+      <p className="text-xs text-night-500">
         Heures locales. Les maxima d'étoiles filantes sont des dates moyennes (±1 jour). Les rapprochements indiquent la séparation minimale vue
         du centre de la Terre.
       </p>

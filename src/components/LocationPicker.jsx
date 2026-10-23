@@ -73,7 +73,7 @@ export function LocationDialog({ onClose }) {
       >
         <div className="mb-4 flex items-center justify-between">
           <h2 id="location-title" className="flex items-center gap-2 text-lg font-bold">
-            <MapPin size={18} className="text-orange-500" /> Lieu d'observation
+            <MapPin size={18} className="text-accent-500" /> Lieu d'observation
           </h2>
           <button type="button" className="btn-icon" onClick={onClose} aria-label="Fermer">
             <X size={16} />
@@ -101,7 +101,7 @@ export function LocationDialog({ onClose }) {
             <LocateFixed size={16} /> <span className="hidden sm:inline">Ma position</span>
           </button>
         </div>
-        {geoState && <p className="mt-2 text-xs text-zinc-500">{geoState}</p>}
+        {geoState && <p className="mt-2 text-xs text-night-500">{geoState}</p>}
 
         <div className="mt-4 grid grid-cols-2 gap-3">
           <div className="col-span-2">
@@ -115,14 +115,14 @@ export function LocationDialog({ onClose }) {
               Latitude (° N+)
             </label>
             <input id="loc-lat" className="input font-mono" inputMode="decimal" value={form.lat} onChange={(e) => setForm({ ...form, lat: e.target.value })} />
-            <p className="mt-1 font-mono text-[11px] text-zinc-500">{Number.isFinite(lat) ? fmtDMS(lat) : 'invalide'}</p>
+            <p className="mt-1 font-mono text-[11px] text-night-500">{Number.isFinite(lat) ? fmtDMS(lat) : 'invalide'}</p>
           </div>
           <div>
             <label className="label" htmlFor="loc-lon">
               Longitude (° E+, O−)
             </label>
             <input id="loc-lon" className="input font-mono" inputMode="decimal" value={form.lon} onChange={(e) => setForm({ ...form, lon: e.target.value })} />
-            <p className="mt-1 font-mono text-[11px] text-zinc-500">{Number.isFinite(lon) ? fmtDMS(lon) : 'invalide'}</p>
+            <p className="mt-1 font-mono text-[11px] text-night-500">{Number.isFinite(lon) ? fmtDMS(lon) : 'invalide'}</p>
           </div>
           <div>
             <label className="label" htmlFor="loc-elev">
@@ -160,10 +160,10 @@ export function LocationButton({ className = '', showCoords = false }) {
   return (
     <>
       <button type="button" className={`btn max-w-full ${className}`} onClick={() => setOpen(true)} title="Changer de lieu d'observation">
-        <MapPin size={15} className="shrink-0 text-orange-500" />
+        <MapPin size={15} className="shrink-0 text-accent-500" />
         <span className="truncate">{location.name}</span>
         {showCoords && (
-          <span className="hidden font-mono text-xs text-zinc-500 sm:inline">
+          <span className="hidden font-mono text-xs text-night-500 sm:inline">
             {fmtLat(location.lat, 2)} · {fmtLon(location.lon, 2)}
           </span>
         )}

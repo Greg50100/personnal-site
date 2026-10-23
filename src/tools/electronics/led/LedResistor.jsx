@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { fmt } from '../../../lib/format'
-import { formatSI, parseSI } from '../si'
-import { Result, SIField } from '../fields'
+import { formatSI, parseSI } from '../../../lib/si'
+import { Result, SIField } from '../../kit/fields'
 import { LED_PRESETS, solveLed } from './led'
 
 const FRACTIONS = { 0.125: '1/8 W', 0.25: '1/4 W', 0.5: '1/2 W' }
@@ -31,13 +31,13 @@ export default function LedResistor() {
                 aria-pressed={preset?.id === p.id}
                 className={`inline-flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-sm transition-colors ${
                   preset?.id === p.id
-                    ? 'border-orange-500 bg-orange-500/10 text-orange-600 dark:text-orange-400'
-                    : 'border-zinc-200 text-zinc-600 hover:border-orange-500/50 dark:border-zinc-800 dark:text-zinc-400'
+                    ? 'border-accent-500 bg-accent-500/10 text-accent-700 dark:text-accent-400'
+                    : 'border-night-200 text-night-600 hover:border-accent-500/50 dark:border-night-800 dark:text-night-400'
                 }`}
               >
                 <span className="h-3 w-3 rounded-full border border-black/20" style={{ backgroundColor: p.color }} />
                 {p.label}
-                <span className="font-mono text-xs text-zinc-500">{String(p.vf).replace('.', ',')} V</span>
+                <span className="font-mono text-xs text-night-500">{String(p.vf).replace('.', ',')} V</span>
               </button>
             ))}
           </div>
@@ -75,8 +75,8 @@ export default function LedResistor() {
           </div>
         </div>
 
-        <div className="border-t border-zinc-200 pt-4 dark:border-zinc-800">
-          {res.error === 'missing' && <p className="text-sm text-zinc-500">Saisissez la tension d'alimentation, la tension directe et le courant.</p>}
+        <div className="border-t border-night-200 pt-4 dark:border-night-800">
+          {res.error === 'missing' && <p className="text-sm text-night-500">Saisissez la tension d'alimentation, la tension directe et le courant.</p>}
           {res.error === 'voltage' && (
             <p className="text-sm text-red-500">
               L'alimentation doit dépasser la somme des tensions directes ({formatSI(res.totalVf, 'V', 4)}) : réduisez le nombre de LED en série ou
@@ -100,7 +100,7 @@ export default function LedResistor() {
         </div>
       </div>
 
-      <div className="card card-pad text-sm text-zinc-600 dark:text-zinc-400">
+      <div className="card card-pad text-sm text-night-600 dark:text-night-400">
         <p className="label">À savoir</p>
         <ul className="list-disc space-y-2 pl-4">
           <li>Les tensions directes sont typiques : consultez la fiche technique de votre LED pour un calcul précis.</li>

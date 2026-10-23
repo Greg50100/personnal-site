@@ -25,11 +25,11 @@ import MoonPhase from '../components/MoonPhase'
 
 function Row({ label, value, sub }) {
   return (
-    <div className="flex items-baseline justify-between gap-3 border-b border-zinc-100 py-1.5 last:border-0 dark:border-zinc-800/60">
-      <span className="text-sm text-zinc-600 dark:text-zinc-400">{label}</span>
+    <div className="flex items-baseline justify-between gap-3 border-b border-night-100 py-1.5 last:border-0 dark:border-night-800/60">
+      <span className="text-sm text-night-600 dark:text-night-400">{label}</span>
       <span className="text-right font-mono text-sm">
         {value}
-        {sub && <span className="ml-2 text-xs text-zinc-500">{sub}</span>}
+        {sub && <span className="ml-2 text-xs text-night-500">{sub}</span>}
       </span>
     </div>
   )
@@ -108,7 +108,7 @@ export default function Tonight() {
             Aujourd'hui
           </button>
         )}
-        <span className="text-sm capitalize text-zinc-500">{fmtDate(day)}</span>
+        <span className="text-sm capitalize text-night-500">{fmtDate(day)}</span>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -126,7 +126,7 @@ export default function Tonight() {
           <Row label="Crépuscule nautique" value={fmtTime(sun.nauticalDusk)} />
           <Row label="Crépuscule astronomique" value={fmtTime(sun.astronomicalDusk)} />
           <Row label="Durée du jour" value={fmtDuration(sun.dayLength)} />
-          <p className="mt-3 text-xs text-zinc-500">
+          <p className="mt-3 text-xs text-night-500">
             {darkHours
               ? `Nuit noire (Soleil sous −18°) : ${fmtTime(sun.astronomicalDusk)} → ${fmtTime(nextSun.astronomicalDawn)}, soit ${fmtDuration(darkHours)}.`
               : 'Pas de nuit astronomique à cette date : le Soleil ne descend pas sous −18°.'}
@@ -135,14 +135,14 @@ export default function Tonight() {
 
         <section className="card card-pad">
           <h2 className="mb-3 flex items-center gap-2 font-semibold">
-            <Moon size={18} className="text-zinc-400" /> Lune
+            <Moon size={18} className="text-night-400" /> Lune
           </h2>
           <div className="mb-3 flex items-center gap-4">
             <MoonPhase phase={moon.phase} size={84} south={location.lat < 0} title={moon.name} />
             <div>
               <p className="font-semibold">{moon.name}</p>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">Éclairée à {fmt(moon.illumination * 100, 1)} %</p>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">Âge : {fmt(moon.ageDays, 1)} jours</p>
+              <p className="text-sm text-night-600 dark:text-night-400">Éclairée à {fmt(moon.illumination * 100, 1)} %</p>
+              <p className="text-sm text-night-600 dark:text-night-400">Âge : {fmt(moon.ageDays, 1)} jours</p>
             </div>
           </div>
           {rts(moonRts) && <Row label="Visibilité" value={rts(moonRts)} />}
@@ -153,11 +153,11 @@ export default function Tonight() {
           <Row label="Position actuelle" value={`${fmt(moonPos.alt, 1)}° · ${compass(moonPos.az)}`} sub={moonConstellation.name} />
           <div className="mt-3 grid grid-cols-2 gap-2">
             {quarters.map((q) => (
-              <div key={q.date.getTime()} className="flex items-center gap-2 rounded-lg border border-zinc-200 p-2 dark:border-zinc-800">
+              <div key={q.date.getTime()} className="flex items-center gap-2 rounded-lg border border-night-200 p-2 dark:border-night-800">
                 <MoonPhase phase={q.quarter * 90} size={26} south={location.lat < 0} title={q.name} />
                 <div className="min-w-0 text-xs">
                   <p className="truncate font-medium">{q.name}</p>
-                  <p className="text-zinc-500">
+                  <p className="text-night-500">
                     {fmtShortDate(q.date)} {fmtTime(q.date)}
                   </p>
                 </div>
@@ -172,16 +172,16 @@ export default function Tonight() {
             {planets
               .filter((p) => p.nakedEye)
               .map((p) => (
-                <li key={p.id} className={`rounded-lg border p-3 ${p.vis.visible ? 'border-zinc-200 dark:border-zinc-800' : 'border-dashed border-zinc-200 opacity-60 dark:border-zinc-800'}`}>
+                <li key={p.id} className={`rounded-lg border p-3 ${p.vis.visible ? 'border-night-200 dark:border-night-800' : 'border-dashed border-night-200 opacity-60 dark:border-night-800'}`}>
                   <div className="flex items-baseline justify-between gap-2">
                     <span className="font-semibold">
                       <span className="sym" style={{ color: p.color }}>{p.symbol}</span> {p.name}
                     </span>
-                    <span className="font-mono text-xs text-zinc-500">mag {fmt(p.vis.magnitude, 1)}</span>
+                    <span className="font-mono text-xs text-night-500">mag {fmt(p.vis.magnitude, 1)}</span>
                   </div>
                   <p className="mt-1 text-sm">{visibilityText(p.vis)}</p>
                   {p.vis.best && (
-                    <p className="text-xs text-zinc-500">
+                    <p className="text-xs text-night-500">
                       Au mieux vers {fmtTime(p.vis.best.t)} à {fmt(p.vis.best.alt, 0)}° ({compass(p.vis.best.az)}) · {p.constellation.name}
                     </p>
                   )}
@@ -194,7 +194,7 @@ export default function Tonight() {
       <section className="card card-pad">
         <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="font-semibold">Hauteur au-dessus de l'horizon</h2>
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-night-500">
             De {fmtTime(start)} le {fmtShortDate(start)} à {fmtTime(end)} le {fmtShortDate(end)} · survolez pour lire les hauteurs
           </p>
         </div>
@@ -202,7 +202,7 @@ export default function Tonight() {
       </section>
 
       <section className="card overflow-hidden">
-        <h2 className="border-b border-zinc-200 px-4 py-3 font-semibold dark:border-zinc-800">Toutes les planètes</h2>
+        <h2 className="border-b border-night-200 px-4 py-3 font-semibold dark:border-night-800">Toutes les planètes</h2>
         <div className="overflow-x-auto">
           <table className="table-data">
             <thead>
@@ -225,12 +225,12 @@ export default function Tonight() {
                   </td>
                   <td className="font-mono">{rts(p.rts) ?? fmtTime(p.rts.rise)}</td>
                   <td className="font-mono">
-                    {fmtTime(p.rts.transit)} <span className="text-zinc-500">({fmt(p.rts.transitAlt, 0)}°)</span>
+                    {fmtTime(p.rts.transit)} <span className="text-night-500">({fmt(p.rts.transitAlt, 0)}°)</span>
                   </td>
                   <td className="font-mono">{rts(p.rts) ?? fmtTime(p.rts.set)}</td>
                   <td className="font-mono">{fmt(p.vis.magnitude, 1)}</td>
                   <td className="font-mono">
-                    {fmt(p.vis.elongation, 0)}° <span className="text-zinc-500">{p.vis.side}</span>
+                    {fmt(p.vis.elongation, 0)}° <span className="text-night-500">{p.vis.side}</span>
                   </td>
                   <td>{p.constellation.name}</td>
                   <td className="font-mono">{visibilityText(p.vis)}</td>
@@ -239,7 +239,7 @@ export default function Tonight() {
             </tbody>
           </table>
         </div>
-        <p className="px-4 py-3 text-xs text-zinc-500">
+        <p className="px-4 py-3 text-xs text-night-500">
           Heures locales du navigateur. « Visible la nuit » : hauteur supérieure à 5° pendant que le Soleil est sous −6°. Calculs : Astronomy Engine
           (théories VSOP87 et ELP), précision de l'ordre de la minute d'arc.
         </p>

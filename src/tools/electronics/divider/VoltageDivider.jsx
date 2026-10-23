@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import Segmented from '../../../components/Segmented'
 import { fmt } from '../../../lib/format'
-import { formatSI, parseSI } from '../si'
-import { Result, SIField } from '../fields'
+import { formatSI, parseSI } from '../../../lib/si'
+import { Result, SIField } from '../../kit/fields'
 import { findR2, solveDivider } from './divider'
 
 /** Schéma du pont : Vin en haut, R1, point milieu Vout, R2 vers la masse, charge RL facultative. */
@@ -10,8 +10,8 @@ function Schematic({ withLoad }) {
   const stroke = 'currentColor'
   const resistor = (x, y) => <rect x={x - 9} y={y} width="18" height="44" rx="2" fill="none" stroke={stroke} strokeWidth="2" />
   return (
-    <svg viewBox="0 0 200 240" className="mx-auto h-auto w-full max-w-[220px] text-zinc-500" role="img" aria-label="Schéma du pont diviseur">
-      <text x="60" y="16" textAnchor="middle" className="fill-orange-500 font-mono text-[12px] font-bold">
+    <svg viewBox="0 0 200 240" className="mx-auto h-auto w-full max-w-[220px] text-night-500" role="img" aria-label="Schéma du pont diviseur">
+      <text x="60" y="16" textAnchor="middle" className="fill-accent-500 font-mono text-[12px] font-bold">
         Vin
       </text>
       <line x1="60" y1="22" x2="60" y2="40" stroke={stroke} strokeWidth="2" />
@@ -20,9 +20,9 @@ function Schematic({ withLoad }) {
         R1
       </text>
       <line x1="60" y1="84" x2="60" y2="130" stroke={stroke} strokeWidth="2" />
-      <circle cx="60" cy="107" r="3.5" fill="#f97316" />
-      <line x1="60" y1="107" x2={withLoad ? 140 : 110} y2="107" stroke="#f97316" strokeWidth="2" />
-      <text x={withLoad ? 100 : 116} y={withLoad ? 100 : 111} textAnchor={withLoad ? 'middle' : 'start'} className="fill-orange-500 font-mono text-[12px] font-bold">
+      <circle cx="60" cy="107" r="3.5" fill="#f59e0b" />
+      <line x1="60" y1="107" x2={withLoad ? 140 : 110} y2="107" stroke="#f59e0b" strokeWidth="2" />
+      <text x={withLoad ? 100 : 116} y={withLoad ? 100 : 111} textAnchor={withLoad ? 'middle' : 'start'} className="fill-accent-500 font-mono text-[12px] font-bold">
         Vout
       </text>
       {resistor(60, 130)}
@@ -97,7 +97,7 @@ export default function VoltageDivider() {
           )}
         </div>
 
-        <div className="border-t border-zinc-200 pt-4 dark:border-zinc-800">
+        <div className="border-t border-night-200 pt-4 dark:border-night-800">
           {mode === 'vout' &&
             (res ? (
               <div className="grid gap-3 sm:grid-cols-3">
@@ -109,7 +109,7 @@ export default function VoltageDivider() {
                 {withLoad && <Result label="Puissance dans la charge" value={formatSI(res.pLoad, 'W', 3)} />}
               </div>
             ) : (
-              <p className="text-sm text-zinc-500">Saisissez Vin, R1 et R2.</p>
+              <p className="text-sm text-night-500">Saisissez Vin, R1 et R2.</p>
             ))}
 
           {mode === 'r2' &&
@@ -142,7 +142,7 @@ export default function VoltageDivider() {
                 </table>
               </>
             ) : (
-              <p className="text-sm text-zinc-500">Vout doit être positive et inférieure à Vin, R1 strictement positive.</p>
+              <p className="text-sm text-night-500">Vout doit être positive et inférieure à Vin, R1 strictement positive.</p>
             ))}
         </div>
       </div>
@@ -151,7 +151,7 @@ export default function VoltageDivider() {
         <p className="label">Schéma</p>
         <Schematic withLoad={withLoad} />
         <p className="mt-3 text-center font-mono text-sm">Vout = Vin × R2 ÷ (R1 + R2)</p>
-        <p className="mt-2 text-xs text-zinc-500">
+        <p className="mt-2 text-xs text-night-500">
           Avec une charge, R2 est remplacée par R2 ∥ RL : prenez RL au moins 10 fois plus grande que R2 pour une chute négligeable.
         </p>
       </div>

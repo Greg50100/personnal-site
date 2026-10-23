@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { RotateCcw } from 'lucide-react'
-import { formatSI, parseSI } from '../si'
+import { formatSI, parseSI } from '../../../lib/si'
 import { solveOhm } from './ohm'
 
 const FIELDS = [
@@ -28,7 +28,7 @@ export default function OhmsLaw() {
     <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
       <div className="card card-pad">
         <div className="mb-4 flex items-center justify-between">
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">Remplissez exactement deux champs (préfixes acceptés : m, µ/u, k, M…).</p>
+          <p className="text-sm text-night-600 dark:text-night-400">Remplissez exactement deux champs (préfixes acceptés : m, µ/u, k, M…).</p>
           <button type="button" className="btn-icon" onClick={() => setValues({ U: '', I: '', R: '', P: '' })} aria-label="Tout effacer" title="Tout effacer">
             <RotateCcw size={15} />
           </button>
@@ -45,7 +45,7 @@ export default function OhmsLaw() {
                 <input
                   id={`ohm-${f.id}`}
                   className={`input font-mono text-lg ${
-                    computed ? 'border-orange-500/50 bg-orange-500/5 font-semibold text-orange-600 dark:bg-orange-500/5 dark:text-orange-400' : ''
+                    computed ? 'border-accent-500/50 bg-accent-500/5 font-semibold text-accent-700 dark:bg-accent-500/5 dark:text-accent-400' : ''
                   } ${invalid.includes(f) ? 'border-red-500' : ''}`}
                   inputMode="decimal"
                   placeholder={disabled ? '' : f.placeholder}
@@ -56,7 +56,7 @@ export default function OhmsLaw() {
                   title={computed ? 'Valeur calculée : videz un autre champ pour la saisir' : undefined}
                 />
                 {!computed && Number.isFinite(parsed[f.id]) && (
-                  <p className="mt-1 font-mono text-xs text-zinc-500">= {formatSI(parsed[f.id], f.unit, 6)}</p>
+                  <p className="mt-1 font-mono text-xs text-night-500">= {formatSI(parsed[f.id], f.unit, 6)}</p>
                 )}
               </div>
             )
@@ -71,7 +71,7 @@ export default function OhmsLaw() {
         <ul className="space-y-3 font-mono text-sm">
           {Object.entries(FORMULAS).map(([k, list]) => (
             <li key={k}>
-              <span className="font-bold text-orange-600 dark:text-orange-400">{k}</span> = {list.join('  ·  ')}
+              <span className="font-bold text-accent-700 dark:text-accent-400">{k}</span> = {list.join('  ·  ')}
             </li>
           ))}
         </ul>
