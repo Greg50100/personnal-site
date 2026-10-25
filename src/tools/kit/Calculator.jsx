@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { RotateCcw } from 'lucide-react'
+import { ExternalLink, RotateCcw } from 'lucide-react'
 import Segmented from '../../components/Segmented'
 import { parseNumber, toDateInput } from '../../lib/format'
 import { formatSI, parseSI } from '../../lib/si'
@@ -25,13 +25,16 @@ import LineChart from './LineChart'
  *   compute(v) {                                  // v.r → nombre, v.mode → texte
  *     return {
  *       results: [{ label, value, unit, format: 'si' | 'num' | 'auto' | 'text' | 'percent' | 'duration', digits, main, hint }],
- *       table: { title, columns: [...], rows: [[...]] },
+ *       table: { title, columns: [...], rows: [[...]], wrap: [1] },   // wrap : colonnes dont le texte peut passer à la ligne
  *       chart: { title, x: { label }, y: { label }, series: [{ name, color, points: [[x, y]] }] },
+ *              // ou { component: MonGraphique, … } : graphique sur mesure, qui reçoit `chart` en prop
  *       notes: ['…'],
  *     } // ou { error: 'message' } ou null (calcul impossible)
  *   },
- *   formulas: ['τ = R × C'],
- *   notes: ['texte d'aide'],
+ *   formulas: ['τ = R × C', { f: 'h = 1,006 T + w (2 501 + 1,86 T)', ref: ['ashrae'] }],
+ *   notes: ['texte d'aide', { text: '…', ref: 'ashrae' }],
+ *   references: [{ id: 'ashrae', label: 'Auteur, titre, année', url: 'https://…', detail: 'éq. 12' }],
+ *   // ref : identifiant(s) de `references`, affichés en renvoi numéroté [1] vers la liste des sources
  * }
  */
 
@@ -161,7 +164,7 @@ export function ResultTable({ table }) {
             {table.rows.map((row, i) => (
               <tr key={i}>
                 {row.map((cell, j) => (
-                  <td key={j} className={j > 0 ? 'font-mono' : ''}>
+                  <td key={j} className={`${j > 0 ? 'font-mono' : ''} ${table.wrap?.includes(j) ? 'min-w-[11rem] !whitespace-normal' : ''}`}>
                     {cell}
                   </td>
                 ))}
@@ -171,6 +174,63 @@ export function ResultTable({ table }) {
         </table>
       </div>
     </div>
+  )
+}
+
+const refIds = (ref) => (ref == null ? [] : Array.isArray(ref) ? ref : [ref])
+const itemText = (item) => (typeof item === 'string' ? item : (item.f ?? item.text))
+
+/** Renvois numérotés [1, 3] vers la liste des références (pas d'ancre : le routeur utilise le #). */
+function RefMarks({ ids, refs, prefix }) {
+  const marks = refIds(ids)
+    .map((id) => refs.findIndex((r) => r.id === id) + 1)
+    .filter((n) => n > 0)
+  if (!marks.length) return null
+  return (
+    <sup className="ml-1 whitespace-nowrap font-sans text-[10px]">
+      [
+      {marks.map((n, i) => (
+        <span key={n}>
+          {i > 0 && ', '}
+          <button
+            type="button"
+            className="inline-block px-0.5 leading-none text-accent-700 underline-offset-2 hover:underline dark:text-accent-300"
+            aria-label={`Référence ${n}`}
+            onClick={() => document.getElementById(`${prefix}-${n}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+          >
+            {n}
+          </button>
+        </span>
+      ))}
+      ]
+    </sup>
+  )
+}
+
+function References({ refs, prefix }) {
+  return (
+    <section className="card card-pad" aria-labelledby={`${prefix}-title`}>
+      <h2 id={`${prefix}-title`} className="label">
+        Sources et références
+      </h2>
+      <ol className="space-y-2 text-sm">
+        {refs.map((r, i) => (
+          <li key={r.id ?? r.label} id={`${prefix}-${i + 1}`} className="flex scroll-mt-24 gap-2">
+            <span className="w-7 shrink-0 font-mono text-night-500">[{i + 1}]</span>
+            <span className="min-w-0 text-night-700 dark:text-night-300">
+              {r.label}
+              {r.detail && <span className="text-night-500"> — {r.detail}</span>}
+              {r.url && (
+                <a href={r.url} target="_blank" rel="noreferrer" className="ml-1.5 inline-flex items-center gap-1 break-all text-accent-700 hover:underline dark:text-accent-300">
+                  <ExternalLink size={12} className="shrink-0" />
+                  {r.url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')}
+                </a>
+              )}
+            </span>
+          </li>
+        ))}
+      </ol>
+    </section>
   )
 }
 
@@ -190,52 +250,66 @@ export default function Calculator({ spec }) {
     }
   }
 
+  const ChartView = output?.chart?.component ?? LineChart
+  const refs = spec.references ?? []
+  const prefix = 'calc-ref'
+
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
-      <div className="card card-pad min-w-0">
-        <div className="grid gap-4 sm:grid-cols-2">
-          {visible.map((input) => (
-            <Field key={input.id} input={input} value={raw[input.id]} values={values} onChange={(val) => setRaw((r) => ({ ...r, [input.id]: val }))} />
-          ))}
-        </div>
-
-        <div className="mt-5 border-t border-night-200 pt-4 dark:border-night-800">
-          {missing.length > 0 && <p className="text-sm text-night-500">Renseignez : {missing.map((i) => labelOf(i, values).toLowerCase()).join(', ')}.</p>}
-          {!missing.length && !output && <p className="text-sm text-night-500">Calcul impossible avec ces valeurs.</p>}
-          {output?.error && <p className="text-sm text-red-500">{output.error}</p>}
-          {output?.results?.length > 0 && <ResultTiles results={output.results} />}
-          {output?.table && <ResultTable table={output.table} />}
-          {output?.chart && <LineChart chart={output.chart} />}
-          {output?.notes?.map((n) => (
-            <p key={n} className="mt-3 text-sm text-night-600 dark:text-night-400">
-              {n}
-            </p>
-          ))}
-        </div>
-      </div>
-
-      <aside className="card card-pad h-fit">
-        {spec.formulas?.length > 0 && (
-          <>
-            <p className="label">Formules</p>
-            <ul className="space-y-1.5 font-mono text-sm">
-              {spec.formulas.map((f) => (
-                <li key={f}>{f}</li>
-              ))}
-            </ul>
-          </>
-        )}
-        {spec.notes?.length > 0 && (
-          <div className={`space-y-2 text-sm text-night-600 dark:text-night-400 ${spec.formulas?.length ? 'mt-4' : ''}`}>
-            {spec.notes.map((n) => (
-              <p key={n}>{n}</p>
+    <div className="space-y-6">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+        <div className="card card-pad min-w-0">
+          <div className="grid gap-4 sm:grid-cols-2">
+            {visible.map((input) => (
+              <Field key={input.id} input={input} value={raw[input.id]} values={values} onChange={(val) => setRaw((r) => ({ ...r, [input.id]: val }))} />
             ))}
           </div>
-        )}
-        <button type="button" className="btn mt-4 w-full" onClick={() => setRaw(defaults)}>
-          <RotateCcw size={14} /> Valeurs par défaut
-        </button>
-      </aside>
+
+          <div className="mt-5 border-t border-night-200 pt-4 dark:border-night-800">
+            {missing.length > 0 && <p className="text-sm text-night-500">Renseignez : {missing.map((i) => labelOf(i, values).toLowerCase()).join(', ')}.</p>}
+            {!missing.length && !output && <p className="text-sm text-night-500">Calcul impossible avec ces valeurs.</p>}
+            {output?.error && <p className="text-sm text-red-500">{output.error}</p>}
+            {output?.results?.length > 0 && <ResultTiles results={output.results} />}
+            {output?.table && <ResultTable table={output.table} />}
+            {output?.chart && <ChartView chart={output.chart} />}
+            {output?.notes?.map((n) => (
+              <p key={itemText(n)} className="mt-3 text-sm text-night-600 dark:text-night-400">
+                {itemText(n)}
+                <RefMarks ids={n.ref} refs={refs} prefix={prefix} />
+              </p>
+            ))}
+          </div>
+        </div>
+
+        <aside className="card card-pad h-fit">
+          {spec.formulas?.length > 0 && (
+            <>
+              <p className="label">Formules</p>
+              <ul className="space-y-1.5 font-mono text-sm">
+                {spec.formulas.map((f) => (
+                  <li key={itemText(f)}>
+                    {itemText(f)}
+                    <RefMarks ids={f.ref} refs={refs} prefix={prefix} />
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          {spec.notes?.length > 0 && (
+            <div className={`space-y-2 text-sm text-night-600 dark:text-night-400 ${spec.formulas?.length ? 'mt-4' : ''}`}>
+              {spec.notes.map((n) => (
+                <p key={itemText(n)}>
+                  {itemText(n)}
+                  <RefMarks ids={n.ref} refs={refs} prefix={prefix} />
+                </p>
+              ))}
+            </div>
+          )}
+          <button type="button" className="btn mt-4 w-full" onClick={() => setRaw(defaults)}>
+            <RotateCcw size={14} /> Valeurs par défaut
+          </button>
+        </aside>
+      </div>
+      {refs.length > 0 && <References refs={refs} prefix={prefix} />}
     </div>
   )
 }

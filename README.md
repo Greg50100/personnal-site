@@ -17,7 +17,7 @@ astronomique, et tout le nécessaire pour observer le ciel (dans l'esprit de
 | Électronique | Loi d'Ohm · Codes des résistances (couleurs, CMS) et des condensateurs · Séries E · Série/parallèle · Pont diviseur · LED · Tolérances · Puissance · Valeur efficace · Réactance · Impédance RLC · Résonance LC · Filtres passifs · Constante de temps · 555 · AOP · Polarisation BJT · Zener · Transformateur · Wheatstone · Triangle-étoile · Câbles (chute de tension, section) · Bobine à air · Batterie · Coût de l'énergie |
 | Mathématiques | Traceur de courbes · Second degré · Matrices · Pourcentages · PGCD/PPCM · Complexes · Bases numériques |
 | Physique | Chute libre · Projectile · Loi de Newton · Gaz parfaits · Bernoulli · Ondes |
-| Météo | Air humide (point de rosée, température humide, enthalpie) · Ressenti, pression et altitude |
+| Météo | Air humide et diagramme psychrométrique · Confort thermique (formules de l'intégration Home Assistant Thermal Comfort) · Ressenti, pression et altitude |
 | Santé | IMC · Métabolisme · Masse grasse |
 | Chimie | Masse molaire |
 
@@ -77,9 +77,10 @@ export default {
   component: calc(() => import('./physique/energie-cinetique.js')) },
 ```
 
-Une spec peut aussi renvoyer un tableau (`table`), un graphique (`chart`) et des notes ; les champs
-acceptent les préfixes SI (« 4k7 », « 100n »), des listes de choix et des valeurs prédéfinies.
-Voir `src/tools/kit/Calculator.jsx`.
+Une spec peut aussi renvoyer un tableau (`table`), un graphique (`chart`, ou `chart.component` pour un
+graphique sur mesure comme le diagramme de l'air humide) et des notes ; les champs acceptent les préfixes SI
+(« 4k7 », « 100n »), des listes de choix et des valeurs prédéfinies. Une liste `references` affiche les
+sources, et chaque formule ou note peut y renvoyer (`ref`) par un numéro. Voir `src/tools/kit/Calculator.jsx`.
 
 **Outil avec une interface sur mesure** : un composant React (export default), déclaré avec
 `component: lazy(() => import('./rubrique/MonOutil.jsx'))`.

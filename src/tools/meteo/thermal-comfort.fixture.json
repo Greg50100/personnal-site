@@ -1,0 +1,545 @@
+{
+ "_source": "Valeurs calculées par le code Python de dolezsa/thermal_comfort (commit 7422cb0), voir thermal-comfort.js",
+ "cases": [
+  {
+   "input": {
+    "t": 20,
+    "rh": 50,
+    "p": null,
+    "wind": 0,
+    "to": 5,
+    "rho": 80
+   },
+   "expected": {
+    "dew_point": 9.27984544440477,
+    "heat_index": 19.361111111111107,
+    "humidex": 20.952885798747744,
+    "humidex_perception": "comfortable",
+    "dew_point_perception": "dry",
+    "absolute_humidity": 8.639091242147579,
+    "frost_point": 6.598542958402504,
+    "frost_risk": "no_risk",
+    "relative_strain": [
+     "outside_calculable_range",
+     {
+      "relative_strain_index": -0.02
+     }
+    ],
+    "summer_scharlau": [
+     "comfortable",
+     {
+      "summer_scharlau_index": 8.13
+     }
+    ],
+    "winter_scharlau": [
+     "outside_calculable_range",
+     {
+      "winter_scharlau_index": 20.98
+     }
+    ],
+    "summer_simmer_index": 22.424999999999997,
+    "summer_simmer_perception": "slightly_cool",
+    "moist_air_enthalpy": 38.55174137998151,
+    "humidity_ratio": 7.261737207462574,
+    "vapor_pressure_deficit": 1.1694018500369907,
+    "wet_bulb_temperature": 13.699341968988136,
+    "thoms_discomfort_index": 18.4875,
+    "epstein_moran": 16.85,
+    "thoms_discomfort_perception": "no_discomfort",
+    "moisture_excess": 3.202340231717886,
+    "ventilated_relative_humidity": 29.86,
+    "outdoor_dew_point": 1.84,
+    "ventilation_advice": "drier_outside",
+    "ventilation_need": "above_limit",
+    "wind_chill": 20,
+    "apparent_temperature": 19.848242312858147
+   }
+  },
+  {
+   "input": {
+    "t": 32,
+    "rh": 60,
+    "p": null,
+    "wind": 10,
+    "to": 5,
+    "rho": 80
+   },
+   "expected": {
+    "dew_point": 23.27646874076295,
+    "heat_index": 37.07428412177792,
+    "humidex": 42.54434086659711,
+    "humidex_perception": "great_discomfort",
+    "dew_point_perception": "quite_uncomfortable",
+    "absolute_humidity": 20.282069922644457,
+    "frost_point": 18.672972826624118,
+    "frost_risk": "no_risk",
+    "relative_strain": [
+     "significant_discomfort",
+     {
+      "relative_strain_index": 0.37
+     }
+    ],
+    "summer_scharlau": [
+     "highly_uncomfortable",
+     {
+      "summer_scharlau_index": -6.99
+     }
+    ],
+    "winter_scharlau": [
+     "outside_calculable_range",
+     {
+      "winter_scharlau_index": 31.81
+     }
+    ],
+    "summer_simmer_index": 41.56279999999999,
+    "summer_simmer_perception": "extremely_warm",
+    "moist_air_enthalpy": 78.36639308661515,
+    "humidity_ratio": 18.033209303819206,
+    "vapor_pressure_deficit": 1.9034136955977106,
+    "wet_bulb_temperature": 25.7926344029309,
+    "thoms_discomfort_index": 28.15,
+    "epstein_moran": 28.9,
+    "thoms_discomfort_perception": "most",
+    "moisture_excess": 14.845318912214765,
+    "ventilated_relative_humidity": 14.66,
+    "outdoor_dew_point": 1.84,
+    "ventilation_advice": "drier_outside",
+    "ventilation_need": "above_limit",
+    "wind_chill": 32,
+    "apparent_temperature": 35.43679079056855
+   }
+  },
+  {
+   "input": {
+    "t": 27,
+    "rh": 90,
+    "p": null,
+    "wind": 0,
+    "to": 5,
+    "rho": 80
+   },
+   "expected": {
+    "dew_point": 25.233699586259334,
+    "heat_index": 31.090676964000014,
+    "humidex": 39.594890481110866,
+    "humidex_perception": "evident_discomfort",
+    "dew_point_perception": "extremely_uncomfortable",
+    "absolute_humidity": 23.17429038770985,
+    "frost_point": 21.45988204554851,
+    "frost_risk": "no_risk",
+    "relative_strain": [
+     "slight_discomfort",
+     {
+      "relative_strain_index": 0.23
+     }
+    ],
+    "summer_scharlau": [
+     "highly_uncomfortable",
+     {
+      "summer_scharlau_index": -8.92
+     }
+    ],
+    "winter_scharlau": [
+     "outside_calculable_range",
+     {
+      "winter_scharlau_index": 23.67
+     }
+    ],
+    "summer_simmer_index": 37.942699999999995,
+    "summer_simmer_perception": "extremely_warm",
+    "moist_air_enthalpy": 79.0839075118611,
+    "humidity_ratio": 20.351795420175876,
+    "vapor_pressure_deficit": 0.3567311847200747,
+    "wet_bulb_temperature": 25.664660270202106,
+    "thoms_discomfort_index": 26.3125,
+    "epstein_moran": 26.33,
+    "thoms_discomfort_perception": "more_than_half",
+    "moisture_excess": 17.737539377280157,
+    "ventilated_relative_humidity": 19.57,
+    "outdoor_dew_point": 1.84,
+    "ventilation_advice": "drier_outside",
+    "ventilation_need": "above_limit",
+    "wind_chill": 27,
+    "apparent_temperature": 33.55568010469091
+   }
+  },
+  {
+   "input": {
+    "t": 2,
+    "rh": 85,
+    "p": null,
+    "wind": 20,
+    "to": -3,
+    "rho": 90
+   },
+   "expected": {
+    "dew_point": -0.25557231734256114,
+    "heat_index": 0.47499999999999826,
+    "humidex": -0.22577800985502305,
+    "humidex_perception": "comfortable",
+    "dew_point_perception": "dry",
+    "absolute_humidity": 4.725948670028943,
+    "frost_point": -0.49301978159678583,
+    "frost_risk": "probable",
+    "relative_strain": [
+     "outside_calculable_range",
+     {
+      "relative_strain_index": -0.37
+     }
+    ],
+    "summer_scharlau": [
+     "outside_calculable_range",
+     {
+      "summer_scharlau_index": 17.06
+     }
+    ],
+    "winter_scharlau": [
+     "slightly_uncomfortable",
+     {
+      "winter_scharlau_index": -0.84
+     }
+    ],
+    "summer_simmer_index": 2.000000000000001,
+    "summer_simmer_perception": "cool",
+    "moist_air_enthalpy": 11.292465348826562,
+    "humidity_ratio": 3.7051907394146104,
+    "vapor_pressure_deficit": 0.10589316632091306,
+    "wet_bulb_temperature": 0.6371334605164405,
+    "thoms_discomfort_index": 3.03125,
+    "epstein_moran": 1.32,
+    "thoms_discomfort_perception": "no_discomfort",
+    "moisture_excess": 1.1856933317728,
+    "ventilated_relative_humidity": 62.52,
+    "outdoor_dew_point": -4.41,
+    "ventilation_advice": "drier_outside",
+    "ventilation_need": "within_limit",
+    "wind_chill": -2.7185510668639323,
+    "apparent_temperature": -3.911013285364958
+   }
+  },
+  {
+   "input": {
+    "t": 21,
+    "rh": 65,
+    "p": 980.0,
+    "wind": 0,
+    "to": 4,
+    "rho": 85
+   },
+   "expected": {
+    "dew_point": 14.187402310957017,
+    "heat_index": 20.852777777777792,
+    "humidex": 24.47582053651942,
+    "humidex_perception": "comfortable",
+    "dew_point_perception": "comfortable",
+    "absolute_humidity": 11.905386277520607,
+    "frost_point": 11.3549382954958,
+    "frost_risk": "no_risk",
+    "relative_strain": [
+     "outside_calculable_range",
+     {
+      "relative_strain_index": 0.0
+     }
+    ],
+    "summer_scharlau": [
+     "comfortable",
+     {
+      "summer_scharlau_index": 2.64
+     }
+    ],
+    "winter_scharlau": [
+     "outside_calculable_range",
+     {
+      "winter_scharlau_index": 20.25
+     }
+    ],
+    "summer_simmer_index": 24.931350000000005,
+    "summer_simmer_perception": "slightly_cool",
+    "moist_air_enthalpy": 47.629367820079985,
+    "humidity_ratio": 10.434150303567625,
+    "vapor_pressure_deficit": 0.8706834894627504,
+    "wet_bulb_temperature": 16.564289794536233,
+    "thoms_discomfort_index": 19.74875,
+    "epstein_moran": 18.78,
+    "thoms_discomfort_perception": "no_discomfort",
+    "moisture_excess": 6.499705034442716,
+    "ventilated_relative_humidity": 27.81,
+    "outdoor_dew_point": 1.71,
+    "ventilation_advice": "drier_outside",
+    "ventilation_need": "above_limit",
+    "wind_chill": 21,
+    "apparent_temperature": 22.320443437334326
+   }
+  },
+  {
+   "input": {
+    "t": -4,
+    "rh": 70,
+    "p": null,
+    "wind": 30,
+    "to": 5,
+    "rho": 80
+   },
+   "expected": {
+    "dew_point": -8.665577934128832,
+    "heat_index": -6.516666666666668,
+    "humidex": -7.7841484331438515,
+    "humidex_perception": "comfortable",
+    "dew_point_perception": "dry",
+    "absolute_humidity": 2.5648344095702953,
+    "frost_point": -8.20360948391226,
+    "frost_risk": "unlikely",
+    "relative_strain": [
+     "outside_calculable_range",
+     {
+      "relative_strain_index": -0.46
+     }
+    ],
+    "summer_scharlau": [
+     "outside_calculable_range",
+     {
+      "summer_scharlau_index": 26.38
+     }
+    ],
+    "winter_scharlau": [
+     "highly_uncomfortable",
+     {
+      "winter_scharlau_index": -5.3
+     }
+    ],
+    "summer_simmer_index": -3.9999999999999996,
+    "summer_simmer_perception": "cool",
+    "moist_air_enthalpy": 0.6773337202606555,
+    "humidity_ratio": 1.9605975440947616,
+    "vapor_pressure_deficit": 0.136461267036954,
+    "wet_bulb_temperature": -6.078567836695408,
+    "thoms_discomfort_index": -0.9475000000000002,
+    "epstein_moran": -5.04,
+    "thoms_discomfort_perception": "no_discomfort",
+    "moisture_excess": -2.8719166008593975,
+    "ventilated_relative_humidity": 100.0,
+    "outdoor_dew_point": 1.84,
+    "ventilation_advice": "condensation_risk",
+    "ventilation_need": "within_limit",
+    "wind_chill": -11.691970167627742,
+    "apparent_temperature": -12.783976015031673
+   }
+  },
+  {
+   "input": {
+    "t": 28,
+    "rh": 10,
+    "p": null,
+    "wind": 0,
+    "to": 5,
+    "rho": 80
+   },
+   "expected": {
+    "dew_point": -6.437380755898803,
+    "heat_index": 26.39377275437655,
+    "humidex": 24.546374654097104,
+    "humidex_perception": "comfortable",
+    "dew_point_perception": "dry",
+    "absolute_humidity": 2.7212175256061775,
+    "frost_point": -10.37383779425977,
+    "frost_risk": "no_risk",
+    "relative_strain": [
+     "comfortable",
+     {
+      "relative_strain_index": 0.13
+     }
+    ],
+    "summer_scharlau": [
+     "outside_calculable_range",
+     {
+      "summer_scharlau_index": 27.63
+     }
+    ],
+    "winter_scharlau": [
+     "outside_calculable_range",
+     {
+      "winter_scharlau_index": 34.25
+     }
+    ],
+    "summer_simmer_index": 28.0042,
+    "summer_simmer_perception": "comfortable",
+    "moist_air_enthalpy": 34.11734600080808,
+    "humidity_ratio": 2.330262271769032,
+    "vapor_pressure_deficit": 3.4039862711360747,
+    "wet_bulb_temperature": 11.581285677633208,
+    "thoms_discomfort_index": 21.3175,
+    "epstein_moran": 19.79,
+    "thoms_discomfort_perception": "less_than_half",
+    "moisture_excess": -2.7155334848235153,
+    "ventilated_relative_humidity": 18.45,
+    "outdoor_dew_point": 1.84,
+    "ventilation_advice": "more_humid_outside",
+    "ventilation_need": "within_limit",
+    "wind_chill": 28,
+    "apparent_temperature": 25.24334794762699
+   }
+  },
+  {
+   "input": {
+    "t": 0.5,
+    "rh": 95,
+    "p": null,
+    "wind": 3,
+    "to": 5,
+    "rho": 80
+   },
+   "expected": {
+    "dew_point": -0.20962994276123825,
+    "heat_index": -0.9138888888888866,
+    "humidex": -1.7146340690103234,
+    "humidex_perception": "comfortable",
+    "dew_point_perception": "dry",
+    "absolute_humidity": 4.768435839015776,
+    "frost_point": -0.2668817714653642,
+    "frost_risk": "high",
+    "relative_strain": [
+     "outside_calculable_range",
+     {
+      "relative_strain_index": -0.39
+     }
+    ],
+    "summer_scharlau": [
+     "outside_calculable_range",
+     {
+      "summer_scharlau_index": 16.66
+     }
+    ],
+    "winter_scharlau": [
+     "highly_uncomfortable",
+     {
+      "winter_scharlau_index": -3.3
+     }
+    ],
+    "summer_simmer_index": 0.4999999999999992,
+    "summer_simmer_perception": "cool",
+    "moist_air_enthalpy": 9.804592743300608,
+    "humidity_ratio": 3.7177669812107483,
+    "vapor_pressure_deficit": 0.03168873235427738,
+    "wet_bulb_temperature": -0.039734223060935214,
+    "thoms_discomfort_index": 0.8849999999999996,
+    "epstein_moran": 0.23,
+    "thoms_discomfort_perception": "no_discomfort",
+    "moisture_excess": -0.6683151714139166,
+    "ventilated_relative_humidity": 100.0,
+    "outdoor_dew_point": 1.84,
+    "ventilation_advice": "condensation_risk",
+    "ventilation_need": "within_limit",
+    "wind_chill": 0.5,
+    "apparent_temperature": -2.098761403925085
+   }
+  },
+  {
+   "input": {
+    "t": 10,
+    "rh": 60,
+    "p": null,
+    "wind": 0,
+    "to": 9,
+    "rho": 65
+   },
+   "expected": {
+    "dew_point": 2.6008896969849777,
+    "heat_index": 8.622222222222224,
+    "humidex": 8.534374894193302,
+    "humidex_perception": "comfortable",
+    "dew_point_perception": "dry",
+    "absolute_humidity": 5.636095475297797,
+    "frost_point": 1.3417616348147021,
+    "frost_risk": "no_risk",
+    "relative_strain": [
+     "outside_calculable_range",
+     {
+      "relative_strain_index": -0.22
+     }
+    ],
+    "summer_scharlau": [
+     "outside_calculable_range",
+     {
+      "summer_scharlau_index": 15.01
+     }
+    ],
+    "winter_scharlau": [
+     "outside_calculable_range",
+     {
+      "winter_scharlau_index": 9.81
+     }
+    ],
+    "summer_simmer_index": 10.0,
+    "summer_simmer_perception": "cool",
+    "moist_air_enthalpy": 21.538482537428735,
+    "humidity_ratio": 4.55567651112428,
+    "vapor_pressure_deficit": 0.49119811017631176,
+    "wet_bulb_temperature": 6.023601784718423,
+    "thoms_discomfort_index": 10.99,
+    "epstein_moran": 8.01,
+    "thoms_discomfort_perception": "no_discomfort",
+    "moisture_excess": -0.09297073286475044,
+    "ventilated_relative_humidity": 60.77,
+    "outdoor_dew_point": 2.78,
+    "ventilation_advice": "similar",
+    "ventilation_need": "within_limit",
+    "wind_chill": 10,
+    "apparent_temperature": 8.427432784223143
+   }
+  },
+  {
+   "input": {
+    "t": 24,
+    "rh": 55,
+    "p": 1010.0,
+    "wind": 0,
+    "to": 18,
+    "rho": 70
+   },
+   "expected": {
+    "dew_point": 14.422822823438864,
+    "heat_index": 23.891666666666662,
+    "humidex": 27.616298053282264,
+    "humidex_perception": "comfortable",
+    "dew_point_perception": "comfortable",
+    "absolute_humidity": 11.967854481388418,
+    "frost_point": 11.127060998582465,
+    "frost_risk": "no_risk",
+    "relative_strain": [
+     "outside_calculable_range",
+     {
+      "relative_strain_index": 0.07
+     }
+    ],
+    "summer_scharlau": [
+     "comfortable",
+     {
+      "summer_scharlau_index": 2.5
+     }
+    ],
+    "winter_scharlau": [
+     "outside_calculable_range",
+     {
+      "winter_scharlau_index": 24.39
+     }
+    ],
+    "summer_simmer_index": 28.6873,
+    "summer_simmer_perception": "slightly_warm",
+    "moist_air_enthalpy": 50.30599456032908,
+    "humidity_ratio": 10.277177668613428,
+    "vapor_pressure_deficit": 1.3433071805719043,
+    "wet_bulb_temperature": 17.881140194508156,
+    "thoms_discomfort_index": 21.64875,
+    "epstein_moran": 20.94,
+    "thoms_discomfort_perception": "less_than_half",
+    "moisture_excess": 1.219747770855017,
+    "ventilated_relative_humidity": 48.4,
+    "outdoor_dew_point": 12.46,
+    "ventilation_advice": "drier_outside",
+    "ventilation_need": "not_winter",
+    "wind_chill": 24,
+    "apparent_temperature": 25.400041963440685
+   }
+  }
+ ]
+}

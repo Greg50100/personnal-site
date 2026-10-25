@@ -1,4 +1,7 @@
+import { fmt } from '../../lib/format'
+import PsychroChart from './PsychroChart.jsx'
 import { absoluteHumidity, dewPoint, enthalpy, humidityRatio, relativeHumidityFromDewPoint, saturationVaporPressure, specificVolume, wetBulb } from './psychro'
+import { refs } from './references'
 
 export default {
   inputs: [
@@ -14,6 +17,7 @@ export default {
     if (!(rh > 0 && rh <= 100)) return { error: v.known === 'rh' ? 'L’humidité relative doit être comprise entre 0 et 100 %.' : 'Le point de rosée ne peut pas dépasser la température de l’air.' }
     if (!(v.p > 100 && v.p < 1200)) return { error: 'Pression attendue en hPa (entre 100 et 1 200).' }
     const es = saturationVaporPressure(v.t)
+    if (es >= v.p) return { error: 'À cette pression, l’eau bout en dessous de cette température.' }
     const e = (rh / 100) * es
     const w = humidityRatio(e, v.p)
     const results = [
@@ -28,28 +32,23 @@ export default {
       { label: 'Enthalpie spécifique', value: enthalpy(v.t, w), unit: 'kJ/kg air sec', format: 'num', digits: 2 },
       { label: 'Volume spécifique', value: specificVolume(v.t, w, v.p), unit: 'm³/kg air sec', format: 'num', digits: 4 },
     ]
-    // Courbe de saturation et point courant (diagramme de l'air humide simplifié)
-    const sat = []
-    for (let t = -10; t <= 45; t += 1) sat.push([t, humidityRatio(saturationVaporPressure(t), v.p) * 1000])
-    const half = sat.map(([t]) => [t, humidityRatio(0.5 * saturationVaporPressure(t), v.p) * 1000])
     return {
       results,
-      chart: {
-        title: 'Diagramme de l’air humide (simplifié)',
-        x: { label: 'Température sèche (°C)' },
-        y: { label: 'Rapport de mélange (g/kg)', min: 0 },
-        series: [
-          { name: 'Saturation (100 %)', color: '#38bdf8', points: sat },
-          { name: '50 %', color: '#94a3b8', points: half, dashed: true },
-        ],
-        markers: [{ x: v.t, y: w * 1000, label: 'Votre air', color: '#f59e0b' }],
-      },
+      chart: { component: PsychroChart, title: `Diagramme de l’air humide à ${fmt(v.p, 2)} hPa`, p: v.p, t: v.t, w },
     }
   },
   formulas: [
-    'es(T) = 6,1094 · exp(17,625 T / (T + 243,04))  (hPa, Magnus)',
-    'e = HR · es(T) ;  Td = 243,04 · ln(e/6,1094) / (17,625 − ln(e/6,1094))',
-    'w = 0,622 · e / (P − e) ;  h = 1,006 T + w (2 501 + 1,86 T)',
+    { f: 'es(T) = 6,1094 · exp(17,625 T / (T + 243,04))  (hPa, Magnus)', ref: 'alduchov' },
+    { f: 'e = HR · es(T) ;  Td = 243,04 · ln(e/6,1094) / (17,625 − ln(e/6,1094))', ref: ['alduchov', 'lawrence'] },
+    { f: 'w = 0,621945 · e / (P − e)', ref: ['ashrae', 'psychrolib'] },
+    { f: 'h = 1,006 T + w (2 501 + 1,86 T)  (kJ/kg air sec)', ref: ['ashrae', 'psychrolib'] },
+    { f: 'v = 0,287042 (T + 273,15)(1 + 1,607858 w) / P  (P en kPa)', ref: ['ashrae', 'psychrolib'] },
+    { f: 'Tw : w = ((2 501 − 2,326 Tw) ws(Tw) − 1,006 (T − Tw)) / (2 501 + 1,86 T − 4,186 Tw)', ref: ['ashrae', 'psychrolib'] },
+    { f: 'ρv = e / (Rv T), Rv = 461,5 J/(kg·K)', ref: 'amsAbsolute' },
   ],
-  notes: ['Formules valables au-dessus de l’eau liquide, de −40 à +60 °C. La température humide est la température de saturation adiabatique (méthode ASHRAE).'],
+  notes: [
+    { text: 'Formules valables au-dessus de l’eau liquide, de −40 à +60 °C (sous 0 °C, saturation sur l’eau surfondue, comme les hygromètres et les services météo). La température humide est la température de saturation adiabatique, résolue par dichotomie.', ref: ['alduchov', 'ashrae'] },
+    { text: 'Le diagramme est recalculé pour la pression saisie : en altitude, le rapport de mélange à saturation augmente et toutes les courbes se déplacent.', ref: 'ashrae' },
+  ],
+  references: refs('alduchov', 'ashrae', 'psychrolib', 'amsAbsolute', 'lawrence'),
 }
