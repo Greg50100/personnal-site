@@ -19,13 +19,28 @@ export function dewPointFromVapor(e) {
 export const dewPoint = (t, rh) => dewPointFromVapor((rh / 100) * saturationVaporPressure(t))
 export const relativeHumidityFromDewPoint = (t, td) => (100 * saturationVaporPressure(td)) / saturationVaporPressure(t)
 
-/** Rapport de mélange (kg de vapeur par kg d'air sec). */
+/** Rapport de mélange (kg de vapeur par kg d'air sec), ASHRAE éq. 20. */
 export const humidityRatio = (e, p) => (0.621945 * e) / (p - e)
 
-/** Enthalpie spécifique (kJ par kg d'air sec). */
+/** Pression de vapeur (hPa) d'un air de rapport de mélange w, ASHRAE éq. 20 inversée. */
+export const vaporPressureFromRatio = (w, p) => (p * w) / (0.621945 + w)
+
+/** Rapport de mélange de l'air saturé à la température t. */
+export const saturationRatio = (t, p) => humidityRatio(saturationVaporPressure(t), p)
+
+/** Rapport de mélange d'un air à t dont la température humide est tw (ASHRAE éq. 33 et 35). */
+export const ratioFromWetBulb = (t, tw, p) => ((2501 - 2.326 * tw) * saturationRatio(tw, p) - 1.006 * (t - tw)) / (2501 + 1.86 * t - 4.186 * tw)
+
+/** Rapport de mélange d'un air à t d'enthalpie h (kJ/kg air sec), ASHRAE éq. 30 inversée. */
+export const ratioFromEnthalpy = (t, h) => (h - 1.006 * t) / (2501 + 1.86 * t)
+
+/** Température sèche d'un air de volume spécifique v (m³/kg air sec) et de rapport w, ASHRAE éq. 26 inversée. */
+export const temperatureFromVolume = (v, w, p) => (v * (p / 10)) / (0.287042 * (1 + 1.607858 * w)) - 273.15
+
+/** Enthalpie spécifique (kJ par kg d'air sec), ASHRAE éq. 30. */
 export const enthalpy = (t, w) => 1.006 * t + w * (2501 + 1.86 * t)
 
-/** Volume spécifique (m³ par kg d'air sec), p en hPa. */
+/** Volume spécifique (m³ par kg d'air sec), p en hPa, ASHRAE éq. 26. */
 export const specificVolume = (t, w, p) => (0.287042 * (t + 273.15) * (1 + 1.607858 * w)) / (p / 10)
 
 /** Humidité absolue (g de vapeur par m³ d'air). */
@@ -33,11 +48,11 @@ export const absoluteHumidity = (t, e) => (e * 100 * 1000) / (461.5 * (t + 273.1
 
 /**
  * Température humide thermodynamique (°C) : bilan d'énergie de la saturation adiabatique
- * (ASHRAE Fundamentals, équation 35), résolu par dichotomie entre le point de rosée et T.
+ * (ASHRAE Fundamentals, chapitre 1, équations 33 et 35), résolu par dichotomie entre le point de rosée et T.
  */
 export function wetBulb(t, e, p) {
   const w = humidityRatio(e, p)
-  const f = (tw) => ((2501 - 2.326 * tw) * humidityRatio(saturationVaporPressure(tw), p) - 1.006 * (t - tw)) / (2501 + 1.86 * t - 4.186 * tw) - w
+  const f = (tw) => ratioFromWetBulb(t, tw, p) - w
   let lo = dewPointFromVapor(e) - 1
   let hi = t
   for (let i = 0; i < 60; i++) {
@@ -46,6 +61,20 @@ export function wetBulb(t, e, p) {
     else lo = mid
   }
   return (lo + hi) / 2
+}
+
+/** État complet de l'air de température t et de rapport de mélange w (kg/kg) : HR, Td, Tw, h et v. */
+export function airState(t, w, p) {
+  const e = vaporPressureFromRatio(w, p)
+  return {
+    t,
+    w,
+    rh: (100 * e) / saturationVaporPressure(t),
+    td: e > 0 ? dewPointFromVapor(e) : NaN,
+    tw: e > 0 ? wetBulb(t, e, p) : NaN,
+    h: enthalpy(t, w),
+    v: specificVolume(t, w, p),
+  }
 }
 
 /** Indice de chaleur (NOAA, régression de Rothfusz avec ses corrections), en °C. */

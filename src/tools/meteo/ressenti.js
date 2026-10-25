@@ -1,4 +1,5 @@
 import { cloudBase, dewPoint, heatIndex, humidex, potentialTemperature, seaLevelPressure, standardPressure, windChill } from './psychro'
+import { refs } from './references'
 
 export default {
   inputs: [
@@ -33,8 +34,14 @@ export default {
     }
   },
   formulas: [
-    'Refroidissement éolien : 13,12 + 0,6215 T − 11,37 V^0,16 + 0,3965 T V^0,16',
-    'Humidex : T + 0,5555 (e − 10), e calculée au point de rosée',
-    'Pression au niveau de la mer : P (1 − 0,0065 h / (T + 0,0065 h + 273,15))^−5,257',
+    { f: 'Indice de chaleur : 0,5 (F + 61 + 1,2 (F − 68) + 0,094 HR), moyenné avec F ; régression de Rothfusz si ≥ 80 °F', ref: ['noaa', 'rothfusz'] },
+    { f: 'Humidex : T + 0,5555 (e − 10), e = 6,11 exp(5 417,753 (1/273,16 − 1/Td))', ref: 'masterton' },
+    { f: 'Refroidissement éolien : 13,12 + 0,6215 T − 11,37 V^0,16 + 0,3965 T V^0,16', ref: ['windChillNws', 'osczevski'] },
+    { f: 'Base des cumulus ≈ 125 m × (T − Td)', ref: ['amsLcl', 'lawrence'] },
+    { f: 'Pression standard : 1 013,25 (1 − 2,25577·10⁻⁵ h)^5,25588', ref: ['ashrae', 'icao'] },
+    { f: 'Pression au niveau de la mer : P (1 − 0,0065 h / (T + 0,0065 h + 273,15))^−5,257', ref: 'icao' },
+    { f: 'Température potentielle : θ = T (1 000 / P)^0,2857', ref: 'amsTheta' },
   ],
+  notes: [{ text: 'Point de rosée par la formule de Magnus (coefficients d’Alduchov et Eskridge), comme l’outil « Air humide ».', ref: 'alduchov' }],
+  references: refs('noaa', 'rothfusz', 'masterton', 'windChillNws', 'osczevski', 'amsLcl', 'lawrence', 'ashrae', 'icao', 'amsTheta', 'alduchov'),
 }

@@ -20,7 +20,7 @@ export const CATEGORIES = [
   { id: 'electronique', label: 'Électronique', icon: I.Cpu, description: 'Loi d’Ohm, résistances, filtres, alimentations, câbles et composants actifs.' },
   { id: 'maths', label: 'Mathématiques', icon: I.Sigma, description: 'Traceur de courbes, équations, matrices, arithmétique, complexes et pourcentages.' },
   { id: 'physique', label: 'Physique', icon: I.Atom, description: 'Mécanique, gaz parfaits, fluides et ondes.' },
-  { id: 'meteo', label: 'Météo', icon: I.CloudSun, description: 'Air humide (point de rosée, température humide, enthalpie), ressenti, pression et altitude.' },
+  { id: 'meteo', label: 'Météo', icon: I.CloudSun, description: 'Air humide et diagramme psychrométrique, confort thermique (formules de Thermal Comfort), ressenti, pression et altitude.' },
   { id: 'sante', label: 'Santé', icon: I.HeartPulse, description: 'IMC, besoins caloriques et masse grasse.' },
   { id: 'chimie', label: 'Chimie', icon: I.FlaskConical, description: 'Masse molaire et composition des molécules.' },
 ]
@@ -106,7 +106,8 @@ export const TOOLS = [
   { id: 'onde', category: 'physique', title: "Longueur d'onde et fréquence", summary: 'λ = c / f pour la lumière, le son ou un câble, période et énergie du photon.', icon: I.AudioWaveform, tags: ['onde', 'fréquence', 'photon'], repo: 'Ganymede', component: calc(() => import('./physique/onde.js')) },
 
   // --- Météo ---
-  { id: 'air-humide', category: 'meteo', title: 'Air humide (psychrométrie)', summary: 'Point de rosée ou humidité relative, température humide, rapport de mélange, enthalpie et volume spécifique.', icon: I.Droplets, tags: ['point de rosée', 'humidité', 'psychrométrie', 'CVC', 'enthalpie'], repo: 'convertisseur2', component: calc(() => import('./meteo/air-humide.js')) },
+  { id: 'air-humide', category: 'meteo', title: 'Air humide (psychrométrie)', summary: 'Diagramme de l’air humide, point de rosée ou humidité relative, température humide, rapport de mélange, enthalpie et volume spécifique.', icon: I.Droplets, tags: ['point de rosée', 'humidité', 'psychrométrie', 'diagramme de Carrier', 'CVC', 'enthalpie'], wide: true, repo: 'convertisseur2', component: calc(() => import('./meteo/air-humide.js')) },
+  { id: 'confort-thermique', category: 'meteo', title: 'Confort thermique (Thermal Comfort)', summary: 'Les capteurs de l’intégration Home Assistant Thermal Comfort, avec ses formules et ses seuils exacts : humidex, point de rosée, gelée, Thom, Scharlau, Simmer, aération.', icon: I.Thermometer, tags: ['Home Assistant', 'Thermal Comfort', 'humidex', 'point de gelée', 'aération', 'indice de Thom'], wide: true, component: calc(() => import('./meteo/confort-thermique.js')) },
   { id: 'ressenti', category: 'meteo', title: 'Ressenti, pression et altitude', summary: 'Indice de chaleur, humidex, refroidissement éolien, base des nuages, pression ramenée au niveau de la mer.', icon: I.ThermometerSun, tags: ['humidex', 'wind chill', 'indice de chaleur', 'baromètre', 'QNH'], component: calc(() => import('./meteo/ressenti.js')) },
 
   // --- Santé ---
