@@ -117,3 +117,8 @@ Pour un domaine personnel, remplacer `base` dans `vite.config.js` par `'/'`.
   [CelesTrak](https://celestrak.org).
 - Taux de change : taux de référence de la Banque centrale européenne via [Frankfurter](https://frankfurter.dev).
 - Secondes intercalaires : IERS. Icônes : [Lucide](https://lucide.dev).
+
+## Licence
+
+Code du site sous licence MIT : voir le fichier `LICENSE`. Les données reprises d'autres projets
+gardent leur propre licence (voir la section précédente).
