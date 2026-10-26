@@ -14,7 +14,8 @@ astronomique, et tout le nécessaire pour observer le ciel (dans l'esprit de
 | Astronomie | Ce soir dans le ciel · Carte du ciel · Calendrier astronomique · Calculateur du système solaire · Le Soleil · La Lune · Résumé des planètes · Éclipses et passages · Passages de l'ISS et satellites · Satellites brillants · Où est l'ISS ? · Jour et nuit sur la Terre |
 | Dates et temps | Heure et temps astronomique (UTC, TAI, TT, GPS, jour julien, temps sidéral, équation du temps) · Fuseaux horaires · Calcul de dates · Pâques et jours fériés |
 | Conversions et calcul | Convertisseur (75 grandeurs, plus de 600 unités, devises BCE) · Calculatrice scientifique |
-| Électronique | Loi d'Ohm · Codes des résistances (couleurs, CMS) et des condensateurs · Séries E · Série/parallèle · Pont diviseur · LED · Tolérances · Puissance · Valeur efficace · Réactance · Impédance RLC · Résonance LC · Filtres passifs · Constante de temps · 555 · AOP · Polarisation BJT · Zener · Transformateur · Wheatstone · Triangle-étoile · Câbles (chute de tension, section) · Bobine à air · Batterie · Coût de l'énergie |
+| Électronique | Loi d'Ohm · Codes des résistances (couleurs, CMS) et des condensateurs · Séries E · Série/parallèle · Pont diviseur · LED · Tolérances · Puissance · Valeur efficace · Réactance · Impédance RLC · Résonance LC · Filtres passifs · Constante de temps · 555 · AOP · Polarisation BJT · Zener · Transformateur · Wheatstone · Triangle-étoile · Câbles (chute de tension, section) · Bobine à air · Batterie · Coût de l'énergie · Régulateur LM317 · Condensateur de filtrage · Dissipateur thermique · Largeur de piste (IPC-2221) · Décibels · Atténuateur en T et en π |
+| Références | Brochages de connecteurs (USB, HDMI, RJ45, OBD-II…) · Brochages de composants (transistors, régulateurs, 74HC, CMOS 4000…) · Symboles électroniques · Fils AWG · Couleurs des conducteurs · Piles et accumulateurs · Fusibles · Résistivité et permittivité · Boîtiers |
 | Matériel | Cartes de développement (Arduino, ESP8266, ESP32, Raspberry Pi Pico et Raspberry Pi) · Brochages des cartes · Capteurs et modules (avec leur câblage type) · Vérifier un montage · Bus et niveaux logiques (schémas des bus et des adaptateurs) · Résistances de tirage I2C · Autonomie en veille profonde |
 | Mathématiques | Traceur de courbes · Second degré · Matrices · Pourcentages · PGCD/PPCM · Complexes · Bases numériques |
 | Physique | Chute libre · Projectile · Loi de Newton · Gaz parfaits · Bernoulli · Ondes |
@@ -54,6 +55,7 @@ src/
     ├── astronomy/           # lib/ (astro, time, geo), components/ (cartes, graphiques), un dossier par outil
     ├── utilities/converter/ # units/ (grandeurs par famille), currency.js (taux BCE)
     ├── materiel/            # data/ (cartes, brochages, modules, câblages), check.js (vérification d'un montage)
+    ├── references/          # data/ (connecteurs, composants, fils), pages de tables et symboles
     ├── temps/ maths/ physique/ meteo/ sante/ chimie/ electronics/
 ```
 
