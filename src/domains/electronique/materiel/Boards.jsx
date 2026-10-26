@@ -1,10 +1,11 @@
 import { useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { GitCompare, ListChecks, X } from 'lucide-react'
 import { BOARDS, FAMILIES, WIRELESS, wirelessTags } from './data/boards'
 import { Links, LogicBadge, SearchField, SpecList, ToggleChip } from './ui'
 import { PINOUTS } from './data/pinouts'
 import PinoutDiagram from './PinoutDiagram'
+import PinTable from './PinTable'
 import { useLocalStorage } from '../../../hooks/useLocalStorage'
 import { DEFAULT_MONTAGE, MONTAGE_KEY } from './check'
 
@@ -66,8 +67,8 @@ function BoardDetail({ board, onClose, onUse }) {
         </div>
       </div>
       <div className="grid gap-6 xl:grid-cols-2">
-        <SpecList rows={ROWS.map(([k, f]) => [k, f(board)])} />
-        <div className="space-y-5">
+        <SpecList className="min-w-0" rows={ROWS.map(([k, f]) => [k, f(board)])} />
+        <div className="min-w-0 space-y-5">
           <div>
             <p className="label">Broches particulières</p>
             <div className="overflow-x-auto rounded-xl border border-night-200 dark:border-night-800">
@@ -98,9 +99,10 @@ function BoardDetail({ board, onClose, onUse }) {
         </div>
       </div>
       {PINOUTS[board.id] && (
-        <div className="mt-6 border-t border-night-200 pt-4 dark:border-night-800">
-          <h3 className="label">Brochage</h3>
+        <div className="mt-6 space-y-5 border-t border-night-200 pt-4 dark:border-night-800">
+          <h3 className="font-display text-lg font-semibold text-night-900 dark:text-night-50">Brochage</h3>
           <PinoutDiagram key={board.id} pinout={PINOUTS[board.id]} />
+          <PinTable key={`table-${board.id}`} pinout={PINOUTS[board.id]} />
         </div>
       )}
     </section>
@@ -153,7 +155,10 @@ export default function Boards() {
   const [wireless, setWireless] = useState(null)
   const [query, setQuery] = useState('')
   const [compare, setCompare] = useState([])
-  const [selected, setSelected] = useState(null)
+  // Carte ouverte dans l'adresse (?carte=esp32) : lien direct vers une fiche et son brochage
+  const [params, setParams] = useSearchParams()
+  const selected = BOARDS.some((b) => b.id === params.get('carte')) ? params.get('carte') : null
+  const setSelected = (id) => setParams(id ? { carte: id } : {}, { replace: true })
   const [, setMontage] = useLocalStorage(MONTAGE_KEY, DEFAULT_MONTAGE)
   const [used, setUsed] = useState(false)
   const topRef = useRef(null)
@@ -210,7 +215,7 @@ export default function Boards() {
           {used && (
             <p className="text-sm text-night-600 dark:text-night-300">
               {detail.name} est choisie dans l’outil{' '}
-              <Link to="/materiel/verifier-montage" className="text-accent-700 underline dark:text-accent-300">
+              <Link to="/electronique/verifier-montage" className="text-accent-700 underline dark:text-accent-300">
                 Vérifier un montage
               </Link>
               .
@@ -247,7 +252,7 @@ export default function Boards() {
             />
             <div className="mt-auto flex flex-wrap items-center gap-2 pt-1">
               <button type="button" className="btn flex-1" onClick={() => open(b.id)}>
-                Fiche complète
+                Fiche et brochage
               </button>
               <label className="chip cursor-pointer gap-1.5 px-2.5 py-1.5 text-xs">
                 <input

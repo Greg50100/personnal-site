@@ -150,8 +150,8 @@ export default function WiringDiagram({ wiring }) {
       </Schematic>
       <p className="text-xs text-night-500">
         Sur une carte en 3,3 V (ESP32, Pico, Raspberry Pi){optional ? ' ; en pointillés, les fils facultatifs' : ''}. Broches exactes :{' '}
-        <Link to="/materiel/brochages" className="text-accent-700 underline dark:text-accent-300">
-          brochages des cartes
+        <Link to="/electronique/cartes" className="text-accent-700 underline dark:text-accent-300">
+          fiche et brochage de chaque carte
         </Link>
         .
       </p>
