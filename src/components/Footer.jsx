@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { SITE } from '../config/site'
-import { CATEGORIES, TOOLS } from '../tools/registry'
+import { CATEGORIES, TOOLS } from '../registry'
 import { Logo } from './Brand'
 
 export default function Footer() {

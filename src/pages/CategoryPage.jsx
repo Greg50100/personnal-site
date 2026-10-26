@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import { getCategory, toolsOf } from '../tools/registry'
+import { getCategory, toolsOf } from '../registry'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import SectionTitle from '../components/SectionTitle'
 import ToolCard from '../components/ToolCard'

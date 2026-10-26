@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CornerDownLeft, Search } from 'lucide-react'
-import { searchTools, toolPath, getCategory } from '../tools/registry'
+import { searchTools, toolPath, getCategory } from '../registry'
 
 /** Recherche rapide d'un outil (ouverte par Ctrl/⌘ + K ou le bouton de l'en-tête). À monter à l'ouverture. */
 export default function CommandPalette({ onClose }) {

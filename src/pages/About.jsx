@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { ExternalLink, FolderGit2 } from 'lucide-react'
 import { PROJECTS, PROJECT_STATUS } from '../data/projects'
 import { SITE } from '../config/site'
-import { CATEGORIES, TOOLS, toolPath, toolsOf } from '../tools/registry'
+import { CATEGORIES, TOOLS, toolPath, toolsOf } from '../registry'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import SectionTitle from '../components/SectionTitle'
 

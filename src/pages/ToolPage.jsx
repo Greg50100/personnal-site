@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ChevronRight, Github } from 'lucide-react'
-import { getCategory, getTool } from '../tools/registry'
+import { getCategory, getTool } from '../registry'
 import { SITE } from '../config/site'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import ErrorBoundary from '../components/ErrorBoundary'

@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Search } from 'lucide-react'
 import { SITE } from '../config/site'
-import { CATEGORIES, TOOLS, toolPath, toolsOf } from '../tools/registry'
+import { CATEGORIES, TOOLS, toolPath, toolsOf } from '../registry'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import SectionTitle from '../components/SectionTitle'
 import ToolCard from '../components/ToolCard'
@@ -10,7 +10,7 @@ import Loader from '../components/Loader'
 import ErrorBoundary from '../components/ErrorBoundary'
 
 // Chargé à part : le moteur astronomique ne pèse pas sur le premier affichage.
-const TonightWidget = lazy(() => import('../tools/astronomy/tonight/TonightWidget.jsx'))
+const TonightWidget = lazy(() => import('../domains/astronomie/tonight/TonightWidget.jsx'))
 
 // La palette de recherche est gérée par l'en-tête, qui écoute cet événement.
 const openSearch = () => window.dispatchEvent(new Event('open-search'))

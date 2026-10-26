@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { toolPath } from '../tools/registry'
+import { toolPath } from '../registry'
 import StatusBadge from './StatusBadge'
 
 /** Carte d'un outil. `compact` : icône + titre seulement (grilles denses). */

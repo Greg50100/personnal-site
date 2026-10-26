@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Search } from 'lucide-react'
-import { CATEGORIES, TOOLS, searchTools } from '../tools/registry'
+import { CATEGORIES, TOOLS, searchTools } from '../registry'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import SectionTitle from '../components/SectionTitle'
 import ToolCard from '../components/ToolCard'
