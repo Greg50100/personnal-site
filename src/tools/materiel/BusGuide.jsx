@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { addressTable, hex } from './data/modules'
+import { AhctShifter, Bss138Shifter, DividerShifter, I2cBus, I2sBus, LevelChart, OneWireBus, SpiBus, UartLink } from './BusDiagrams'
 import { Links, SearchField } from './ui'
 
 const BUSES = [
@@ -113,6 +114,34 @@ function Table({ head, rows, wrap = [] }) {
   )
 }
 
+const BUS_DIAGRAMS = [
+  ['I2C', I2cBus, 'Deux fils pour tous les modules. Les sorties ne savent que tirer à 0 : les résistances Rp ramènent les lignes à l’état haut. Chaque module a son adresse.'],
+  ['SPI', SpiBus, 'Horloge et données partagées ; la carte choisit le module à qui elle parle en mettant sa ligne CS à 0.'],
+  ['UART', UartLink, 'Le TX de l’un va sur le RX de l’autre, avec une masse commune. Les deux côtés doivent avoir le même débit.'],
+  ['1-Wire', OneWireBus, 'Une seule résistance de 4,7 kΩ pour tout le bus ; chaque sonde a une adresse unique de 64 bits.'],
+  ['I2S', I2sBus, 'Le micro et l’ampli partagent les horloges BCLK et WS d’un même port ; ESPHome peut aussi leur donner deux ports séparés.'],
+]
+
+const SHIFTER_DIAGRAMS = [
+  ['Pont diviseur (5 V → 3,3 V)', DividerShifter, 'Pour une sortie 5 V vers une entrée 3,3 V, dans un seul sens.'],
+  ['BSS138 (bidirectionnel)', Bss138Shifter, 'Note NXP AN10441 : chaque côté est tiré à sa tension ; un 0 d’un côté rend le MOSFET passant (ou sa diode interne) et tire l’autre côté à 0.'],
+  ['74AHCT125 (3,3 V → 5 V)', AhctShifter, 'Alimenté en 5 V, il lit 3,3 V comme un état haut (seuil de 2 V) et sort 5 V ; OE à la masse active la sortie.'],
+]
+
+/** Schéma avec son titre et une phrase d'explication. */
+function Diagram({ title, schema, caption }) {
+  const Schema = schema
+  return (
+    <figure className="flex flex-col gap-2 rounded-xl border border-night-200 p-3 dark:border-night-800">
+      <figcaption className="text-sm font-medium text-night-900 dark:text-night-50">{title}</figcaption>
+      <div className="flex flex-1 items-center">
+        <Schema />
+      </div>
+      <p className="text-sm text-night-600 dark:text-night-400">{caption}</p>
+    </figure>
+  )
+}
+
 function Section({ id, title, children }) {
   return (
     <section className="card card-pad space-y-3" aria-labelledby={id}>
@@ -135,7 +164,17 @@ export default function BusGuide() {
         <Table head={['Bus', 'Fils', 'Débit', 'Distance (ordre de grandeur)', 'Modules', 'À retenir']} rows={BUSES.map((b) => [b.name, b.wires, b.speed, b.distance, b.devices, b.tips])} wrap={[1, 2, 3, 4, 5]} />
       </Section>
 
+      <Section id="cablage" title="Câblage des bus">
+        <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
+          {BUS_DIAGRAMS.map(([title, Schema, caption]) => (
+            <Diagram key={title} title={title} schema={Schema} caption={caption} />
+          ))}
+        </div>
+        <p className="text-sm text-night-600 dark:text-night-400">Alimentation des modules non représentée ; un croisement sans point n’est pas une connexion.</p>
+      </Section>
+
       <Section id="niveaux" title="Niveaux logiques : ce qui est lu comme un 0 ou un 1">
+        <LevelChart />
         <Table
           head={['Famille', 'État haut lu à partir de (VIH)', 'État bas lu en dessous de (VIL)', 'Sortie à l’état haut (VOH)']}
           rows={LEVELS.map((l) => [l.family, l.vih, l.vil, l.voh])}
@@ -155,6 +194,11 @@ export default function BusGuide() {
       </Section>
 
       <Section id="adaptateurs" title="Adaptateurs de niveau">
+        <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
+          {SHIFTER_DIAGRAMS.map(([title, Schema, caption]) => (
+            <Diagram key={title} title={title} schema={Schema} caption={caption} />
+          ))}
+        </div>
         <Table head={['Solution', 'Sens', 'Usage']} rows={SHIFTERS} wrap={[2]} />
         <p className="text-sm text-night-600 dark:text-night-400">
           Calculer un pont diviseur :{' '}

@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest'
 import { assignI2c, checkMontage, supplyFor } from './check'
 import { BOARDS } from './data/boards'
 import { MODULES, addressTable } from './data/modules'
+import { wiringOf } from './data/wiring'
 
 const board = (id) => BOARDS.find((b) => b.id === id)
 const mod = (id) => MODULES.find((m) => m.id === id)
@@ -148,5 +149,44 @@ describe('brochages', async () => {
     const boot = pins.filter((p) => p.tags.has('boot')).map((p) => Number(p.values.gpio)).sort((a, b) => a - b)
     expect(boot).toEqual([0, 2, 5, 12, 15])
     expect(pins.filter((p) => p.tags.has('in')).map((p) => Number(p.values.gpio)).sort((a, b) => a - b)).toEqual([34, 35, 36, 39])
+  })
+})
+
+describe('câblage des modules', () => {
+  const SIGNALS = new Set(['pwr', 'gnd', 'i2c', 'spi', 'uart', 'adc', 'pwm', 'gpio', 'i2s'])
+  const wired = MODULES.filter((m) => m.bus !== 'power')
+
+  test('un schéma pour chaque module hors alimentations, avec des signaux connus', () => {
+    for (const m of wired) {
+      const w = wiringOf(m)
+      expect(w, m.id).not.toBeNull()
+      const pins = w.rows.map((r) => r[1])
+      expect(new Set(pins).size, `${m.id} : broches du module en double`).toBe(pins.length)
+      for (const [, , signal, dir] of w.rows) {
+        expect(SIGNALS.has(signal), `${m.id} ${signal}`).toBe(true)
+        expect([undefined, null, '>', '<', '<>']).toContain(dir)
+      }
+      const grounded = w.rows.some((r) => r[2] === 'gnd' || r[4]?.pulldown || r[4]?.divider)
+      expect(grounded, `${m.id} : masse`).toBe(true)
+    }
+    for (const id of ['ams1117', 'buck', 'tp4056']) expect(wiringOf(mod(id))).toBeNull()
+  })
+
+  test('les modules I2C ont SDA et SCL', () => {
+    for (const m of wired.filter((x) => x.bus === 'i2c')) {
+      const i2c = wiringOf(m).rows.filter((r) => r[2] === 'i2c').map((r) => r[0])
+      expect(i2c, m.id).toEqual(expect.arrayContaining(['SDA', 'SCL']))
+    }
+  })
+
+  test('aucun signal 5 V n’arrive sans adaptation sur une entrée 3,3 V', () => {
+    for (const m of wired) {
+      const { rows } = wiringOf(m)
+      const fiveVolt = rows.some((r) => r[0] === '5V' && r[2] === 'pwr') && m.levels === 'vcc'
+      if (!fiveVolt) continue
+      for (const [board, pin, signal, dir, via] of rows) {
+        if (dir === '<' || dir === '<>') expect(via?.divider ?? via?.chip, `${m.id} ${pin} → ${board} (${signal})`).toBeTruthy()
+      }
+    }
   })
 })
