@@ -19,6 +19,7 @@ export const CATEGORIES = [
   { id: 'utilitaires', label: 'Conversions et calcul', icon: I.ArrowLeftRight, description: "Convertisseur d'unités et de devises, calculatrice scientifique." },
   { id: 'electronique', label: 'Électronique', icon: I.Cpu, description: 'Loi d’Ohm, résistances, filtres, alimentations, câbles et composants actifs.' },
   { id: 'materiel', label: 'Matériel', icon: I.Microchip, description: 'Cartes Arduino, ESP et Raspberry Pi, capteurs et modules, bus et niveaux logiques : caractéristiques, pièges et vérification d’un montage.' },
+  { id: 'references', label: 'Références', icon: I.BookOpen, description: 'Brochages de connecteurs et de composants, tables de fils, piles, fusibles et matériaux, symboles et boîtiers, à la manière d’un aide-mémoire d’électronicien.' },
   { id: 'maths', label: 'Mathématiques', icon: I.Sigma, description: 'Traceur de courbes, équations, matrices, arithmétique, complexes et pourcentages.' },
   { id: 'physique', label: 'Physique', icon: I.Atom, description: 'Mécanique, gaz parfaits, fluides et ondes.' },
   { id: 'meteo', label: 'Météo', icon: I.CloudSun, description: 'Air humide et diagramme psychrométrique, confort thermique (formules de Thermal Comfort), ressenti, pression et altitude.' },
@@ -97,6 +98,9 @@ export const TOOLS = [
   { id: 'bus-niveaux', category: 'materiel', title: 'Bus et niveaux logiques', summary: 'I2C, SPI, UART, 1-Wire et I2S ; seuils 3,3 V et 5 V, adaptateurs de niveau et adresses I2C des modules courants.', icon: I.Cable, tags: ['I2C', 'SPI', 'UART', '1-Wire', '3,3 V', '5 V', 'adaptateur de niveau'], wide: true, component: lazy(() => import('./materiel/BusGuide.jsx')) },
   { id: 'pull-up-i2c', category: 'materiel', title: 'Résistances de tirage I2C', summary: 'Plage de valeurs selon la tension, la vitesse et la capacité du bus (norme NXP), avec les résistances déjà sur les modules.', icon: I.ArrowUpFromLine, tags: ['I2C', 'pull-up', 'SDA', 'SCL'], component: calc(() => import('./materiel/pull-up-i2c.js')) },
   { id: 'autonomie-veille', category: 'materiel', title: 'Autonomie en veille profonde', summary: 'Durée de vie sur batterie d’un montage qui se réveille périodiquement (ESP, Arduino), avec la courbe selon l’intervalle.', icon: I.BatteryMedium, tags: ['batterie', 'deep sleep', 'ESP32', 'consommation'], component: calc(() => import('./materiel/autonomie-veille.js')) },
+
+  // --- Références ---
+  { id: 'connecteurs', category: 'references', title: 'Brochages de connecteurs', summary: 'USB (A, C, micro), HDMI, VGA, RS-232, RJ45 et PoE, jacks, XLR, MIDI, DMX, ATX, SATA, OBD-II, ISP, SWD, Qwiic, cartes SD… : broches, couleurs de fils et pièges.', icon: I.Plug, tags: ['connecteur', 'pinout', 'USB-C', 'RJ45', 'HDMI', 'OBD'], wide: true, featured: true, component: lazy(() => import('./references/Connectors.jsx')) },
 
   // --- Mathématiques ---
   { id: 'traceur', category: 'maths', title: 'Traceur de courbes', summary: 'Tracez plusieurs fonctions f(x), déplacez-vous et zoomez, lisez les valeurs au survol.', icon: I.ChartLine, tags: ['graphique', 'fonction', 'courbe'], repo: 'Ganymede', wide: true, featured: true, component: lazy(() => import('./maths/grapher/FunctionGrapher.jsx')) },
