@@ -1,4 +1,5 @@
 import { parseSI } from '../../../lib/si'
+import { SerieParalleleSchema } from '../schemas.jsx'
 
 const UNITS = { r: 'Ω', l: 'H', c: 'F' }
 
@@ -11,6 +12,7 @@ export function combine(values, kind) {
 }
 
 export default {
+  schematic: SerieParalleleSchema,
   inputs: [
     {
       id: 'kind',

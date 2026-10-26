@@ -1,4 +1,6 @@
+import { BobineSchema } from '../schemas.jsx'
 export default {
+  schematic: BobineSchema,
   inputs: [
     { id: 'n', label: 'Nombre de spires', type: 'number', value: '50' },
     { id: 'd', label: 'Diamètre de la bobine', unit: 'm', value: '20m', hint: 'Diamètre moyen, ex. 20m = 20 mm' },

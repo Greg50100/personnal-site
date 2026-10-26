@@ -1,3 +1,4 @@
+import { RlcSchema } from '../schemas.jsx'
 const DEG = 180 / Math.PI
 
 /** Impédance complexe d'un circuit R, L, C en série ou en parallèle à la fréquence f. */
@@ -22,6 +23,7 @@ export function impedance({ r, l, c, f, parallel }) {
 }
 
 export default {
+  schematic: RlcSchema,
   inputs: [
     {
       id: 'mode',

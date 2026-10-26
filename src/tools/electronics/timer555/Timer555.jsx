@@ -5,6 +5,7 @@ import { nearestInSeries } from '../resistor/colors'
 import { formatSI, parseSI } from '../../../lib/si'
 import { Result, SIField } from '../../kit/fields'
 import { astable, designAstable, monostable } from './timer555'
+import { Ne555Schema } from '../schemas'
 
 /** Chronogramme du signal de sortie (2 périodes en astable, une impulsion en monostable). */
 function Waveform({ duty: rawDuty }) {
@@ -43,6 +44,8 @@ function Waveform({ duty: rawDuty }) {
     </svg>
   )
 }
+
+const siOr = (x, unit) => (Number.isFinite(x) ? formatSI(x, unit, 3) : '?')
 
 export default function Timer555() {
   const [mode, setMode] = useState('astable')
@@ -128,6 +131,15 @@ export default function Timer555() {
       </div>
 
       <div className="card card-pad">
+        <figure className="mb-4">
+          <figcaption className="label">Schéma</figcaption>
+          <Ne555Schema
+            mode={mode === 'monostable' ? 'monostable' : 'astable'}
+            r1={siOr(mode === 'design' ? design?.r1 : mode === 'monostable' ? parseSI(v.r) : parseSI(v.r1), 'Ω')}
+            r2={siOr(mode === 'design' ? design?.r2 : parseSI(v.r2), 'Ω')}
+            c={siOr(parseSI(mode === 'design' ? v.cd : v.c), 'F')}
+          />
+        </figure>
         <p className="label">Signal de sortie</p>
         <Waveform duty={mode === 'monostable' ? null : mode === 'astable' ? (a?.duty ?? 0.6) : (parseSI(v.duty) / 100 || 0.6)} />
         <div className="mt-4 space-y-2 text-xs text-night-500">

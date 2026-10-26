@@ -1,6 +1,8 @@
 import { MATERIALS, SECTIONS, awgLabel, awgToMm2, mm2ToAwg } from './cables'
+import { CableSchema } from '../schemas.jsx'
 
 export default {
+  schematic: CableSchema,
   inputs: [
     { id: 'u', label: 'Tension de la source', unit: 'V', value: '12' },
     { id: 'i', label: 'Courant', unit: 'A', value: '10' },

@@ -3,6 +3,7 @@ import { fmt } from '../../../lib/format'
 import { formatSI, parseSI } from '../../../lib/si'
 import { Result, SIField } from '../../kit/fields'
 import { LED_PRESETS, solveLed } from './led'
+import { LedSchema } from '../schemas'
 
 const FRACTIONS = { 0.125: '1/8 W', 0.25: '1/4 W', 0.5: '1/2 W' }
 const ratingLabel = (w) => FRACTIONS[w] ?? `${w} W`
@@ -101,6 +102,15 @@ export default function LedResistor() {
       </div>
 
       <div className="card card-pad text-sm text-night-600 dark:text-night-400">
+        <figure className="mb-4">
+          <figcaption className="label">Schéma</figcaption>
+          <LedSchema
+            supply={Number.isFinite(parseSI(v.supply)) ? formatSI(parseSI(v.supply), 'V', 3) : '?'}
+            count={v.count}
+            resistor={res.error ? '?' : formatSI(res.standard, 'Ω', 3)}
+            current={res.error ? null : formatSI(res.actualCurrent, 'A', 3)}
+          />
+        </figure>
         <p className="label">À savoir</p>
         <ul className="list-disc space-y-2 pl-4">
           <li>Les tensions directes sont typiques : consultez la fiche technique de votre LED pour un calcul précis.</li>

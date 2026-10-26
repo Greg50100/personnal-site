@@ -1,3 +1,4 @@
+import { FiltreSchema } from '../schemas.jsx'
 const TWO_PI = 2 * Math.PI
 
 /** Gain (dB) d'un filtre passif du premier ordre (RC/RL) ou LC (second ordre, non amorti) à la fréquence f. */
@@ -12,6 +13,7 @@ export function filterGain(type, pass, fc, f) {
 }
 
 export default {
+  schematic: FiltreSchema,
   inputs: [
     {
       id: 'type',

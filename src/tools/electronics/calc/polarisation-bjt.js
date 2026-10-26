@@ -1,4 +1,6 @@
+import { BjtSchema } from '../schemas.jsx'
 export default {
+  schematic: BjtSchema,
   inputs: [
     { id: 'vcc', label: 'Alimentation Vcc', unit: 'V', value: '12' },
     { id: 'r1', label: 'R1 (base → Vcc)', unit: 'Ω', value: '10k' },
