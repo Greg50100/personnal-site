@@ -114,3 +114,39 @@ describe('calculateurs', () => {
     expect(spec.compute({ cap: 2500, usable: 80, ia: 80, ta: 700, is: 20, period: 10 }).error).toBeTruthy()
   })
 })
+
+describe('brochages', async () => {
+  const { PINOUTS, parsePin } = await import('./data/pinouts')
+  const count = (p) => (p.layout === 'rows' ? [...p.top, ...p.bottom, ...(p.extra?.left ?? []), ...(p.extra?.right ?? [])] : [...p.left, ...p.right]).filter((s) => s !== 'gap').length
+  test('une carte, un brochage, avec le bon nombre de broches', () => {
+    for (const b of BOARDS) expect(PINOUTS[b.id], b.id).toBeTruthy()
+    expect(count(PINOUTS.esp32)).toBe(38)
+    expect(count(PINOUTS['esp32-s3'])).toBe(44)
+    expect(count(PINOUTS['esp32-c3'])).toBe(30)
+    expect(count(PINOUTS['esp32-c6'])).toBe(32)
+    expect(count(PINOUTS.esp8266)).toBe(16)
+    expect(count(PINOUTS.nano)).toBe(30)
+    expect(count(PINOUTS.pico)).toBe(40)
+    expect(count(PINOUTS['pi-4'])).toBe(40)
+    expect(count(PINOUTS['mega-2560'])).toBe(26 + 24 + 36)
+  })
+  test('étiquettes connues et notes rattachées à une broche existante', () => {
+    const known = new Set(['pwr', 'gnd', 'nc', 'ctl', 'gpio', 'in', 'adc', 'adc2', 'dac', 'i2c', 'spi', 'uart', 'pwm', 'i2s', 'onewire', 'usb', 'usbser', 'boot', 'flash', 'psram', 'led', 'wake', 'int', 'id'])
+    for (const [id, p] of Object.entries(PINOUTS)) {
+      const lists = p.layout === 'rows' ? [p.top, p.bottom, p.extra?.left ?? [], p.extra?.right ?? []] : [p.left, p.right]
+      const pins = lists.flat().map(parsePin).filter((x) => !x.gap)
+      for (const pin of pins) for (const t of pin.tags) expect(known.has(t), `${id} ${pin.name} ${t}`).toBe(true)
+      const names = new Set(pins.map((x) => x.name))
+      for (const n of Object.keys(p.notes ?? {})) expect(names.has(n), `${id} note ${n}`).toBe(true)
+      expect(p.source?.url, id).toMatch(/^https:\/\//)
+    }
+  })
+  test('broches à éviter de l’ESP32 conformes à la documentation Espressif', () => {
+    const pins = [...PINOUTS.esp32.left, ...PINOUTS.esp32.right].map(parsePin)
+    const flash = pins.filter((p) => p.tags.has('flash')).map((p) => Number(p.values.gpio)).sort((a, b) => a - b)
+    expect(flash).toEqual([6, 7, 8, 9, 10, 11])
+    const boot = pins.filter((p) => p.tags.has('boot')).map((p) => Number(p.values.gpio)).sort((a, b) => a - b)
+    expect(boot).toEqual([0, 2, 5, 12, 15])
+    expect(pins.filter((p) => p.tags.has('in')).map((p) => Number(p.values.gpio)).sort((a, b) => a - b)).toEqual([34, 35, 36, 39])
+  })
+})

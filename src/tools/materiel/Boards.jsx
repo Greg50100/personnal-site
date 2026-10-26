@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { GitCompare, ListChecks, X } from 'lucide-react'
 import { BOARDS, FAMILIES, WIRELESS, wirelessTags } from './data/boards'
 import { Links, LogicBadge, SearchField, SpecList, ToggleChip } from './ui'
+import { PINOUTS } from './data/pinouts'
+import PinoutDiagram from './PinoutDiagram'
 import { useLocalStorage } from '../../hooks/useLocalStorage'
 import { DEFAULT_MONTAGE, MONTAGE_KEY } from './check'
 
@@ -95,6 +97,12 @@ function BoardDetail({ board, onClose, onUse }) {
           </div>
         </div>
       </div>
+      {PINOUTS[board.id] && (
+        <div className="mt-6 border-t border-night-200 pt-4 dark:border-night-800">
+          <h3 className="label">Brochage</h3>
+          <PinoutDiagram key={board.id} pinout={PINOUTS[board.id]} />
+        </div>
+      )}
     </section>
   )
 }
