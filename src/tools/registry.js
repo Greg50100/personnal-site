@@ -101,6 +101,7 @@ export const TOOLS = [
 
   // --- Références ---
   { id: 'connecteurs', category: 'references', title: 'Brochages de connecteurs', summary: 'USB (A, C, micro), HDMI, VGA, RS-232, RJ45 et PoE, jacks, XLR, MIDI, DMX, ATX, SATA, OBD-II, ISP, SWD, Qwiic, cartes SD… : broches, couleurs de fils et pièges.', icon: I.Plug, tags: ['connecteur', 'pinout', 'USB-C', 'RJ45', 'HDMI', 'OBD'], wide: true, featured: true, component: lazy(() => import('./references/Connectors.jsx')) },
+  { id: 'composants', category: 'references', title: 'Brochages de composants', summary: 'Transistors, MOSFET, régulateurs, TL431, capteurs, AOP, 555, optocoupleurs, ULN2003, L293D, logique 74HC et CMOS 4000 : boîtier dessiné, broches et pièges.', icon: I.Cpu, tags: ['brochage', 'transistor', '2N2222', 'LM317', '74HC595', 'CD4017'], wide: true, featured: true, component: lazy(() => import('./references/Components.jsx')) },
 
   // --- Mathématiques ---
   { id: 'traceur', category: 'maths', title: 'Traceur de courbes', summary: 'Tracez plusieurs fonctions f(x), déplacez-vous et zoomez, lisez les valeurs au survol.', icon: I.ChartLine, tags: ['graphique', 'fonction', 'courbe'], repo: 'Ganymede', wide: true, featured: true, component: lazy(() => import('./maths/grapher/FunctionGrapher.jsx')) },
