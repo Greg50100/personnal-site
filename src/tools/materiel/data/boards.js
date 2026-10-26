@@ -316,6 +316,7 @@ export const BOARDS = [
       ['GPIO19 / 20', 'USB natif (D− / D+).'],
       ['GPIO26 à 32', 'Mémoire flash : ne pas utiliser.'],
       ['GPIO35 à 37', 'Occupées par la PSRAM octale sur les modules « R8 » (N8R8, N16R8).'],
+      ['GPIO38', 'LED RGB de la DevKitC-1 v1.1 (GPIO48 sur la première version).'],
       ['ADC2 (GPIO11 à 20)', 'Inutilisable quand le Wi-Fi est actif.'],
     ],
     notes: [
@@ -401,7 +402,7 @@ export const BOARDS = [
     i2s: true,
     rail33: null,
     pins: [
-      ['GPIO8, GPIO9, GPIO15', 'Broches de démarrage (GPIO9 = bouton BOOT).'],
+      ['GPIO4, GPIO5, GPIO8, GPIO9, GPIO15', 'Broches de démarrage (GPIO4 = MTMS, GPIO5 = MTDI, GPIO9 = bouton BOOT, GPIO8 pilote la LED RGB).'],
       ['GPIO12 / 13', 'USB natif.'],
       ['GPIO24 à 30', 'Mémoire flash.'],
       ['LP GPIO0 à 7', 'Utilisables par le cœur basse consommation pendant la veille.'],

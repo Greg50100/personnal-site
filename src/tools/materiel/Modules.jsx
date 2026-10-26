@@ -5,6 +5,8 @@ import { BUSES, KINDS, MODULES, hex } from './data/modules'
 import { Links, SearchField, SpecList, ToggleChip } from './ui'
 import { useLocalStorage } from '../../hooks/useLocalStorage'
 import { DEFAULT_MONTAGE, MONTAGE_KEY } from './check'
+import { wiringOf } from './data/wiring'
+import WiringDiagram from './WiringDiagram'
 
 const volts = (v) => String(v).replace('.', ',')
 const supplyText = ([a, b]) => (a === b ? `${volts(a)} V` : `${volts(a)} à ${volts(b)} V`)
@@ -22,6 +24,7 @@ function matches(m, kind, bus, query) {
 
 function ModuleCard({ module: m, open, onToggle, onAdd, count }) {
   const addresses = [...(m.i2c ?? []), ...(m.i2cExtra ?? [])]
+  const wiring = open ? wiringOf(m) : null
   return (
     <article className="card card-pad flex flex-col gap-3">
       <div>
@@ -37,6 +40,7 @@ function ModuleCard({ module: m, open, onToggle, onAdd, count }) {
       <SpecList className="text-xs" rows={m.specs} />
       {open && (
         <div className="space-y-3 border-t border-night-200 pt-3 dark:border-night-800">
+          {wiring && <WiringDiagram wiring={wiring} />}
           <SpecList
             className="text-xs"
             rows={[
@@ -55,7 +59,7 @@ function ModuleCard({ module: m, open, onToggle, onAdd, count }) {
       )}
       <div className="mt-auto flex flex-wrap items-center gap-2 pt-1">
         <button type="button" className="btn flex-1" onClick={onToggle} aria-expanded={open}>
-          {open ? <ChevronUp size={14} /> : <ChevronDown size={14} />} {open ? 'Moins' : 'Conseils et liens'}
+          {open ? <ChevronUp size={14} /> : <ChevronDown size={14} />} {open ? 'Moins' : 'Câblage et conseils'}
         </button>
         {m.bus !== 'power' && (
           <button type="button" className="btn" onClick={onAdd} aria-label={`Ajouter ${m.name} au montage`}>

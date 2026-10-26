@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { RotateCcw } from 'lucide-react'
 import { formatSI, parseSI } from '../../../lib/si'
 import { solveOhm } from './ohm'
+import { OhmSchema } from '../schemas'
 
 const FIELDS = [
   { id: 'U', label: 'Tension', unit: 'V', placeholder: 'ex. 12' },
@@ -23,6 +24,11 @@ export default function OhmsLaw() {
   const filled = FIELDS.filter((f) => values[f.id].trim() !== '')
   const invalid = filled.filter((f) => !Number.isFinite(parsed[f.id]))
   const result = filled.length === 2 && !invalid.length ? solveOhm(parsed) : null
+  const unitOf = (id) => FIELDS.find((f) => f.id === id).unit
+  const shown = (id) => {
+    const value = result ? result[id] : parsed[id]
+    return Number.isFinite(value) ? formatSI(value, unitOf(id), 3) : null
+  }
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
@@ -67,6 +73,14 @@ export default function OhmsLaw() {
       </div>
 
       <div className="card card-pad">
+        <figure className="mb-4">
+          <figcaption className="label">Schéma</figcaption>
+          <OhmSchema
+            u={shown('U')}
+            i={shown('I')}
+            r={shown('R')}
+          />
+        </figure>
         <p className="label">Formulaire</p>
         <ul className="space-y-3 font-mono text-sm">
           {Object.entries(FORMULAS).map(([k, list]) => (

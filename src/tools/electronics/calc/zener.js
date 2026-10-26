@@ -1,4 +1,6 @@
+import { ZenerSchema } from '../schemas.jsx'
 export default {
+  schematic: ZenerSchema,
   inputs: [
     { id: 'vin', label: "Tension d'entrée", unit: 'V', value: '12' },
     { id: 'vz', label: 'Tension Zener', unit: 'V', value: '5.1' },

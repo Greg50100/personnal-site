@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest'
 import { assignI2c, checkMontage, supplyFor } from './check'
 import { BOARDS } from './data/boards'
 import { MODULES, addressTable } from './data/modules'
+import { wiringOf } from './data/wiring'
 
 const board = (id) => BOARDS.find((b) => b.id === id)
 const mod = (id) => MODULES.find((m) => m.id === id)
@@ -112,5 +113,80 @@ describe('calculateurs', () => {
     expect(out.results[1].value).toBeCloseTo(150.6, 1)
     expect(out.chart.series[0].points.length).toBeGreaterThan(5)
     expect(spec.compute({ cap: 2500, usable: 80, ia: 80, ta: 700, is: 20, period: 10 }).error).toBeTruthy()
+  })
+})
+
+describe('brochages', async () => {
+  const { PINOUTS, parsePin } = await import('./data/pinouts')
+  const count = (p) => (p.layout === 'rows' ? [...p.top, ...p.bottom, ...(p.extra?.left ?? []), ...(p.extra?.right ?? [])] : [...p.left, ...p.right]).filter((s) => s !== 'gap').length
+  test('une carte, un brochage, avec le bon nombre de broches', () => {
+    for (const b of BOARDS) expect(PINOUTS[b.id], b.id).toBeTruthy()
+    expect(count(PINOUTS.esp32)).toBe(38)
+    expect(count(PINOUTS['esp32-s3'])).toBe(44)
+    expect(count(PINOUTS['esp32-c3'])).toBe(30)
+    expect(count(PINOUTS['esp32-c6'])).toBe(32)
+    expect(count(PINOUTS.esp8266)).toBe(16)
+    expect(count(PINOUTS.nano)).toBe(30)
+    expect(count(PINOUTS.pico)).toBe(40)
+    expect(count(PINOUTS['pi-4'])).toBe(40)
+    expect(count(PINOUTS['mega-2560'])).toBe(26 + 24 + 36)
+  })
+  test('étiquettes connues et notes rattachées à une broche existante', () => {
+    const known = new Set(['pwr', 'gnd', 'nc', 'ctl', 'gpio', 'in', 'adc', 'adc2', 'dac', 'i2c', 'spi', 'uart', 'pwm', 'i2s', 'onewire', 'usb', 'usbser', 'boot', 'flash', 'psram', 'led', 'wake', 'int', 'id'])
+    for (const [id, p] of Object.entries(PINOUTS)) {
+      const lists = p.layout === 'rows' ? [p.top, p.bottom, p.extra?.left ?? [], p.extra?.right ?? []] : [p.left, p.right]
+      const pins = lists.flat().map(parsePin).filter((x) => !x.gap)
+      for (const pin of pins) for (const t of pin.tags) expect(known.has(t), `${id} ${pin.name} ${t}`).toBe(true)
+      const names = new Set(pins.map((x) => x.name))
+      for (const n of Object.keys(p.notes ?? {})) expect(names.has(n), `${id} note ${n}`).toBe(true)
+      expect(p.source?.url, id).toMatch(/^https:\/\//)
+    }
+  })
+  test('broches à éviter de l’ESP32 conformes à la documentation Espressif', () => {
+    const pins = [...PINOUTS.esp32.left, ...PINOUTS.esp32.right].map(parsePin)
+    const flash = pins.filter((p) => p.tags.has('flash')).map((p) => Number(p.values.gpio)).sort((a, b) => a - b)
+    expect(flash).toEqual([6, 7, 8, 9, 10, 11])
+    const boot = pins.filter((p) => p.tags.has('boot')).map((p) => Number(p.values.gpio)).sort((a, b) => a - b)
+    expect(boot).toEqual([0, 2, 5, 12, 15])
+    expect(pins.filter((p) => p.tags.has('in')).map((p) => Number(p.values.gpio)).sort((a, b) => a - b)).toEqual([34, 35, 36, 39])
+  })
+})
+
+describe('câblage des modules', () => {
+  const SIGNALS = new Set(['pwr', 'gnd', 'i2c', 'spi', 'uart', 'adc', 'pwm', 'gpio', 'i2s'])
+  const wired = MODULES.filter((m) => m.bus !== 'power')
+
+  test('un schéma pour chaque module hors alimentations, avec des signaux connus', () => {
+    for (const m of wired) {
+      const w = wiringOf(m)
+      expect(w, m.id).not.toBeNull()
+      const pins = w.rows.map((r) => r[1])
+      expect(new Set(pins).size, `${m.id} : broches du module en double`).toBe(pins.length)
+      for (const [, , signal, dir] of w.rows) {
+        expect(SIGNALS.has(signal), `${m.id} ${signal}`).toBe(true)
+        expect([undefined, null, '>', '<', '<>']).toContain(dir)
+      }
+      const grounded = w.rows.some((r) => r[2] === 'gnd' || r[4]?.pulldown || r[4]?.divider)
+      expect(grounded, `${m.id} : masse`).toBe(true)
+    }
+    for (const id of ['ams1117', 'buck', 'tp4056']) expect(wiringOf(mod(id))).toBeNull()
+  })
+
+  test('les modules I2C ont SDA et SCL', () => {
+    for (const m of wired.filter((x) => x.bus === 'i2c')) {
+      const i2c = wiringOf(m).rows.filter((r) => r[2] === 'i2c').map((r) => r[0])
+      expect(i2c, m.id).toEqual(expect.arrayContaining(['SDA', 'SCL']))
+    }
+  })
+
+  test('aucun signal 5 V n’arrive sans adaptation sur une entrée 3,3 V', () => {
+    for (const m of wired) {
+      const { rows } = wiringOf(m)
+      const fiveVolt = rows.some((r) => r[0] === '5V' && r[2] === 'pwr') && m.levels === 'vcc'
+      if (!fiveVolt) continue
+      for (const [board, pin, signal, dir, via] of rows) {
+        if (dir === '<' || dir === '<>') expect(via?.divider ?? via?.chip, `${m.id} ${pin} → ${board} (${signal})`).toBeTruthy()
+      }
+    }
   })
 })

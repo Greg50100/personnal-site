@@ -1,4 +1,6 @@
+import { RlcSchema } from '../schemas.jsx'
 export default {
+  schematic: RlcSchema,
   inputs: [
     { id: 'l', label: 'Inductance L', unit: 'H', value: '10m' },
     { id: 'c', label: 'Capacité C', unit: 'F', value: '100n' },

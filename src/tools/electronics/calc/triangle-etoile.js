@@ -1,4 +1,6 @@
+import { TriangleEtoileSchema } from '../schemas.jsx'
 export default {
+  schematic: TriangleEtoileSchema,
   inputs: [
     {
       id: 'dir',

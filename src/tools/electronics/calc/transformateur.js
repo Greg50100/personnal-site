@@ -1,4 +1,6 @@
+import { TransformateurSchema } from '../schemas.jsx'
 export default {
+  schematic: TransformateurSchema,
   inputs: [
     { id: 'np', label: 'Spires au primaire Np', type: 'number', value: '1000' },
     { id: 'ns', label: 'Spires au secondaire Ns', type: 'number', value: '100' },

@@ -1,6 +1,8 @@
+import { WheatstoneSchema } from '../schemas.jsx'
 const NAMES = { r1: 'R1', r2: 'R2', r3: 'R3', rx: 'Rx' }
 
 export default {
+  schematic: WheatstoneSchema,
   inputs: [
     { id: 'unknown', label: 'Résistance inconnue', type: 'choice', value: 'rx', options: Object.entries(NAMES).map(([value, label]) => ({ value, label })) },
     { id: 'r1', label: 'R1', unit: 'Ω', value: '1k', show: (v) => v.unknown !== 'r1' },

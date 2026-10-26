@@ -1,4 +1,6 @@
+import { ReactanceSchema } from '../schemas.jsx'
 export default {
+  schematic: ReactanceSchema,
   inputs: [
     {
       id: 'type',

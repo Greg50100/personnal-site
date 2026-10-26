@@ -1,3 +1,4 @@
+import { AmpliOpSchema } from '../schemas.jsx'
 const CONFIGS = {
   inv: { label: 'Inverseur', gain: (v) => -v.rf / v.r1, formula: 'G = −Rf / R1' },
   noninv: { label: 'Non inverseur', gain: (v) => 1 + v.rf / v.r1, formula: 'G = 1 + Rf / R1' },
@@ -6,6 +7,7 @@ const CONFIGS = {
 }
 
 export default {
+  schematic: AmpliOpSchema,
   inputs: [
     { id: 'config', label: 'Montage', type: 'choice', value: 'inv', options: Object.entries(CONFIGS).map(([value, c]) => ({ value, label: c.label })) },
     { id: 'r1', label: 'R1 (entrée)', unit: 'Ω', value: '10k', show: (v) => v.config !== 'follower' },

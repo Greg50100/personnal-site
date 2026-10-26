@@ -34,6 +34,7 @@ import LineChart from './LineChart'
  *   formulas: ['τ = R × C', { f: 'h = 1,006 T + w (2 501 + 1,86 T)', ref: ['ashrae'] }],
  *   notes: ['texte d'aide', { text: '…', ref: 'ashrae' }],
  *   references: [{ id: 'ashrae', label: 'Auteur, titre, année', url: 'https://…', detail: 'éq. 12' }],
+ *   schematic: MonSchema,                         // composant React : schéma du montage, reçoit { values }
  *   // ref : identifiant(s) de `references`, affichés en renvoi numéroté [1] vers la liste des sources
  * }
  */
@@ -251,6 +252,7 @@ export default function Calculator({ spec }) {
   }
 
   const ChartView = output?.chart?.component ?? LineChart
+  const Schema = spec.schematic
   const refs = spec.references ?? []
   const prefix = 'calc-ref'
 
@@ -281,6 +283,12 @@ export default function Calculator({ spec }) {
         </div>
 
         <aside className="card card-pad h-fit">
+          {Schema && (
+            <figure className="mb-4">
+              <figcaption className="label">Schéma</figcaption>
+              <Schema values={values} />
+            </figure>
+          )}
           {spec.formulas?.length > 0 && (
             <>
               <p className="label">Formules</p>

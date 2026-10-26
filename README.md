@@ -15,7 +15,7 @@ astronomique, et tout le nécessaire pour observer le ciel (dans l'esprit de
 | Dates et temps | Heure et temps astronomique (UTC, TAI, TT, GPS, jour julien, temps sidéral, équation du temps) · Fuseaux horaires · Calcul de dates · Pâques et jours fériés |
 | Conversions et calcul | Convertisseur (75 grandeurs, plus de 600 unités, devises BCE) · Calculatrice scientifique |
 | Électronique | Loi d'Ohm · Codes des résistances (couleurs, CMS) et des condensateurs · Séries E · Série/parallèle · Pont diviseur · LED · Tolérances · Puissance · Valeur efficace · Réactance · Impédance RLC · Résonance LC · Filtres passifs · Constante de temps · 555 · AOP · Polarisation BJT · Zener · Transformateur · Wheatstone · Triangle-étoile · Câbles (chute de tension, section) · Bobine à air · Batterie · Coût de l'énergie |
-| Matériel | Cartes de développement (Arduino, ESP8266, ESP32, Raspberry Pi Pico et Raspberry Pi) · Capteurs et modules · Vérifier un montage · Bus et niveaux logiques · Résistances de tirage I2C · Autonomie en veille profonde |
+| Matériel | Cartes de développement (Arduino, ESP8266, ESP32, Raspberry Pi Pico et Raspberry Pi) · Brochages des cartes · Capteurs et modules (avec leur câblage type) · Vérifier un montage · Bus et niveaux logiques (schémas des bus et des adaptateurs) · Résistances de tirage I2C · Autonomie en veille profonde |
 | Mathématiques | Traceur de courbes · Second degré · Matrices · Pourcentages · PGCD/PPCM · Complexes · Bases numériques |
 | Physique | Chute libre · Projectile · Loi de Newton · Gaz parfaits · Bernoulli · Ondes |
 | Météo | Air humide et diagramme psychrométrique · Confort thermique (formules de l'intégration Home Assistant Thermal Comfort) · Ressenti, pression et altitude |
@@ -50,10 +50,10 @@ src/
 ├── lib/                     # formatage français (nombres, angles, heures), notation SI
 └── tools/
     ├── registry.js          # ⭐ REGISTRE DES OUTILS
-    ├── kit/                 # calculateur générique piloté par une « spec », graphiques
+    ├── kit/                 # calculateur générique piloté par une « spec », graphiques, symboles de schémas électriques
     ├── astronomy/           # lib/ (astro, time, geo), components/ (cartes, graphiques), un dossier par outil
     ├── utilities/converter/ # units/ (grandeurs par famille), currency.js (taux BCE)
-    ├── materiel/            # data/ (cartes, modules), check.js (vérification d'un montage)
+    ├── materiel/            # data/ (cartes, brochages, modules, câblages), check.js (vérification d'un montage)
     ├── temps/ maths/ physique/ meteo/ sante/ chimie/ electronics/
 ```
 
@@ -82,7 +82,8 @@ export default {
 Une spec peut aussi renvoyer un tableau (`table`), un graphique (`chart`, ou `chart.component` pour un
 graphique sur mesure comme le diagramme de l'air humide) et des notes ; les champs acceptent les préfixes SI
 (« 4k7 », « 100n »), des listes de choix et des valeurs prédéfinies. Une liste `references` affiche les
-sources, et chaque formule ou note peut y renvoyer (`ref`) par un numéro. Voir `src/tools/kit/Calculator.jsx`.
+sources, et chaque formule ou note peut y renvoyer (`ref`) par un numéro. Un composant `schematic` dessine le
+schéma du montage avec les valeurs saisies (symboles dans `src/tools/kit/schematic.jsx`). Voir `src/tools/kit/Calculator.jsx`.
 
 **Outil avec une interface sur mesure** : un composant React (export default), déclaré avec
 `component: lazy(() => import('./rubrique/MonOutil.jsx'))`.

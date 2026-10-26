@@ -1,4 +1,6 @@
+import { ConstanteTempsSchema } from '../schemas.jsx'
 export default {
+  schematic: ConstanteTempsSchema,
   inputs: [
     {
       id: 'type',
