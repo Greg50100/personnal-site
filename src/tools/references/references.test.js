@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { COMPONENTS, GROUPS, PACKAGES, PIN_KINDS } from './data/components'
 import { CONNECTORS, FAMILIES, KINDS } from './data/connectors'
+import { awgArea, awgDiameter, awgLabel, nearestAwg, resistancePerKm } from './data/wires'
 
 const pinOf = (id, n) => CONNECTORS.find((c) => c.id === id).pins.find((p) => String(p.n) === String(n))
 
@@ -89,5 +90,19 @@ describe('composants', () => {
     // Alimentation du LM324 en 4 et 11
     expect(part('lm324').pins[3][1]).toBe('V+')
     expect(part('74hc595').pins[14][1]).toBe('QA')
+  })
+})
+
+describe('fils AWG', () => {
+  test('valeurs de la norme ASTM B258', () => {
+    expect(awgDiameter(36)).toBeCloseTo(0.127, 6)
+    expect(awgDiameter(0)).toBeCloseTo(8.252, 2)
+    expect(awgDiameter(-3)).toBeCloseTo(11.684, 2)
+    expect(awgArea(10)).toBeCloseTo(5.261, 2)
+    expect(awgArea(22)).toBeCloseTo(0.326, 3)
+    expect(resistancePerKm(1)).toBeCloseTo(17.24, 2)
+    expect(awgLabel(-3)).toBe('4/0')
+    expect(awgLabel(0)).toBe('1/0')
+    expect([0.5, 1.5, 2.5].map(nearestAwg)).toEqual([20, 15, 13])
   })
 })
