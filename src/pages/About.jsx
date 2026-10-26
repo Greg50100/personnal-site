@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { ExternalLink, FolderGit2 } from 'lucide-react'
 import { PROJECTS, PROJECT_STATUS } from '../data/projects'
 import { SITE } from '../config/site'
-import { CATEGORIES, TOOLS, toolPath, toolsOf } from '../registry'
+import { DOMAINS, TOOLS, toolPath, toolsOfDomain } from '../registry'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import SectionTitle from '../components/SectionTitle'
 
@@ -72,10 +72,10 @@ export default function About() {
           précision de l'ordre de la minute d'arc : ils conviennent à l'observation et à la curiosité, pas à la navigation.
         </p>
         <ul className="grid gap-1 text-sm sm:grid-cols-2">
-          {CATEGORIES.map((c) => (
-            <li key={c.id}>
-              <Link to={`/${c.id}`} className="inline-flex items-center gap-2 hover:text-accent-700 dark:hover:text-accent-300">
-                <c.icon size={15} className="text-accent-600" /> {c.label} ({toolsOf(c.id).length})
+          {DOMAINS.map((d) => (
+            <li key={d.id}>
+              <Link to={`/${d.id}`} className="inline-flex items-center gap-2 hover:text-accent-700 dark:hover:text-accent-300">
+                <d.icon size={15} className="text-accent-600" /> {d.label} ({toolsOfDomain(d.id).length})
               </Link>
             </li>
           ))}

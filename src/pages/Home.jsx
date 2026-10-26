@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Search } from 'lucide-react'
 import { SITE } from '../config/site'
-import { CATEGORIES, TOOLS, toolPath, toolsOf } from '../registry'
+import { DOMAINS, TOOLS, rubriquePath, toolPath, toolsOf, toolsOfDomain } from '../registry'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import SectionTitle from '../components/SectionTitle'
 import ToolCard from '../components/ToolCard'
@@ -61,26 +61,36 @@ export default function Home() {
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <section className="pt-14">
-          <SectionTitle kicker="Rubriques" title="Tous les outils, par thème" />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {CATEGORIES.map((cat) => {
-              const tools = toolsOf(cat.id)
-              return (
-                <Link key={cat.id} to={`/${cat.id}`} className="card group flex flex-col p-5 transition-all hover:-translate-y-0.5 hover:border-accent-400/70">
-                  <div className="flex items-center justify-between">
-                    <span className="rounded-xl bg-accent-400/15 p-2.5 text-accent-700 transition-colors group-hover:bg-accent-400 group-hover:text-night-950 dark:text-accent-300">
-                      <cat.icon size={22} />
+          <SectionTitle kicker="Espaces" title="Quatre espaces, un seul site" />
+          <div className="grid gap-4 md:grid-cols-2">
+            {DOMAINS.map((d) => (
+              <article key={d.id} className="card group flex flex-col p-5 transition-colors hover:border-accent-400/70">
+                <Link to={`/${d.id}`} className="flex items-start gap-4">
+                  <span className="rounded-xl bg-accent-400/15 p-3 text-accent-700 transition-colors group-hover:bg-accent-400 group-hover:text-night-950 dark:text-accent-300">
+                    <d.icon size={26} />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-center justify-between gap-2">
+                      <span className="text-xl font-semibold">{d.label}</span>
+                      <span className="chip">{toolsOfDomain(d.id).length} outils</span>
                     </span>
-                    <span className="chip">{tools.length} outil{tools.length > 1 ? 's' : ''}</span>
-                  </div>
-                  <h3 className="mt-4 text-lg font-semibold">{cat.label}</h3>
-                  <p className="mt-1 flex-1 text-sm text-night-600 dark:text-night-400">{cat.description}</p>
-                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-accent-700 dark:text-accent-400">
-                    Voir la rubrique <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+                    <span className="mt-1 block text-sm text-night-600 dark:text-night-400">{d.description}</span>
                   </span>
                 </Link>
-              )
-            })}
+                <ul className="mt-4 flex flex-wrap gap-1.5" aria-label={`Rubriques de ${d.label}`}>
+                  {d.rubriques.map((r) => (
+                    <li key={r.id}>
+                      <Link to={rubriquePath(r)} className="chip gap-1.5 px-2.5 py-1 text-xs hover:border-accent-400">
+                        <r.icon size={12} /> {r.label} <span className="text-night-400">{toolsOf(r.id).length}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                <Link to={`/${d.id}`} className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-accent-700 dark:text-accent-400">
+                  Ouvrir l’espace <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+                </Link>
+              </article>
+            ))}
           </div>
         </section>
 

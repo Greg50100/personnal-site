@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { SITE } from '../config/site'
-import { CATEGORIES, TOOLS } from '../registry'
+import { DOMAINS, TOOLS, rubriquePath } from '../registry'
 import { Logo } from './Brand'
 
 export default function Footer() {
@@ -15,17 +15,23 @@ export default function Footer() {
             {SITE.tagline}. {TOOLS.length} outils gratuits, sans compte ni publicité, qui fonctionnent dans le navigateur.
           </p>
         </div>
-        <div>
-          <p className="label">Rubriques</p>
-          <ul className="grid grid-cols-2 gap-1 text-sm">
-            {CATEGORIES.map((c) => (
-              <li key={c.id}>
-                <Link to={`/${c.id}`} className="text-night-600 hover:text-accent-700 dark:text-night-400 dark:hover:text-accent-300">
-                  {c.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-4 text-sm">
+          {DOMAINS.map((d) => (
+            <div key={d.id}>
+              <Link to={`/${d.id}`} className="label hover:text-accent-700 dark:hover:text-accent-300">
+                {d.label}
+              </Link>
+              <ul className="grid gap-0.5">
+                {d.rubriques.map((r) => (
+                  <li key={r.id}>
+                    <Link to={rubriquePath(r)} className="text-night-600 hover:text-accent-700 dark:text-night-400 dark:hover:text-accent-300">
+                      {r.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
         <div className="text-xs leading-relaxed text-night-500">
           <p className="label">Sources et crédits</p>

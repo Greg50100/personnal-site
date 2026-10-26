@@ -206,7 +206,7 @@ export default function BusGuide() {
             Pont diviseur de tension
           </Link>
           . Dimensionner les résistances de tirage :{' '}
-          <Link to="/materiel/pull-up-i2c" className="text-accent-700 underline dark:text-accent-300">
+          <Link to="/electronique/pull-up-i2c" className="text-accent-700 underline dark:text-accent-300">
             Résistances de tirage I2C
           </Link>
           .
@@ -223,7 +223,7 @@ export default function BusGuide() {
         <p className="text-sm text-night-600 dark:text-night-400">
           Deux modules à la même adresse ne peuvent pas partager un bus : changer l’adresse de l’un (broche ADDR, SDO ou A0), utiliser le second bus de la
           carte ou un multiplexeur TCA9548A. L’outil{' '}
-          <Link to="/materiel/verifier-montage" className="text-accent-700 underline dark:text-accent-300">
+          <Link to="/electronique/verifier-montage" className="text-accent-700 underline dark:text-accent-300">
             Vérifier un montage
           </Link>{' '}
           fait cette répartition automatiquement.

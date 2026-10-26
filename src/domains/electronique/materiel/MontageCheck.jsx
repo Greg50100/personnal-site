@@ -93,7 +93,7 @@ export default function MontageCheck() {
           </div>
           <p className="mt-1 text-xs text-night-500">
             Ou depuis le catalogue{' '}
-            <Link to="/materiel/capteurs-modules" className="text-accent-700 underline dark:text-accent-300">
+            <Link to="/electronique/capteurs-modules" className="text-accent-700 underline dark:text-accent-300">
               Capteurs et modules
             </Link>
             .

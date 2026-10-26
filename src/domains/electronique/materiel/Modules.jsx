@@ -118,7 +118,7 @@ export default function Modules() {
             {montage.modules.length > 0 && (
               <>
                 {' · '}
-                <Link to="/materiel/verifier-montage" className="text-accent-700 underline dark:text-accent-300">
+                <Link to="/electronique/verifier-montage" className="text-accent-700 underline dark:text-accent-300">
                   {montage.modules.length} dans le montage : le vérifier
                 </Link>
               </>

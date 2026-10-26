@@ -2,17 +2,12 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { Menu, Moon, Search, Sun, X } from 'lucide-react'
 import { useTheme } from '../context/theme'
-import { CATEGORIES, toolsOf } from '../registry'
+import { DOMAINS, rubriquePath, toolsOf } from '../registry'
 import Brand from './Brand'
 import CommandPalette from './CommandPalette'
 import { LocationButton } from './LocationPicker'
 
-const NAV = [
-  { to: '/astronomie', label: 'Astronomie' },
-  { to: '/outils', label: 'Calculateurs' },
-  { to: '/utilitaires/convertisseur', label: 'Convertisseur' },
-  { to: '/a-propos', label: 'À propos' },
-]
+const NAV = [...DOMAINS.map((d) => ({ to: `/${d.id}`, label: d.label })), { to: '/a-propos', label: 'À propos' }]
 
 const navClass = ({ isActive }) =>
   `rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
@@ -101,16 +96,17 @@ export default function Header() {
             <LocationButton className="w-full justify-start" showCoords />
           </div>
           <div className="mt-5 grid gap-x-4 sm:grid-cols-2">
-            {CATEGORIES.map((cat) => (
-              <div key={cat.id} className="mt-3">
-                <Link to={`/${cat.id}`} className="label flex items-center gap-1.5 hover:text-accent-600">
-                  <cat.icon size={13} /> {cat.label}
+            {DOMAINS.map((d) => (
+              <div key={d.id} className="mt-3">
+                <Link to={`/${d.id}`} className="label flex items-center gap-1.5 hover:text-accent-600">
+                  <d.icon size={13} /> {d.label}
                 </Link>
                 <ul className="grid gap-0.5">
-                  {toolsOf(cat.id).map((tool) => (
-                    <li key={tool.id}>
-                      <Link to={`/${cat.id}/${tool.id}`} className="block rounded-md px-2 py-1 text-sm text-night-700 hover:bg-accent-400/10 dark:text-night-300">
-                        {tool.title}
+                  {d.rubriques.map((r) => (
+                    <li key={r.id}>
+                      <Link to={rubriquePath(r)} className="flex items-center justify-between rounded-md px-2 py-1 text-sm text-night-700 hover:bg-accent-400/10 dark:text-night-300">
+                        {r.label}
+                        <span className="text-xs text-night-400">{toolsOf(r.id).length}</span>
                       </Link>
                     </li>
                   ))}

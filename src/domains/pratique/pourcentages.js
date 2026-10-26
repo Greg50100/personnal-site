@@ -1,4 +1,4 @@
-import { smartNumber } from '../../../lib/format'
+import { smartNumber } from '../../lib/format'
 
 const MODES = {
   of: { label: 'x % de y', a: 'Pourcentage x (%)', b: 'Valeur y', run: (a, b) => ({ value: (a / 100) * b, text: `${smartNumber(a)} % de ${smartNumber(b)}` }) },
