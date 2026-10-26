@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Search } from 'lucide-react'
-import { CATEGORIES, TOOLS, searchTools } from '../tools/registry'
+import { DOMAINS, RUBRIQUES, TOOLS, searchTools, toolsOf } from '../registry'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import SectionTitle from '../components/SectionTitle'
 import ToolCard from '../components/ToolCard'
@@ -13,7 +13,7 @@ export default function ToolsIndex() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <SectionTitle kicker="Catalogue" title="Tous les outils">
-        {TOOLS.length} outils répartis en {CATEGORIES.length} rubriques. Tous fonctionnent directement dans le navigateur, sans compte ni
+        {TOOLS.length} outils répartis en {DOMAINS.length} espaces et {RUBRIQUES.length} rubriques. Tous fonctionnent directement dans le navigateur, sans compte ni
         installation.
       </SectionTitle>
 
@@ -40,16 +40,21 @@ export default function ToolsIndex() {
           <p className="py-12 text-center text-night-500">Aucun outil ne correspond à « {query} ».</p>
         )
       ) : (
-        CATEGORIES.map((cat) => (
-          <section key={cat.id} className="mb-10">
-            <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
-              <cat.icon size={18} className="text-accent-600" /> {cat.label}
+        DOMAINS.map((d) => (
+          <section key={d.id} className="mb-12" aria-labelledby={`espace-${d.id}`}>
+            <h2 id={`espace-${d.id}`} className="mb-4 flex items-center gap-2 text-2xl font-bold">
+              <d.icon size={22} className="text-accent-600" /> {d.label}
             </h2>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {TOOLS.filter((t) => t.category === cat.id).map((tool) => (
-                <ToolCard key={tool.id} tool={tool} compact />
-              ))}
-            </div>
+            {d.rubriques.map((r) => (
+              <div key={r.id} className="mb-6">
+                <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-night-500">{r.label}</h3>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {toolsOf(r.id).map((tool) => (
+                    <ToolCard key={tool.id} tool={tool} compact />
+                  ))}
+                </div>
+              </div>
+            ))}
           </section>
         ))
       )}

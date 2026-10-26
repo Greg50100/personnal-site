@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
 import { ChevronRight, Github } from 'lucide-react'
-import { getCategory, getTool } from '../tools/registry'
+import { getDomain, getRubrique, resolveTool, rubriquePath, toolPath } from '../registry'
 import { SITE } from '../config/site'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import ErrorBoundary from '../components/ErrorBoundary'
@@ -11,25 +11,29 @@ import NotFound from './NotFound'
 import { isPublicRepo } from '../data/projects'
 
 export default function ToolPage() {
-  const { category: categoryId, toolId } = useParams()
-  const tool = getTool(categoryId, toolId)
-  const category = getCategory(categoryId)
+  const { domain: domainId, toolId } = useParams()
+  const { search } = useLocation()
+  const tool = resolveTool(toolId)
   useDocumentTitle(tool?.title)
 
-  if (!tool || !category) return <NotFound />
+  if (!tool) return <NotFound />
+  // Ancienne adresse (#/<rubrique>/<outil>) ou outil fusionné dans un autre : adresse actuelle
+  if (tool.domain !== domainId || tool.id !== toolId) return <Navigate to={`${toolPath(tool)}${search}`} replace />
 
+  const domain = getDomain(tool.domain)
+  const rubrique = getRubrique(tool.rubrique)
   const Icon = tool.icon
   const Tool = tool.component
 
   return (
     <div className={`mx-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-8 ${tool.wide ? 'max-w-[1600px]' : 'max-w-5xl'}`}>
       <nav aria-label="Fil d'Ariane" className="mb-4 flex flex-wrap items-center gap-1 text-sm text-night-500">
-        <Link to="/outils" className="hover:text-accent-600">
-          Outils
+        <Link to={`/${domain.id}`} className="hover:text-accent-600">
+          {domain.label}
         </Link>
         <ChevronRight size={12} />
-        <Link to={`/${category.id}`} className="hover:text-accent-600">
-          {category.label}
+        <Link to={rubriquePath(rubrique)} className="hover:text-accent-600">
+          {rubrique.label}
         </Link>
       </nav>
 

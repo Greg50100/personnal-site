@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CornerDownLeft, Search } from 'lucide-react'
-import { searchTools, toolPath, getCategory } from '../tools/registry'
+import { getDomain, getRubrique, searchTools, toolPath } from '../registry'
 
 /** Recherche rapide d'un outil (ouverte par Ctrl/⌘ + K ou le bouton de l'en-tête). À monter à l'ouverture. */
 export default function CommandPalette({ onClose }) {
@@ -62,7 +62,7 @@ export default function CommandPalette({ onClose }) {
           {results.map((tool, i) => {
             const Icon = tool.icon
             return (
-              <li key={`${tool.category}/${tool.id}`} role="option" aria-selected={i === active} data-active={i === active}>
+              <li key={tool.id} role="option" aria-selected={i === active} data-active={i === active}>
                 <button
                   type="button"
                   onMouseEnter={() => setActive(i)}
@@ -77,7 +77,7 @@ export default function CommandPalette({ onClose }) {
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-medium">{tool.title}</span>
                     <span className="block truncate text-xs text-night-500">
-                      {getCategory(tool.category)?.label} · {tool.summary}
+                      {getDomain(tool.domain)?.label} · {getRubrique(tool.rubrique)?.label} · {tool.summary}
                     </span>
                   </span>
                   {i === active && <CornerDownLeft size={14} className="shrink-0 text-night-400" />}
