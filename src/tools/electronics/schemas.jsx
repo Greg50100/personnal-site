@@ -1,5 +1,6 @@
 import { formatSI, parseSI } from '../../lib/si'
-import { Battery, Box, Capacitor, CurrentArrow, Dot, Ground, Inductor, Label, Led, Load, Meter, Npn, OpAmp, Resistor, Schematic, Source, Switch, Terminal, VoltageArrow, Wire, Zener } from '../kit/schematic'
+import { Battery, Box, Capacitor, CurrentArrow, Diode, Dot, Ground, Inductor, Label, Led, Load, Meter, Npn, OpAmp, Resistor, Schematic, Source, Switch, Terminal, VoltageArrow, Wire, Zener } from '../kit/schematic'
+import { attenuator, lm317R2 } from './formulas'
 import { npnPins, opAmpPins } from '../kit/schematicPins'
 
 /**
@@ -483,6 +484,229 @@ export function Ne555Schema({ mode, r1, r2, c }) {
           </Label>
         </>
       )}
+    </Schematic>
+  )
+}
+
+const deg = (x) => `${String(x).replace('.', ',')} °C/W`
+
+/** Régulateur LM317 : réglage par R1 et R2, ou source de courant. */
+export function Lm317Schema({ values: v }) {
+  const current = v.mode === 'current'
+  const box = Box({ x: 100, y: 34, w: 80, h: 46, title: 'LM317', left: ['IN'], right: ['OUT'], bottom: ['ADJ'] })
+  const { IN, OUT, ADJ } = box.pins
+  const r2 = v.mode === 'r2' ? lm317R2(v.vout, v.r1) : v.r2
+  const rail = 170
+  return (
+    <Schematic width={310} height={200} label={current ? 'Schéma du LM317 en source de courant' : 'Schéma du régulateur LM317'}>
+      <Terminal at={[20, IN[1]]} label="Vin" side="top" />
+      <Wire points={[[20, IN[1]], IN]} />
+      <Capacitor a={[55, IN[1]]} b={[55, rail]} label="C1" value="100 nF" side="left" />
+      <Dot at={[55, IN[1]]} />
+      {box.node}
+      {current ? (
+        <>
+          <Resistor a={OUT} b={[250, OUT[1]]} label="R" value={Number.isFinite(v.iout) ? q(1.25 / v.iout, 'Ω') : null} />
+          <Wire points={[ADJ, [ADJ[0], 120], [250, 120], [250, OUT[1]]]} />
+          <Dot at={[250, OUT[1]]} />
+          <Wire points={[[250, OUT[1]], [290, OUT[1]]]} />
+          <Load a={[290, OUT[1]]} b={[290, rail]} />
+          <CurrentArrow at={[272, OUT[1]]} label="I" />
+          <Wire points={[[55, rail], [290, rail]]} />
+        </>
+      ) : (
+        <>
+          <Wire points={[OUT, [290, OUT[1]]]} />
+          <Terminal at={[290, OUT[1]]} label="Vout" side="top" accent />
+          <Resistor a={[220, OUT[1]]} b={[220, 120]} label="R1" value={q(v.r1, 'Ω')} />
+          <Dot at={[220, OUT[1]]} />
+          <Wire points={[ADJ, [ADJ[0], 120], [220, 120]]} />
+          <Dot at={[ADJ[0], 120]} />
+          <Resistor a={[ADJ[0], 120]} b={[ADJ[0], rail]} label="R2" value={q(r2, 'Ω')} side="left" />
+          <Capacitor a={[260, OUT[1]]} b={[260, rail]} label="C2" value="1 µF" />
+          <Dot at={[260, OUT[1]]} />
+          <Wire points={[[55, rail], [260, rail]]} />
+          <Dot at={[ADJ[0], rail]} />
+        </>
+      )}
+      <Ground at={[170, rail]} />
+    </Schematic>
+  )
+}
+
+/** Redressement (pont, point milieu ou simple alternance), condensateur de filtrage et charge. */
+export function RedresseurSchema({ values: v }) {
+  const plus = 100
+  const minus = 190
+  const cValue = v.mode === 'ripple' ? q(v.c, 'F') : 'à calculer'
+  let left = null
+  if (v.type === 'bridge') {
+    const T = [140, 50]
+    const R = [190, plus]
+    const B = [140, 150]
+    const L = [90, plus]
+    left = (
+      <>
+        <Source ac a={[30, 50]} b={[30, 150]} label="~" value={q(v.vrms, 'V')} side="left" />
+        <Wire points={[[30, 50], T]} />
+        <Wire points={[[30, 150], B]} />
+        <Diode a={T} b={R} />
+        <Diode a={B} b={R} />
+        <Diode a={L} b={T} />
+        <Diode a={L} b={B} />
+        <Wire points={[L, [L[0], minus]]} />
+        <Wire points={[R, [240, plus]]} />
+        {[T, R, B, L].map((p, i) => (
+          <Dot key={i} at={p} />
+        ))}
+      </>
+    )
+  } else if (v.type === 'center') {
+    left = (
+      <>
+        <Source ac a={[30, 40]} b={[30, plus]} label="~" value={q(v.vrms, 'V')} side="left" />
+        <Source ac a={[30, plus]} b={[30, 160]} label="~" side="left" />
+        <Wire points={[[30, 40], [60, 40]]} />
+        <Diode a={[60, 40]} b={[160, 40]} />
+        <Wire points={[[30, 160], [60, 160]]} />
+        <Diode a={[60, 160]} b={[160, 160]} />
+        <Wire points={[[160, 40], [160, 160]]} />
+        <Dot at={[160, plus]} />
+        <Wire points={[[160, plus], [240, plus]]} />
+        <Wire points={[[30, plus], [10, plus], [10, minus]]} />
+        <Dot at={[30, plus]} />
+      </>
+    )
+  } else {
+    left = (
+      <>
+        <Source ac a={[30, 50]} b={[30, 150]} label="~" value={q(v.vrms, 'V')} side="left" />
+        <Wire points={[[30, 50], [60, 50]]} />
+        <Diode a={[60, 50]} b={[160, 50]} />
+        <Wire points={[[160, 50], [160, plus], [240, plus]]} />
+        <Wire points={[[30, 150], [30, minus]]} />
+      </>
+    )
+  }
+  const x0 = v.type === 'center' ? 10 : v.type === 'bridge' ? 90 : 30
+  return (
+    <Schematic width={320} height={215} label="Schéma du redressement et du filtrage">
+      {left}
+      <Wire points={[[240, plus], [300, plus]]} />
+      <Capacitor a={[240, plus]} b={[240, minus]} label="C" value={cValue} side="left" />
+      <Load a={[300, plus]} b={[300, minus]} />
+      <Wire points={[[x0, minus], [300, minus]]} />
+      <Dot at={[240, plus]} />
+      <Dot at={[240, minus]} />
+      <CurrentArrow at={[275, plus]} label={Number.isFinite(v.i) ? q(v.i, 'A') : 'I'} />
+      <Label x={312} y={plus + 4} anchor="start" weight="bold">
+        +
+      </Label>
+      <Label x={312} y={minus + 4} anchor="start" weight="bold">
+        −
+      </Label>
+      <Ground at={[200, minus]} />
+    </Schematic>
+  )
+}
+
+/** Atténuateur résistif en T ou en π, valeurs calculées. */
+export function AttenuateurSchema({ values: v }) {
+  const pi = v.topo === 'pi'
+  const r = Number.isFinite(v.z0) && v.db > 0 ? attenuator(v.z0, v.db, v.topo) : {}
+  const top = 50
+  const bottom = 140
+  return (
+    <Schematic width={240} height={170} label={`Schéma de l’atténuateur en ${pi ? 'π' : 'T'}`}>
+      <Terminal at={[20, top]} label="entrée" side="top" />
+      <Terminal at={[20, bottom]} />
+      <Terminal at={[220, top]} label="sortie" side="top" accent />
+      <Terminal at={[220, bottom]} />
+      <Wire points={[[20, bottom], [220, bottom]]} />
+      {pi ? (
+        <>
+          <Wire points={[[20, top], [70, top]]} />
+          <Resistor a={[70, top]} b={[170, top]} label="R2" value={q(r.series, 'Ω')} />
+          <Wire points={[[170, top], [220, top]]} />
+          <Resistor a={[70, top]} b={[70, bottom]} label="R1" value={q(r.shunt, 'Ω')} />
+          <Resistor a={[170, top]} b={[170, bottom]} label="R1" value={q(r.shunt, 'Ω')} />
+          {[70, 170].map((x) => (
+            <g key={x}>
+              <Dot at={[x, top]} />
+              <Dot at={[x, bottom]} />
+            </g>
+          ))}
+        </>
+      ) : (
+        <>
+          <Resistor a={[20, top]} b={[120, top]} label="R1" value={q(r.series, 'Ω')} />
+          <Resistor a={[120, top]} b={[220, top]} label="R1" value={q(r.series, 'Ω')} />
+          <Resistor a={[120, top]} b={[120, bottom]} label="R2" value={q(r.shunt, 'Ω')} />
+          <Dot at={[120, top]} />
+          <Dot at={[120, bottom]} />
+        </>
+      )}
+    </Schematic>
+  )
+}
+
+/** Chaîne de résistances thermiques jonction → boîtier → dissipateur → air. */
+export function ThermalSchema({ values: v }) {
+  const y = 50
+  return (
+    <Schematic width={300} height={170} label="Schéma thermique : jonction, boîtier, dissipateur, air">
+      <Terminal at={[20, y]} label="P" side="top" accent />
+      <Wire points={[[20, y], [60, y]]} />
+      <CurrentArrow at={[42, y]} />
+      <Resistor a={[60, y]} b={[150, y]} label="Rθjc" value={deg(v.rjc)} side="bottom" />
+      <Resistor a={[150, y]} b={[240, y]} label="Rθcs" value={deg(v.rcs)} side="bottom" />
+      <Resistor a={[240, y]} b={[240, 140]} label="Rθsa" value="à choisir" />
+      {[
+        [60, 'Tj'],
+        [150, 'Tc'],
+        [240, 'Ts'],
+      ].map(([x, t]) => (
+        <g key={t}>
+          <Dot at={[x, y]} />
+          <Label x={x} y={y - 12} weight="bold" size={11}>
+            {t}
+          </Label>
+        </g>
+      ))}
+      <Ground at={[240, 140]} />
+      <Label x={256} y={162} anchor="start" size={11}>
+        Ta = {Number.isFinite(v.ta) ? v.ta : '?'} °C
+      </Label>
+    </Schematic>
+  )
+}
+
+/** Coupe d'une piste de circuit imprimé (épaisseur exagérée). */
+export function PisteSchema({ values: v }) {
+  const internal = v.layer === 'int'
+  const um = { 0.5: 17.5, 1: 35, 2: 70 }[v.oz] ?? 35
+  const cy = internal ? 108 : 78
+  return (
+    <Schematic width={280} height={170} label={`Coupe d’une piste en couche ${internal ? 'interne' : 'externe'}`}>
+      <rect x="20" y="88" width="240" height={internal ? 60 : 44} className="fill-emerald-700/25 stroke-emerald-800/50 dark:fill-emerald-400/15" strokeWidth="1" />
+      <Label x={30} y={internal ? 142 : 126} anchor="start" muted size={10}>
+        époxy FR-4
+      </Label>
+      <rect x="100" y={cy - 4} width="80" height={internal ? 12 : 10} className="fill-amber-500 stroke-amber-700" strokeWidth="1" />
+      <Wire points={[[100, 50], [180, 50]]} />
+      <path d="M108 45 L100 50 L108 55 M172 45 L180 50 L172 55" />
+      <Wire points={[[100, 56], [100, cy - 6]]} dashed />
+      <Wire points={[[180, 56], [180, cy - 6]]} dashed />
+      <Label x={140} y={40} weight="bold">
+        largeur w
+      </Label>
+      <Label x={190} y={cy + 6} anchor="start" size={11}>
+        t = {um} µm
+      </Label>
+      <Label x={140} y={164} muted size={10}>
+        {Number.isFinite(v.i) ? `I = ${q(v.i, 'A')}` : ''}
+        {Number.isFinite(v.dt) ? `, échauffement ${v.dt} °C` : ''}
+      </Label>
     </Schematic>
   )
 }

@@ -5,6 +5,11 @@ import { solveOhm } from './ohm/ohm'
 import { findR2, solveDivider } from './divider/divider'
 import { solveLed } from './led/led'
 import { astable, designAstable, monostable } from './timer555/timer555'
+import { traceWidth } from './calc/largeur-piste'
+import { requiredSinkResistance } from './calc/dissipateur'
+import { peakVoltage, rippleC } from './calc/condensateur-filtrage'
+import { dbmToWatts, powerRatioToDb, voltageRatioToDb } from './calc/decibels'
+import { attenuator, lm317R2, lm317Vout } from './formulas'
 
 describe('préfixes SI', () => {
   test('lecture', () => {
@@ -110,5 +115,37 @@ describe('temporisateur 555', () => {
     expect(back.frequency).toBeCloseTo(1000, 6)
     expect(back.duty).toBeCloseTo(0.6, 9)
     expect(designAstable({ frequency: 1000, duty: 0.4, c: 10e-9 })).toBeNull()
+  })
+})
+
+describe('calculateurs ajoutés (références)', () => {
+  test('largeur de piste IPC-2221 : 1 A, 10 °C, 1 oz en externe ≈ 0,30 mm', () => {
+    expect(traceWidth(1, 10, 1, false)).toBeCloseTo(0.3, 2)
+    // Une couche interne demande environ 2,6 fois plus de largeur
+    expect(traceWidth(1, 10, 1, true) / traceWidth(1, 10, 1, false)).toBeCloseTo(2.6, 1)
+  })
+  test('dissipateur : 5 W, 40 → 110 °C, Rθjc 1,5 et Rθcs 0,5 → 12 °C/W', () => {
+    expect(requiredSinkResistance({ p: 5, ta: 40, tj: 110, rjc: 1.5, rcs: 0.5 })).toBeCloseTo(12, 6)
+  })
+  test('LM317 : 240 Ω et 720 Ω donnent 5,04 V ; 5 V demande 713 Ω', () => {
+    expect(lm317Vout(240, 720)).toBeCloseTo(5.036, 3)
+    expect(lm317R2(5, 240)).toBeCloseTo(713.2, 1)
+  })
+  test('filtrage : 12 V eff. en pont, 0,5 A, 1 V d’ondulation → 15,57 V crête et 5 000 µF', () => {
+    expect(peakVoltage(12, 0.7, 2)).toBeCloseTo(15.57, 2)
+    expect(rippleC(0.5, 100, 1)).toBeCloseTo(5e-3, 9)
+  })
+  test('décibels', () => {
+    expect(powerRatioToDb(2)).toBeCloseTo(3.0103, 4)
+    expect(voltageRatioToDb(2)).toBeCloseTo(6.0206, 4)
+    expect(dbmToWatts(30)).toBeCloseTo(1, 9)
+  })
+  test('atténuateur 50 Ω, 10 dB : T 25,97 / 35,14 Ω ; π 96,25 / 71,15 Ω', () => {
+    const t = attenuator(50, 10, 't')
+    expect(t.series).toBeCloseTo(25.97, 2)
+    expect(t.shunt).toBeCloseTo(35.14, 2)
+    const pi = attenuator(50, 10, 'pi')
+    expect(pi.shunt).toBeCloseTo(96.25, 2)
+    expect(pi.series).toBeCloseTo(71.15, 2)
   })
 })
